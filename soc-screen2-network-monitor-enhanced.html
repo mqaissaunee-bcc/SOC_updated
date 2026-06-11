@@ -1369,6 +1369,84 @@
         })();
         function simRandom() { return SimRandom.next(); }
 
+        /* ============ Shared simulation bus (punch list item 15) ============
+           Scenario events flow between the four dashboards over BroadcastChannel
+           (requires hosting: GitHub Pages, localhost, etc.). Inside the multi-
+           screen viewer, a parent postMessage relay covers file:// usage too.
+           Event ids dedupe double delivery when both transports work. */
+        var SocBus = (function () {
+            'use strict';
+            var seen = {};
+            var handlers = [];
+            var bc = null;
+            try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
+            function deliver(evt) {
+                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                seen[evt.id] = true;
+                handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
+            }
+            if (bc) { bc.onmessage = function (ev) { deliver(ev.data); }; }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.type === 'soc-bus' && d.evt) deliver(d.evt);
+            });
+            return {
+                publish: function (evt) {
+                    evt.type = 'scenario-event';
+                    evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
+                    evt.ts = evt.ts || Date.now();
+                    seen[evt.id] = true;
+                    if (bc) { try { bc.postMessage(evt); } catch (e) {} }
+                    if (window.parent && window.parent !== window) {
+                        try { window.parent.postMessage({ type: 'soc-bus', evt: evt }, '*'); } catch (e) {}
+                    }
+                },
+                subscribe: function (h) { handlers.push(h); }
+            };
+        })();
+
+        /* --- Correlated traffic from scenario events (item 15) --- */
+        function scenarioAttackPoint(evt) {
+            var container = document.getElementById('map-container');
+            if (!container) return;
+            var source = countries.filter(function (c) { return c.code === evt.country; })[0]
+                || countries[Math.floor(simRandom() * countries.length)];
+            var sev = (evt.severity === 'critical' || evt.severity === 'high') ? evt.severity : 'high';
+            var point = document.createElement('div');
+            point.className = 'attack-point ' + sev;
+            point.style.left = ((source.x / 1000) * 100) + '%';
+            point.style.top = ((source.y / 500) * 100) + '%';
+            point.title = sev.toUpperCase() + ' - ' + (evt.title || 'Attack') + ' from ' + source.name + ' [' + (evt.incidentId || 'scenario') + ']';
+            container.appendChild(point);
+            setTimeout(function () { point.remove(); }, 3500);
+        }
+        function scenarioFirewallLog(evt) {
+            var list = document.getElementById('log-list');
+            if (!list) return;
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = '<span class="log-time">' + new Date().toLocaleTimeString() + '</span>' +
+                '<span class="log-action block">BLOCK</span>' +
+                '<span>' + (evt.sourceIp || 'unknown') + '</span>' +
+                '<span>10.0.' + Math.floor(simRandom() * 10) + '.' + Math.floor(simRandom() * 255) + '</span>' +
+                '<span>443</span>' +
+                '<span class="log-protocol">TCP</span>' +
+                '<span>' + (evt.title || 'Scenario rule') + '</span>';
+            var header = list.querySelector('.log-entry');
+            if (header) header.after(entry);
+            var entries = list.querySelectorAll('.log-entry');
+            if (entries.length > 30) entries[entries.length - 1].remove();
+        }
+        SocBus.subscribe(function (evt) {
+            [500, 4000, 9000].forEach(function (delay) {
+                setTimeout(function () { scenarioAttackPoint(evt); }, delay);
+            });
+            [1500, 7000].forEach(function (delay) {
+                setTimeout(function () { scenarioFirewallLog(evt); }, delay);
+            });
+        });
+
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates

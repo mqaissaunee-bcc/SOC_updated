@@ -1061,6 +1061,19 @@
         });
         updateClock();
 
+
+        // SocBus relay (item 15): forward scenario events between child
+        // dashboards so the shared simulation works even on file://
+        window.addEventListener('message', function (ev) {
+            var d = ev.data;
+            if (!d || d.type !== 'soc-bus') return;
+            document.querySelectorAll('.screen-panel iframe').forEach(function (f) {
+                if (f.contentWindow && f.contentWindow !== ev.source && f.getAttribute('src')) {
+                    try { f.contentWindow.postMessage(d, '*'); } catch (e) {}
+                }
+            });
+        });
+
         // Initialize: bind load listeners first so the initial lazy-load is caught
         document.querySelectorAll('iframe[data-loader]').forEach(function (f) {
             f.addEventListener('load', function () {

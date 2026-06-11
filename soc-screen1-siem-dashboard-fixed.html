@@ -996,6 +996,76 @@
         })();
         function simRandom() { return SimRandom.next(); }
 
+        /* ============ Shared simulation bus (punch list item 15) ============
+           Scenario events flow between the four dashboards over BroadcastChannel
+           (requires hosting: GitHub Pages, localhost, etc.). Inside the multi-
+           screen viewer, a parent postMessage relay covers file:// usage too.
+           Event ids dedupe double delivery when both transports work. */
+        var SocBus = (function () {
+            'use strict';
+            var seen = {};
+            var handlers = [];
+            var bc = null;
+            try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
+            function deliver(evt) {
+                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                seen[evt.id] = true;
+                handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
+            }
+            if (bc) { bc.onmessage = function (ev) { deliver(ev.data); }; }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.type === 'soc-bus' && d.evt) deliver(d.evt);
+            });
+            return {
+                publish: function (evt) {
+                    evt.type = 'scenario-event';
+                    evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
+                    evt.ts = evt.ts || Date.now();
+                    seen[evt.id] = true;
+                    if (bc) { try { bc.postMessage(evt); } catch (e) {} }
+                    if (window.parent && window.parent !== window) {
+                        try { window.parent.postMessage({ type: 'soc-bus', evt: evt }, '*'); } catch (e) {}
+                    }
+                },
+                subscribe: function (h) { handlers.push(h); }
+            };
+        })();
+
+        /* --- Correlated alerts from scenario events (item 15) --- */
+        var scenarioCategoryMap = { 'Malware': 'Endpoint', 'Data Breach': 'Exfiltration', 'Insider': 'Exfiltration' };
+        function pushScenarioAlert(evt, n) {
+            var wantCat = scenarioCategoryMap[evt.kind] || evt.kind;
+            var candidates = alertTypes.filter(function (a) { return a.category === wantCat; });
+            var pick = candidates.length ? candidates[Math.floor(simRandom() * candidates.length)] : alertTypes[Math.floor(simRandom() * alertTypes.length)];
+            var alert = {
+                id: alertId++,
+                type: n === 0 ? (evt.title || pick.type) : pick.type,
+                category: evt.kind || pick.category,
+                severity: n === 0 ? (evt.severity || 'high') : (n === 1 ? 'high' : 'medium'),
+                source: 'Correlation: ' + (evt.incidentId || 'scenario'),
+                sourceIP: evt.sourceIp || randomIP('external'),
+                destIP: randomIP('internal'),
+                user: users[Math.floor(simRandom() * users.length)],
+                timestamp: new Date(),
+                tactics: pick.tactics || ['TA0001'],
+                status: 'new'
+            };
+            alerts.unshift(alert);
+            counts[alert.severity]++;
+            counts.total++;
+            if (alerts.length > 100) alerts.pop();
+            renderAlerts();
+            updateCounts();
+            updateTimeline(alert);
+        }
+        SocBus.subscribe(function (evt) {
+            [2000, 12000, 26000].forEach(function (delay, n) {
+                setTimeout(function () { pushScenarioAlert(evt, n); }, delay);
+            });
+        });
+
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1245,6 +1315,18 @@
             { type: 'Container Escape', category: 'Cloud', tactics: ['TA0004'] },
             { type: 'Kubernetes Abuse', category: 'Cloud', tactics: ['TA0002'] },
             { type: 'Serverless Injection', category: 'Cloud', tactics: ['TA0002'] },
+            { type: 'AiTM Phishing Session Detected', category: 'Authentication', tactics: ['TA0006', 'TA0001'] },
+            { type: 'MFA Fatigue Attack', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Session Token Replay', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'OAuth Consent Grant Abuse', category: 'Cloud', tactics: ['TA0001', 'TA0003'] },
+            { type: 'Entra ID Risky Sign-In', category: 'Authentication', tactics: ['TA0001'] },
+            { type: 'Impossible Travel Login', category: 'Authentication', tactics: ['TA0001'] },
+            { type: 'GuardDuty Crypto Mining Finding', category: 'Cloud', tactics: ['TA0040'] },
+            { type: 'CI/CD Pipeline Token Abuse', category: 'Cloud', tactics: ['TA0006', 'TA0001'] },
+            { type: 'Malicious Inbox Rule Created', category: 'Email', tactics: ['TA0003', 'TA0009'] },
+            { type: 'AI-Generated Phishing Detected', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Deepfake Vishing Reported', category: 'Email', tactics: ['TA0001'] },
+            { type: 'LLM Prompt Injection Attempt', category: 'Web', tactics: ['TA0001'] },
             { type: 'Cloud Storage Enumeration', category: 'Cloud', tactics: ['TA0007'] }
         ];
         

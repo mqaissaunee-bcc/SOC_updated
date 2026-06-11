@@ -393,16 +393,64 @@
         .skip-link:focus {
             left: 0;
         }
+    
+        /* What's New */
+        .whats-new-row { text-align: center; margin: 16px 0 4px; }
+        .whats-new-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(46, 213, 115, 0.12);
+            border: 1px solid rgba(46, 213, 115, 0.45);
+            color: #2ed573; border-radius: 20px;
+            padding: 9px 20px; min-height: 44px;
+            font-family: inherit; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; letter-spacing: 0.3px;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .whats-new-pill:hover {
+            background: rgba(46, 213, 115, 0.2);
+            box-shadow: 0 4px 16px rgba(46, 213, 115, 0.25);
+        }
+        .whats-new-panel {
+            background: rgba(46, 213, 115, 0.05);
+            border: 1px solid rgba(46, 213, 115, 0.25);
+            border-radius: 12px; padding: 22px 28px; margin-bottom: 26px;
+        }
+        .whats-new-panel h2 { color: #2ed573; font-size: 1.05rem; margin-bottom: 14px; }
+        .whats-new-panel ul { list-style: none; }
+        .whats-new-panel li {
+            color: #b8c4d0; font-size: 0.9rem; line-height: 1.55;
+            padding: 6px 0 6px 4px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .whats-new-panel li:last-child { border-bottom: none; }
+        .whats-new-panel li strong { color: #e0e0e0; }
     </style>
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <div class="container" id="main" role="main">
         <div class="draft-banner">&#x26A0; Draft &mdash; Work in Progress &#x26A0;</div>
+        <div class="whats-new-row">
+            <button class="whats-new-pill" data-action="toggleWhatsNew()" aria-expanded="false" aria-controls="whatsNewPanel">&#10024; What's New &middot; June 2026</button>
+        </div>
+        <div class="whats-new-panel" id="whatsNewPanel" hidden>
+            <h2>Recent updates</h2>
+            <ul>
+                <li>&#127919; <strong>New: Instructor Inject Console</strong> &mdash; launch live, multi-step attack scenarios across every open dashboard (passphrase-protected)</li>
+                <li>&#128279; <strong>Shared simulation</strong> &mdash; incidents on Screen 3 now produce correlated alerts, map traffic, firewall logs, and threat intel on Screens 1, 2 &amp; 4, so cross-screen pivoting works for real</li>
+                <li>&#9729;&#65039; <strong>6 new exercises (38 total)</strong> &mdash; Cloud &amp; Identity (S3 exposure, AiTM token theft, CI/CD compromise, Kubernetes hunt) and AI-Era threats (deepfake vishing, auditing AI-assisted triage)</li>
+                <li>&#127922; <strong>Seeded runs</strong> &mdash; add <code>?seed=YOURCODE</code> to the viewer or any screen and the whole class sees the identical simulation</li>
+                <li>&#128274; <strong>Instructor edition encrypted</strong> &mdash; answer keys, rubric notes, and teaching tips are now behind a passphrase instead of one click away</li>
+                <li>&#128295; <strong>Single-source exercises</strong> &mdash; both editions are generated from one source file by a validating build script</li>
+                <li>&#128190; <strong>Progress saving</strong> &mdash; the lesson and exercises remember where you left off; the lesson now issues a completion code to submit in Canvas</li>
+                <li>&#9855;&#65039; <strong>Accessibility &amp; LMS compliance</strong> &mdash; full keyboard support, screen-reader labels, reduced-motion support, and CSP-safe code on every page</li>
+                <li>&#9889; <strong>Performance</strong> &mdash; dashboards pause when their tab or panel is hidden; the multi-screen viewer loads screens on demand</li>
+                <li>&#129529; <strong>Housekeeping</strong> &mdash; defanged IOCs throughout the exercises, incident dates that stay current automatically, a clock that actually shows UTC, and print-friendly lesson/exercise pages</li>
+            </ul>
+        </div>
         <header class="header">
             <h1>&#x1F6E1;&#xFE0F; Simulated SOC</h1>
             <p class="description">A simulated Security Operations Center (SOC) with hands-on exercises designed for multidisciplinary use across cybersecurity, computer science, data science, business &amp; risk management, criminal justice, psychology, healthcare, engineering, and social science.</p>
-            <div class="version-info">Version 0.3.0 &middot; April 2026</div>
+            <div class="version-info">Version 0.4.0 &middot; June 2026</div>
         </header>
 
         <h2 class="section-title">SOC Screens</h2>
@@ -444,13 +492,16 @@
 
             <div class="training-section">
                 <h2 class="section-title">Training &amp; Exercises</h2>
-                <p style="color: #a0a0a0; margin-bottom: 10px;">32 hands-on exercises across Tier 1 triage, Tier 2 response, Tier 3 hunting, and a Multidisciplinary section integrating 8 additional programs.</p>
+                <p style="color: #a0a0a0; margin-bottom: 10px;">38 hands-on exercises across Tier 1 triage, Tier 2 response, Tier 3 hunting, a Multidisciplinary section integrating 8 additional programs, plus new Cloud &amp; Identity and AI-Era threat sections.</p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="soc-training-exercises-student.html" target="_blank" class="action-link" style="flex: 1; min-width: 200px;">
                         <span>&#x1F393;</span> Student Edition
                     </a>
                     <a href="soc-training-exercises-instructor.html" target="_blank" class="action-link" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);">
                         <span>&#x1F4DA;</span> Instructor Edition
+                    </a>
+                    <a href="instructor-console.html" target="_blank" class="action-link" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #f472b6 0%, #be185d 100%);">
+                        <span>&#127919;</span> Inject Console
                     </a>
                 </div>
             </div>
@@ -591,6 +642,14 @@
     </div>
 
     <script>
+        function toggleWhatsNew() {
+            const panel = document.getElementById('whatsNewPanel');
+            const pill = document.querySelector('.whats-new-pill');
+            const show = panel.hasAttribute('hidden');
+            if (show) { panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
+            if (pill) pill.setAttribute('aria-expanded', show ? 'true' : 'false');
+        }
+
         function toggleInfoPanel() {
             var overlay = document.getElementById('diOverlay');
             if (overlay.classList.contains('visible')) {

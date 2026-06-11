@@ -997,6 +997,66 @@
         })();
         function simRandom() { return SimRandom.next(); }
 
+        /* ============ Shared simulation bus (punch list item 15) ============
+           Scenario events flow between the four dashboards over BroadcastChannel
+           (requires hosting: GitHub Pages, localhost, etc.). Inside the multi-
+           screen viewer, a parent postMessage relay covers file:// usage too.
+           Event ids dedupe double delivery when both transports work. */
+        var SocBus = (function () {
+            'use strict';
+            var seen = {};
+            var handlers = [];
+            var bc = null;
+            try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
+            function deliver(evt) {
+                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                seen[evt.id] = true;
+                handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
+            }
+            if (bc) { bc.onmessage = function (ev) { deliver(ev.data); }; }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.type === 'soc-bus' && d.evt) deliver(d.evt);
+            });
+            return {
+                publish: function (evt) {
+                    evt.type = 'scenario-event';
+                    evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
+                    evt.ts = evt.ts || Date.now();
+                    seen[evt.id] = true;
+                    if (bc) { try { bc.postMessage(evt); } catch (e) {} }
+                    if (window.parent && window.parent !== window) {
+                        try { window.parent.postMessage({ type: 'soc-bus', evt: evt }, '*'); } catch (e) {}
+                    }
+                },
+                subscribe: function (h) { handlers.push(h); }
+            };
+        })();
+
+        /* --- Correlated intel from scenario events (item 15) --- */
+        SocBus.subscribe(function (evt) {
+            setTimeout(function () {
+                if (evt.sourceIp) {
+                    iocs.unshift({ type: 'ip', value: evt.sourceIp, confidence: 'high', source: 'Internal IR' });
+                    if (iocs.length > 50) iocs.pop();
+                    renderIOCs();
+                }
+            }, 3000);
+            setTimeout(function () {
+                edrAlerts.unshift({
+                    type: evt.title || 'Scenario activity',
+                    category: evt.kind || 'Correlation',
+                    detail: 'Correlated with ' + (evt.incidentId || 'active scenario') + (evt.host ? ' on ' + evt.host : ''),
+                    endpoint: evt.host || 'WKS-001',
+                    user: 'SYSTEM',
+                    time: new Date()
+                });
+                if (edrAlerts.length > 20) edrAlerts.pop();
+                renderEDRAlerts();
+            }, 6000);
+        });
+
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1057,6 +1117,14 @@
             { title: 'Sandworm Destructive Campaign', tags: ['APT', 'Russia', 'Wiper'], severity: 'critical' },
             { title: 'Kimsuky Spearphishing Wave', tags: ['APT', 'North Korea', 'Phishing'], severity: 'critical' },
             { title: 'APT10 Cloud Targeting', tags: ['APT', 'China', 'Cloud'], severity: 'critical' },
+            { title: 'AiTM Phishing Kit Campaign', tags: ['Identity', 'MFA Bypass', 'Phishing'], severity: 'high' },
+            { title: 'Infostealer Logs Marketed', tags: ['Credential', 'Marketplace', 'Stealer'], severity: 'high' },
+            { title: 'OAuth Consent Abuse Wave', tags: ['Identity', 'Cloud', 'SaaS'], severity: 'high' },
+            { title: 'Stolen Session Tokens Traded', tags: ['Identity', 'Token Theft'], severity: 'high' },
+            { title: 'Exposed S3 Buckets Scraped at Scale', tags: ['Cloud', 'Data Exposure'], severity: 'high' },
+            { title: 'AI-Generated Spearphishing Surge', tags: ['AI', 'Phishing', 'BEC'], severity: 'high' },
+            { title: 'Deepfake Vishing Targets Finance Teams', tags: ['AI', 'Social Engineering', 'Fraud'], severity: 'critical' },
+            { title: 'Helpdesk Social Engineering Campaign', tags: ['Identity', 'Social Engineering'], severity: 'critical' },
             { title: 'Charming Kitten Operation', tags: ['APT', 'Iran', 'Credential'], severity: 'critical' },
             // Ransomware
             { title: 'New Ransomware Variant', tags: ['Ransomware', 'LockBit', 'Encryption'], severity: 'critical' },

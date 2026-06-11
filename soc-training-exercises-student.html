@@ -114,6 +114,14 @@
         .tier-multi .tier-header h2 { color: #a855f7; }
         .tier-multi .exercise-number { background: #a855f7; color: #fff; }
 
+        .tier-cloud .tier-header { border-left-color: #38bdf8; }
+        .tier-cloud .tier-header h2 { color: #38bdf8; }
+        .tier-cloud .exercise-number { background: #38bdf8; color: #06283d; }
+
+        .tier-ai .tier-header { border-left-color: #f472b6; }
+        .tier-ai .tier-header h2 { color: #f472b6; }
+        .tier-ai .exercise-number { background: #f472b6; color: #4a0d28; }
+
         /* Discipline sub-sections within the multidisciplinary tier */
         .discipline-group {
             margin-bottom: 30px;
@@ -538,7 +546,7 @@
             <p style="margin: 4px 0 0 0; color: #a0a0a0; font-size: 0.9em;">This version contains the full exercises with rubrics. Answer keys are maintained separately by your instructor.</p>
         </div>
             <h2>&#128203; Training Overview</h2>
-            <p>These exercises provide hands-on experience with Security Operations Center (SOC) workflows using the four-screen simulation environment. They are organized into four sections: the three classic analyst tiers (Tier 1 Alert Triage &rarr; Tier 2 Incident Response &rarr; Tier 3 Threat Hunting), plus a Multidisciplinary section that applies the same SOC dashboards through the lenses of eight other fields &mdash; computer science, data science, business and risk management, criminal justice, psychology, healthcare, engineering, and social science.</p>
+            <p>These exercises provide hands-on experience with Security Operations Center (SOC) workflows using the four-screen simulation environment. They are organized into six sections: the three classic analyst tiers (Tier 1 Alert Triage &rarr; Tier 2 Incident Response &rarr; Tier 3 Threat Hunting), a Multidisciplinary section that applies the same SOC dashboards through the lenses of eight other fields &mdash; computer science, data science, business and risk management, criminal justice, psychology, healthcare, engineering, and social science &mdash; plus two modern-operations sections: Cloud &amp; Identity attacks and AI-era threats.</p>
 
             <div class="screen-reference">
                 <div class="screen-card">
@@ -2456,6 +2464,332 @@
             </div>
         </div>
         <!-- END MULTIDISCIPLINARY EXERCISES -->
+
+        <!-- CLOUD & IDENTITY EXERCISES -->
+        <div class="tier-section tier-cloud">
+            <div class="tier-header">
+                <h2>&#9729;&#65039; Cloud &amp; Identity Exercises: Modern Attack Surfaces</h2>
+                <p>Focus: Cloud audit-log analysis, identity attack chains, token theft, CI/CD and container security</p>
+            </div>
+
+                <div class="exercise" id="ex33">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex33')">
+                        <span class="exercise-number">33</span>
+                        <span class="exercise-title">Public S3 Bucket Exposure Triage</span>
+                        <span class="difficulty beginner">Beginner</span>
+                        <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Read CloudTrail events to reconstruct who changed what, when</li>
+                            <li>Assess data-exposure scope and duration from cloud audit logs</li>
+                            <li>Apply the shared-responsibility model to a misconfiguration incident</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Your CSPM tool fires "S3 Bucket Exposed" (visible as a Cloud-category alert on Screen 1): the bucket <code>acme-claims-archive</code> was changed from private to public-read. CloudTrail shows a <code>PutBucketAcl</code> call at 02:17 UTC by the IAM user <code>ci-deploy</code> from IP 198.51.100[.]23 &#8212; an address never previously seen for that principal. The bucket holds 14,000 insurance claim PDFs. Access logs show 312 anonymous GET requests between 02:17 and 06:40 UTC from three external IPs.</p>
+                            <div class="alert-data">
+                                <p><span class="label">CloudTrail event:</span> <span class="value">PutBucketAcl &#8594; public-read, principal ci-deploy, 02:17 UTC</span></p>
+                                <p><span class="label">Source IP:</span> <span class="value">198.51.100[.]23 (first ever use by this principal)</span></p>
+                                <p><span class="label">Bucket contents:</span> <span class="value">14,000 claim PDFs (names, addresses, policy numbers &#8212; likely PII/PHI)</span></p>
+                                <p><span class="label">Anonymous access:</span> <span class="value">312 GET requests from 3 external IPs, 02:17&#8211;06:40 UTC</span></p>
+                                <p><span class="label">ci-deploy normal use:</span> <span class="value">GitHub Actions pipeline, runs 14:00&#8211;18:00 UTC weekdays from a fixed runner IP</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Was this a misconfiguration or a compromise? List the evidence for each interpretation and state which you'd treat as the working hypothesis</li>
+                            <li>Write the immediate containment sequence in order (bucket ACL, credentials, sessions) and justify the order</li>
+                            <li>Define the exposure window and what an attacker could have obtained; which 312 objects matter most for notification analysis?</li>
+                            <li>Using the shared-responsibility model, identify what AWS was responsible for here and what the customer was responsible for</li>
+                            <li>Recommend two preventive controls that would have stopped this (e.g., SCP, Block Public Access, anomaly detection on the principal)</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Compromise-vs-misconfig analysis with evidence</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Correct containment sequence with justification</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Exposure window and notification reasoning</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Shared-responsibility and preventive controls</span><span class="points">20 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex34">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex34')">
+                        <span class="exercise-number">34</span>
+                        <span class="exercise-title">Identity Attack Chain: AiTM Phishing to Inbox Rule</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Reconstruct a modern token-theft attack chain from identity telemetry</li>
+                            <li>Explain why MFA was satisfied yet the account is compromised</li>
+                            <li>Choose the correct remediation for session-token theft (and why password reset alone fails)</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Entra ID flags a risky sign-in for <code>m.alvarez</code> (Finance): successful login from 102.129.145[.]88 (hosting provider ASN) 40 minutes after a login from her usual home IP &#8212; impossible travel. The sign-in shows <em>MFA satisfied</em> via token claim, not a fresh challenge. Twenty minutes later, audit logs show a new inbox rule: messages containing "invoice", "payment", or "wire" are forwarded to an external address and moved to RSS Feeds. Earlier that morning, the email gateway logged her click on a link to <code>login.micr0soft-sso[.]net</code>.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Risky sign-in:</span> <span class="value">102.129.145[.]88, impossible travel, MFA claim satisfied (no new challenge)</span></p>
+                                <p><span class="label">Phish click (T-1h):</span> <span class="value">hxxps://login.micr0soft-sso[.]net &#8212; reverse-proxy page, valid TLS</span></p>
+                                <p><span class="label">Inbox rule created:</span> <span class="value">forward "invoice|payment|wire" &#8594; external mailbox, hide in RSS Feeds</span></p>
+                                <p><span class="label">Sign-in logs note:</span> <span class="value">session token reused; original token issued to victim's home IP at 08:02</span></p>
+                                <p><span class="label">User report:</span> <span class="value">"I logged in normally this morning, the page looked exactly right"</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Reconstruct the chain in order from the four log sources; name the technique that lets MFA show as satisfied without a challenge</li>
+                            <li>Explain to a non-technical manager why the user did MFA "correctly" and was still compromised</li>
+                            <li>Order the remediation steps: password reset, token/session revocation, inbox-rule deletion, conditional access changes &#8212; and identify which single step actually evicts the attacker</li>
+                            <li>What is the inbox rule for? Describe the fraud this sets up and who the next victim is</li>
+                            <li>Propose two detections that catch this chain earlier than the inbox rule</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct chain reconstruction with technique named</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Token-theft remediation order (revocation first)</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>BEC fraud analysis</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Quality of proposed earlier detections</span><span class="points">20 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex35">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex35')">
+                        <span class="exercise-number">35</span>
+                        <span class="exercise-title">CI/CD Token Compromise & Cloud Blast Radius</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Trace a leaked pipeline credential to its full cloud blast radius</li>
+                            <li>Sequence secret rotation in a dependency-aware order</li>
+                            <li>Recommend pipeline hardening that survives the next leak</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 2: Network Monitor</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>GuardDuty fires <code>CryptoCurrency:EC2/BitcoinTool.B!DNS</code> on two new c5.24xlarge instances in us-east-2 &#8212; a region your org doesn't use. CloudTrail attributes the RunInstances calls to the access key used by your GitHub Actions deploy pipeline. Investigation finds that three days ago, a developer's debug commit set <code>ACTIONS_STEP_DEBUG=true</code>, and a build log &#8212; readable by anyone in the org &#8212; printed the AWS access key. The same key has ListBuckets and GetObject on production buckets and PutImage on your container registry (ECR).</p>
+                            <div class="alert-data">
+                                <p><span class="label">GuardDuty finding:</span> <span class="value">crypto-mining DNS on 2x c5.24xlarge, us-east-2 (unused region)</span></p>
+                                <p><span class="label">Attribution:</span> <span class="value">RunInstances by the GitHub Actions deploy key</span></p>
+                                <p><span class="label">Leak vector:</span> <span class="value">debug build log printed the access key 3 days ago; org-readable</span></p>
+                                <p><span class="label">Key permissions:</span> <span class="value">EC2 RunInstances, S3 List/GetObject on prod buckets, ECR PutImage</span></p>
+                                <p><span class="label">Unknowns:</span> <span class="value">whether prod data was read; whether any container image was modified</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Map the blast radius: for each permission the key holds, state what the attacker could have done and what log source proves or disproves it</li>
+                            <li>The mining instances are the visible damage. Rank the three permission classes (EC2, S3 read, ECR push) by potential impact and argue the ranking</li>
+                            <li>Write the rotation/containment sequence: key deactivation, instance termination, ECR image verification, pipeline re-issuance &#8212; with the reason for each position</li>
+                            <li>ECR PutImage is the scary one: describe the supply-chain attack it enables and how you'd verify it didn't happen</li>
+                            <li>Propose three pipeline hardening changes (think: OIDC federation, least privilege, secret masking, short-lived credentials)</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Complete blast-radius mapping with log sources</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Defensible impact ranking</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Correct containment/rotation sequence</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Supply-chain verification + hardening quality</span><span class="points">25 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex36">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex36')">
+                        <span class="exercise-number">36</span>
+                        <span class="exercise-title">Kubernetes Runtime Hunt: Container Escape Attempt</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Form and test a hunt hypothesis from container runtime alerts</li>
+                            <li>Distinguish container-level from node-level compromise and choose isolation accordingly</li>
+                            <li>Identify the Kubernetes attack path from initial pod access toward cluster control</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 2: Network Monitor</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Runtime security (Falco-style) raises three alerts within nine minutes on pod <code>payments-api-7d4f</code>, node <code>k8s-worker-03</code>: (1) <code>Terminal shell in container</code> &#8212; an interactive shell spawned in a pod that never runs one; (2) <code>Read sensitive file</code> &#8212; the process read <code>/var/run/secrets/kubernetes.io/serviceaccount/token</code>; (3) outbound connection from the pod to 45.142.212[.]61:3333, a known mining pool per Screen 4. The pod runs with a service account bound to a role permitting <code>pods/exec</code> and <code>secrets get</code> in its namespace. The container is NOT privileged; hostPath mounts: none.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Alert 1 (T+0):</span> <span class="value">interactive shell in payments-api pod (no shell in normal profile)</span></p>
+                                <p><span class="label">Alert 2 (T+4m):</span> <span class="value">read of mounted serviceaccount token</span></p>
+                                <p><span class="label">Alert 3 (T+9m):</span> <span class="value">pod &#8594; 45.142.212[.]61:3333 (mining pool, per intel)</span></p>
+                                <p><span class="label">Pod RBAC:</span> <span class="value">serviceaccount can pods/exec + secrets get in namespace</span></p>
+                                <p><span class="label">Container posture:</span> <span class="value">non-privileged, no hostPath, runtime default seccomp</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>State your hunt hypothesis: what happened before alert 1, and where do you look to confirm initial access (think: app vuln vs. stolen kubeconfig vs. exposed dashboard)</li>
+                            <li>The attacker read the serviceaccount token. Enumerate exactly what that token lets them do given the stated RBAC &#8212; and what it does NOT let them do</li>
+                            <li>Container vs node isolation: which do you do here, why, and what evidence would change your answer to node-level?</li>
+                            <li>Assess escape risk: given non-privileged, no hostPath, default seccomp, rate the likelihood the attacker reached the node and name two signals that would indicate they did</li>
+                            <li>Write the hunt queries (pseudocode) you'd run cluster-wide to find sibling compromises</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Hypothesis quality + initial-access verification plan</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Accurate token blast-radius (can vs cannot)</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Isolation decision with evidence triggers</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Escape assessment + hunt query coverage</span><span class="points">25 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+        </div>
+        <!-- END CLOUD & IDENTITY EXERCISES -->
+
+        <!-- AI-ERA EXERCISES -->
+        <div class="tier-section tier-ai">
+            <div class="tier-header">
+                <h2>&#129302; AI-Era Exercises: Machine-Speed Threats &amp; AI-Assisted Defense</h2>
+                <p>Focus: AI-enabled social engineering, deepfake fraud response, auditing AI-assisted triage</p>
+            </div>
+
+                <div class="exercise" id="ex37">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex37')">
+                        <span class="exercise-number">37</span>
+                        <span class="exercise-title">Deepfake Vishing &amp; AI-Generated Spearphish Triage</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Psychology / Criminal Justice</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Triage social-engineering attacks where traditional quality tells are absent</li>
+                            <li>Design verification protocols that survive AI-grade impersonation</li>
+                            <li>Preserve evidence from a voice-fraud attempt for law enforcement</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Two reports land within an hour. (1) An AP specialist says the CFO called her mobile &#8212; correct voice, correct mannerisms, referenced this week's board meeting &#8212; urgently requesting a $380K wire to a "new acquisition escrow," then a follow-up text from an unknown number. She did not send the wire but is shaken and "90% sure it was him." The CFO confirms he made no call. (2) The gateway flags a spearphish to three engineers, flawlessly written, referencing the real internal project name "Atlas-9" and a real coworker, asking them to review a design doc at <code>sharepoint-acmecorp[.]net</code>. No grammar tells; the project name appears in a public conference talk abstract.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Vishing target:</span> <span class="value">AP specialist with wire authority; caller ID spoofed to CFO's cell</span></p>
+                                <p><span class="label">Voice quality:</span> <span class="value">victim 90% confident; CFO has public podcast/earnings-call audio</span></p>
+                                <p><span class="label">Wire request:</span> <span class="value">$380K, urgency framing, secrecy framing ("board-sensitive")</span></p>
+                                <p><span class="label">Spearphish:</span> <span class="value">3 engineers, real project name from public talk, lookalike domain</span></p>
+                                <p><span class="label">Org policy gap:</span> <span class="value">wire verification = "call back the requester" (callback number from the request thread)</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>List which traditional phishing/vishing 'tells' are nullified by AI generation, and which signals SURVIVE (hint: out-of-band facts, channel, behavioral pressure)</li>
+                            <li>Psychology lens: identify the influence techniques in the vishing call (authority, urgency, secrecy) and explain why a correct-sounding voice multiplies their effect</li>
+                            <li>Rewrite the org's wire verification protocol so it works even when voice, email, and caller ID are all fake</li>
+                            <li>Criminal Justice lens: what evidence do you preserve from both attempts for an FBI IC3 report, and why does the victim's phone matter?</li>
+                            <li>Where did the attacker get the voice and the project name? What does that imply about what your org should consider 'public attack surface'?</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Nullified-vs-surviving signal analysis</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Influence-technique analysis (psychology lens)</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Verification protocol quality</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Evidence preservation + source analysis</span><span class="points">25 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex38">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex38')">
+                        <span class="exercise-number">38</span>
+                        <span class="exercise-title">Audit the AI Copilot's Triage</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Data Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 35 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Verify AI-assistant triage verdicts against primary evidence</li>
+                            <li>Recognize characteristic AI failure modes: hallucinated context, plausible-but-wrong reasoning</li>
+                            <li>Define when AI triage should be trusted, reviewed, or overridden</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Your SOC has piloted an AI triage copilot. Overnight it dispositioned five alerts. Review its verdicts: (A) "Brute force vs VPN &#8212; ESCALATE: 300+ failures then a success from same IP" &#8212; logs confirm. (B) "Mass file rename on FS-HR-03 &#8212; CLOSE as FP: this server runs nightly batch-rename jobs" &#8212; the asset inventory lists NO scheduled jobs on FS-HR-03. (C) "Impossible travel for jchen &#8212; CLOSE: jchen is on the approved-VPN-exception list" &#8212; the list exists, jchen is on it, and the second IP is a corporate VPN egress. (D) "PowerShell with base64 on WKS-DEV-05 &#8212; CLOSE as FP: developers run encoded commands routinely" &#8212; true in general for this host, but the decoded command in the log contains <code>Invoke-WebRequest</code> to 91.219.237[.]14 followed by <code>Start-Process</code>. (E) "New admin account 'svc_backup2' &#8212; ESCALATE: no change ticket found" &#8212; correct, no ticket exists.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Verdict A:</span> <span class="value">ESCALATE brute force &#8212; evidence cited matches logs</span></p>
+                                <p><span class="label">Verdict B:</span> <span class="value">CLOSE rename storm, cites 'nightly batch job' &#8212; not in asset inventory</span></p>
+                                <p><span class="label">Verdict C:</span> <span class="value">CLOSE impossible travel via exception list &#8212; list checks out</span></p>
+                                <p><span class="label">Verdict D:</span> <span class="value">CLOSE encoded PowerShell as 'developer normal' &#8212; decoded payload fetches+executes from external IP</span></p>
+                                <p><span class="label">Verdict E:</span> <span class="value">ESCALATE unauthorized admin account &#8212; correct</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Grade each verdict: correct, incorrect, or correct-conclusion-wrong-reasoning &#8212; and state the primary evidence that decides it</li>
+                            <li>Verdicts B and D fail differently. Name each failure mode precisely (fabricated context vs. base-rate reasoning overriding instance evidence)</li>
+                            <li>B closed a likely ransomware precursor. Write the incident note you'd file after re-opening it, including what the copilot's note said</li>
+                            <li>Design the review policy: which alert classes may the copilot auto-close, which require human review, and what verdict-evidence standard must every AI disposition meet?</li>
+                            <li>Data science lens: the team wants to measure the copilot before expanding it. Define the evaluation &#8212; metrics, ground truth source, and the asymmetric cost problem (a wrong CLOSE &#8801; a wrong ESCALATE)</li>
+                        </ul>
+
+                        
+
+                        <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct grading of all five verdicts</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Failure modes precisely distinguished</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Review policy with evidence standard</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Evaluation design handling asymmetric cost</span><span class="points">25 pts</span></div>
+                    </div>
+                    </div>
+                </div>
+
+        </div>
+        <!-- END AI-ERA EXERCISES -->
 
         <footer>
             <p>SOC Training Exercises v2.0 &mdash; Student Edition | Designed for use with the 4-Screen SOC Simulation</p>

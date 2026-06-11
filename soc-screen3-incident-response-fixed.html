@@ -1052,6 +1052,81 @@
         })();
         function simRandom() { return SimRandom.next(); }
 
+        /* ============ Shared simulation bus (punch list item 15) ============
+           Scenario events flow between the four dashboards over BroadcastChannel
+           (requires hosting: GitHub Pages, localhost, etc.). Inside the multi-
+           screen viewer, a parent postMessage relay covers file:// usage too.
+           Event ids dedupe double delivery when both transports work. */
+        var SocBus = (function () {
+            'use strict';
+            var seen = {};
+            var handlers = [];
+            var bc = null;
+            try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
+            function deliver(evt) {
+                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                seen[evt.id] = true;
+                handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
+            }
+            if (bc) { bc.onmessage = function (ev) { deliver(ev.data); }; }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.type === 'soc-bus' && d.evt) deliver(d.evt);
+            });
+            return {
+                publish: function (evt) {
+                    evt.type = 'scenario-event';
+                    evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
+                    evt.ts = evt.ts || Date.now();
+                    seen[evt.id] = true;
+                    if (bc) { try { bc.postMessage(evt); } catch (e) {} }
+                    if (window.parent && window.parent !== window) {
+                        try { window.parent.postMessage({ type: 'soc-bus', evt: evt }, '*'); } catch (e) {}
+                    }
+                },
+                subscribe: function (h) { handlers.push(h); }
+            };
+        })();
+
+        /* --- Scenario publishing & ingestion (item 15) --- */
+        function publishScenario(inc) {
+            var ipIoc = (inc.iocs || []).filter(function (i) { return i.type === 'ip'; })[0];
+            SocBus.publish({
+                origin: 'screen3',
+                incidentId: inc.id,
+                kind: inc.category,
+                title: inc.type,
+                severity: inc.severity,
+                host: (inc.assets && inc.assets[0] && inc.assets[0].name) || 'WKS-001',
+                sourceIp: ipIoc ? ipIoc.value : (Math.floor(simRandom() * 223) + 1) + '.' + Math.floor(simRandom() * 255) + '.' + Math.floor(simRandom() * 255) + '.' + Math.floor(simRandom() * 255),
+                country: ['RU', 'CN', 'KP', 'IR', 'BR', 'NL'][Math.floor(simRandom() * 6)]
+            });
+        }
+
+        function ingestExternalScenario(evt) {
+            var match = incidentTypes.filter(function (it) {
+                return it.type === evt.title || it.category === evt.kind;
+            })[0] || incidentTypes[Math.floor(simRandom() * incidentTypes.length)];
+            var inc = generateIncident();
+            inc.type = evt.title || match.type;
+            inc.category = evt.kind || match.category;
+            inc.severity = evt.severity || inc.severity;
+            inc.status = 'new';
+            if (evt.incidentId) inc.id = evt.incidentId;
+            if (evt.host && inc.assets && inc.assets[0]) inc.assets[0].name = evt.host;
+            if (evt.sourceIp && inc.iocs) inc.iocs.unshift({ type: 'ip', value: evt.sourceIp });
+            incidents.unshift(inc);
+            if (incidents.length > 12) incidents.pop();
+            renderIncidentList();
+            updateStats();
+        }
+
+        SocBus.subscribe(function (evt) {
+            if (evt.origin === 'screen3') return;
+            ingestExternalScenario(evt);
+        });
+
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1454,7 +1529,7 @@
             renderNotes();
             document.getElementById('case-id').textContent = 'INC-' + new Date().getFullYear() + '-0001';
             SimTimers.add(updateDateTime, 1000);
-            SimTimers.add(() => { incidents.unshift(generateIncident()); if (incidents.length > 12) incidents.pop(); renderIncidentList(); updateStats(); }, 30000);
+            SimTimers.add(() => { const inc = generateIncident(); incidents.unshift(inc); if (incidents.length > 12) incidents.pop(); renderIncidentList(); updateStats(); publishScenario(inc); }, 30000);
         }
         
         document.getElementById('note-input').addEventListener('keypress', e => { if (e.key === 'Enter') addNote(); });
