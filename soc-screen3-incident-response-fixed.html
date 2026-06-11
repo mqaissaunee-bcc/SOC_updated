@@ -1022,6 +1022,36 @@
     </main>
     
     <script>
+        /* ============ Seeded randomness (punch list item 13) ============
+           Pass ?seed=<anything> in the URL and every student sees the same
+           sequence of generated alerts, incidents, and IOCs (mulberry32 PRNG).
+           Without a seed, behaves like simRandom(). */
+        var SimRandom = (function () {
+            'use strict';
+            var seedParam = null;
+            try { seedParam = new URLSearchParams(window.location.search).get('seed'); } catch (e) {}
+            var seed;
+            if (seedParam !== null && seedParam !== '') {
+                seed = 0;
+                for (var i = 0; i < seedParam.length; i++) {
+                    seed = (Math.imul(seed, 31) + seedParam.charCodeAt(i)) >>> 0;
+                }
+            } else {
+                seed = (Date.now() & 0xffffffff) >>> 0;
+                seedParam = null;
+            }
+            var state = seed >>> 0;
+            function next() {
+                state = (state + 0x6D2B79F5) | 0;
+                var t = Math.imul(state ^ (state >>> 15), 1 | state);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            }
+            if (seedParam) { document.title += ' [seed: ' + seedParam + ']'; }
+            return { next: next, seed: seedParam };
+        })();
+        function simRandom() { return SimRandom.next(); }
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1235,10 +1265,10 @@
         };
         
         function generateIncident() {
-            const template = incidentTypes[Math.floor(Math.random() * incidentTypes.length)];
+            const template = incidentTypes[Math.floor(simRandom() * incidentTypes.length)];
             const statuses = ['new', 'investigating', 'contained'];
             const possibleSectors = sectorsByCategory[template.category] || ['Enterprise'];
-            const sector = possibleSectors[Math.floor(Math.random() * possibleSectors.length)];
+            const sector = possibleSectors[Math.floor(simRandom() * possibleSectors.length)];
             
             return {
                 id: `INC-${incidentIdCounter++}`,
@@ -1246,11 +1276,11 @@
                 severity: template.severity,
                 category: template.category,
                 sector: sector,
-                status: statuses[Math.floor(Math.random() * statuses.length)],
-                analyst: analysts[Math.floor(Math.random() * analysts.length)],
-                created: new Date(Date.now() - Math.random() * 86400000),
+                status: statuses[Math.floor(simRandom() * statuses.length)],
+                analyst: analysts[Math.floor(simRandom() * analysts.length)],
+                created: new Date(Date.now() - simRandom() * 86400000),
                 ttps: template.ttps,
-                playbook: template.playbook.map((step, i) => ({ text: step, completed: i < Math.floor(Math.random() * template.playbook.length) })),
+                playbook: template.playbook.map((step, i) => ({ text: step, completed: i < Math.floor(simRandom() * template.playbook.length) })),
                 iocs: generateIOCs(),
                 assets: generateAssets(),
                 timeline: generateTimeline(template.ttps)
@@ -1260,14 +1290,14 @@
         function generateIOCs() {
             const iocs = [];
             const types = ['ip', 'hash', 'domain', 'file'];
-            for (let i = 0; i < Math.floor(Math.random() * 3) + 2; i++) {
-                const type = types[Math.floor(Math.random() * types.length)];
+            for (let i = 0; i < Math.floor(simRandom() * 3) + 2; i++) {
+                const type = types[Math.floor(simRandom() * types.length)];
                 let value;
                 switch(type) {
-                    case 'ip': value = `${Math.floor(Math.random() * 223) + 1}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`; break;
-                    case 'hash': value = Array(32).fill(0).map(() => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join(''); break;
-                    case 'domain': value = maliciousDomains[Math.floor(Math.random() * maliciousDomains.length)]; break;
-                    case 'file': value = maliciousFiles[Math.floor(Math.random() * maliciousFiles.length)]; break;
+                    case 'ip': value = `${Math.floor(simRandom() * 223) + 1}.${Math.floor(simRandom() * 255)}.${Math.floor(simRandom() * 255)}.${Math.floor(simRandom() * 255)}`; break;
+                    case 'hash': value = Array(32).fill(0).map(() => '0123456789abcdef'[Math.floor(simRandom() * 16)]).join(''); break;
+                    case 'domain': value = maliciousDomains[Math.floor(simRandom() * maliciousDomains.length)]; break;
+                    case 'file': value = maliciousFiles[Math.floor(simRandom() * maliciousFiles.length)]; break;
                 }
                 iocs.push({ type, value });
             }
@@ -1276,11 +1306,11 @@
         
         function generateAssets() {
             const assets = [];
-            for (let i = 0; i < Math.floor(Math.random() * 2) + 1; i++) {
+            for (let i = 0; i < Math.floor(simRandom() * 2) + 1; i++) {
                 assets.push({
-                    name: assetNames[Math.floor(Math.random() * assetNames.length)],
-                    type: assetTypes[Math.floor(Math.random() * assetTypes.length)],
-                    status: ['compromised', 'at-risk', 'clean'][Math.floor(Math.random() * 3)]
+                    name: assetNames[Math.floor(simRandom() * assetNames.length)],
+                    type: assetTypes[Math.floor(simRandom() * assetTypes.length)],
+                    status: ['compromised', 'at-risk', 'clean'][Math.floor(simRandom() * 3)]
                 });
             }
             return assets;
@@ -1289,12 +1319,12 @@
         function generateTimeline(ttps) {
             const timeline = [];
             let time = Date.now() - 3600000;
-            const numEvents = Math.floor(Math.random() * 3) + 2;
-            const shuffled = [...timelineEvents].sort(() => Math.random() - 0.5);
+            const numEvents = Math.floor(simRandom() * 3) + 2;
+            const shuffled = [...timelineEvents].sort(() => simRandom() - 0.5);
             for (let i = 0; i < numEvents; i++) {
                 const event = shuffled[i];
                 timeline.push({ time: new Date(time), title: event.title, description: event.desc, ttp: ttps[i % ttps.length] });
-                time += Math.floor(Math.random() * 600000) + 300000;
+                time += Math.floor(simRandom() * 600000) + 300000;
             }
             return timeline;
         }
@@ -1406,7 +1436,7 @@
             document.getElementById('active-incidents').textContent = incidents.filter(i => i.status === 'new').length;
             document.getElementById('investigating').textContent = incidents.filter(i => i.status === 'investigating').length;
             document.getElementById('contained').textContent = incidents.filter(i => i.status === 'contained').length;
-            document.getElementById('resolved-today').textContent = Math.floor(Math.random() * 10) + 5;
+            document.getElementById('resolved-today').textContent = Math.floor(simRandom() * 10) + 5;
         }
         
         function updateDateTime() {

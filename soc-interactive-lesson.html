@@ -1290,6 +1290,27 @@
             opacity: 0.75;
             margin-top: 5px;
         }
+    
+        @media print {
+            *, *::before, *::after {
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
+                animation: none !important;
+            }
+            .skip-link, .lesson-nav, button, .sim-btn, .quiz-option-controls,
+            iframe, .video-card iframe, .hero-start-btn { display: none !important; }
+            #hero { display: none !important; }
+            .lesson-body { display: block !important; }
+            .section { display: block !important; page-break-before: always; }
+            .section:first-of-type { page-break-before: avoid; }
+            .quiz-option { display: block !important; border: 1px solid #999 !important; margin: 4px 0; padding: 6px 10px; }
+            .quiz-question, .expand-panel, .glossary-item, .tactic-cell { page-break-inside: avoid; }
+            .expand-panel > * { display: block !important; }
+            .video-card::after { content: "(Video available in the online version)"; font-style: italic; }
+            a { color: #000000 !important; text-decoration: underline; }
+        }
     </style>
 </head>
 <body>

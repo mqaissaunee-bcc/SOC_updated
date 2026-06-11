@@ -966,6 +966,36 @@
     </main>
     
     <script>
+        /* ============ Seeded randomness (punch list item 13) ============
+           Pass ?seed=<anything> in the URL and every student sees the same
+           sequence of generated alerts, incidents, and IOCs (mulberry32 PRNG).
+           Without a seed, behaves like simRandom(). */
+        var SimRandom = (function () {
+            'use strict';
+            var seedParam = null;
+            try { seedParam = new URLSearchParams(window.location.search).get('seed'); } catch (e) {}
+            var seed;
+            if (seedParam !== null && seedParam !== '') {
+                seed = 0;
+                for (var i = 0; i < seedParam.length; i++) {
+                    seed = (Math.imul(seed, 31) + seedParam.charCodeAt(i)) >>> 0;
+                }
+            } else {
+                seed = (Date.now() & 0xffffffff) >>> 0;
+                seedParam = null;
+            }
+            var state = seed >>> 0;
+            function next() {
+                state = (state + 0x6D2B79F5) | 0;
+                var t = Math.imul(state ^ (state >>> 15), 1 | state);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            }
+            if (seedParam) { document.title += ' [seed: ' + seedParam + ']'; }
+            return { next: next, seed: seedParam };
+        })();
+        function simRandom() { return SimRandom.next(); }
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1264,7 +1294,7 @@
         let alerts = [];
         let alertId = 1000;
         let counts = { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
-        let hourlyData = Array(12).fill(0).map(() => Math.floor(Math.random() * 50) + 10);
+        let hourlyData = Array(12).fill(0).map(() => Math.floor(simRandom() * 50) + 10);
         let currentFilter = 'all';
         
         const mitreTactics = [
@@ -1283,15 +1313,15 @@
         
         function randomIP(type) {
             const base = type === 'internal' ? 
-                internalIPs[Math.floor(Math.random() * internalIPs.length)] :
-                externalIPs[Math.floor(Math.random() * externalIPs.length)];
-            return base + Math.floor(Math.random() * 254) + 1 + '.' + Math.floor(Math.random() * 254);
+                internalIPs[Math.floor(simRandom() * internalIPs.length)] :
+                externalIPs[Math.floor(simRandom() * externalIPs.length)];
+            return base + Math.floor(simRandom() * 254) + 1 + '.' + Math.floor(simRandom() * 254);
         }
         
         function generateAlert() {
-            const alertType = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+            const alertType = alertTypes[Math.floor(simRandom() * alertTypes.length)];
             const weight = { critical: 0.1, high: 0.2, medium: 0.35, low: 0.35 };
-            const rand = Math.random();
+            const rand = simRandom();
             let actualSeverity = 'low';
             let cumulative = 0;
             for (const [sev, w] of Object.entries(weight)) {
@@ -1307,10 +1337,10 @@
                 type: alertType.type,
                 category: alertType.category,
                 severity: actualSeverity,
-                source: sources[Math.floor(Math.random() * sources.length)],
+                source: sources[Math.floor(simRandom() * sources.length)],
                 sourceIP: randomIP('external'),
                 destIP: randomIP('internal'),
-                user: users[Math.floor(Math.random() * users.length)],
+                user: users[Math.floor(simRandom() * users.length)],
                 timestamp: new Date(),
                 tactics: alertType.tactics,
                 status: 'new'
@@ -1447,7 +1477,7 @@
             const grid = document.getElementById('mitre-grid');
             grid.innerHTML = mitreTactics.map(tactic => {
                 const levels = ['mitre-low', 'mitre-medium', 'mitre-high', 'mitre-critical'];
-                const level = levels[Math.floor(Math.random() * levels.length)];
+                const level = levels[Math.floor(simRandom() * levels.length)];
                 return `<div class="mitre-cell ${level}" title="${tacticNames[tactic] || tactic}">${tacticNames[tactic] || ''}</div>`;
             }).join('');
         }
@@ -1464,7 +1494,7 @@
         function init() {
             for (let i = 0; i < 15; i++) {
                 const alert = generateAlert();
-                alert.timestamp = new Date(Date.now() - Math.random() * 3600000);
+                alert.timestamp = new Date(Date.now() - simRandom() * 3600000);
                 alerts.push(alert);
                 counts[alert.severity]++;
                 counts.total++;
@@ -1481,10 +1511,10 @@
             alerts.slice(0, 5).forEach(updateTimeline);
             
             SimTimers.add(updateDateTime, 1000);
-            SimTimers.add(addAlert, 3000 + Math.random() * 5000);
+            SimTimers.add(addAlert, 3000 + simRandom() * 5000);
             SimTimers.add(() => {
                 hourlyData.shift();
-                hourlyData.push(Math.floor(Math.random() * 50) + 10);
+                hourlyData.push(Math.floor(simRandom() * 50) + 10);
                 renderHourlyChart();
             }, 30000);
         }

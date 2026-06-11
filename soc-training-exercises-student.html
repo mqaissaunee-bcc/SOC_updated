@@ -473,18 +473,26 @@
         }
 
         @media print {
-            .exercise-content {
-                display: block !important;
+            *, *::before, *::after {
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
             }
-            .answer-content {
-                display: block !important;
-            }
-            .toggle-icon {
-                display: none;
-            }
+            .skip-link, .toggle-icon, .expand-all-btn, .instructor-banner,
+            button, .answer-key { display: none !important; }
+            .exercise-content { display: block !important; border-top: 1px solid #999 !important; }
+            .answer-content { display: block !important; border: 1px solid #999 !important; margin-top: 10px; }
+            .exercise { border: 1px solid #999 !important; margin-bottom: 18px; }
+            .exercise-header { border-bottom: 1px solid #999 !important; page-break-after: avoid; }
+            .rubric, .teaching-tips, .answer-item, .rubric-item,
+            .teaching-tips-item { page-break-inside: avoid; border-color: #999 !important; }
+            .answer-content::before { content: "Answer Key"; display: block; font-weight: 700; margin-bottom: 6px; }
+            a { color: #000000 !important; text-decoration: underline; }
+            .difficulty, .time-estimate { border: 1px solid #999 !important; }
         }
     
-        /* ============ Accessibility (a11y pass) ============ */
+                /* ============ Accessibility (a11y pass) ============ */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -523,12 +531,12 @@
     </header>
 
     <div class="container" id="main" role="main">
+
         <div class="intro-section">
         <div style="background: linear-gradient(90deg, rgba(46,213,115,0.2), rgba(46,213,115,0.05)); border-left: 4px solid #2ed573; padding: 12px 18px; margin-bottom: 20px; border-radius: 0 6px 6px 0;">
             <strong style="color: #2ed573; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.85em;">Student Edition</strong>
             <p style="margin: 4px 0 0 0; color: #a0a0a0; font-size: 0.9em;">This version contains the full exercises with rubrics. Answer keys are maintained separately by your instructor.</p>
         </div>
-
             <h2>&#128203; Training Overview</h2>
             <p>These exercises provide hands-on experience with Security Operations Center (SOC) workflows using the four-screen simulation environment. They are organized into four sections: the three classic analyst tiers (Tier 1 Alert Triage &rarr; Tier 2 Incident Response &rarr; Tier 3 Threat Hunting), plus a Multidisciplinary section that applies the same SOC dashboards through the lenses of eight other fields &mdash; computer science, data science, business and risk management, criminal justice, psychology, healthcare, engineering, and social science.</p>
 
@@ -602,7 +610,9 @@
                         <li>Explain the factors that influenced your prioritization decisions</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Correct severity classifications (4 alerts)</span><span class="points">40 pts</span></div>
                         <div class="rubric-item"><span>Correct priority ordering</span><span class="points">30 pts</span></div>
@@ -664,7 +674,9 @@
                         </ul>
                     </div>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Correct TP/FP classifications</span><span class="points">40 pts</span></div>
                         <div class="rubric-item"><span>Appropriate tuning recommendations</span><span class="points">25 pts</span></div>
@@ -714,7 +726,9 @@
                         <li>Write a brief shift summary (3-4 sentences) describing the network status</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Accurate traffic documentation</span><span class="points">25 pts</span></div>
                         <div class="rubric-item"><span>Geographic anomaly identification</span><span class="points">25 pts</span></div>
@@ -765,7 +779,9 @@
                         <li>Open Screen 3 (Incident Response) and familiarize yourself with the incident queue format</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Correct escalation decisions</span><span class="points">50 pts</span></div>
                         <div class="rubric-item"><span>Quality of escalation notes</span><span class="points">40 pts</span></div>
@@ -816,7 +832,9 @@
                         <li>If any Domain Controller (DC) endpoints show non-Healthy status, explain why this is a priority concern</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Accurate status documentation</span><span class="points">30 pts</span></div>
                         <div class="rubric-item"><span>Server filter usage and analysis</span><span class="points">20 pts</span></div>
@@ -893,7 +911,9 @@
                     <span class="mitre-tag">T1078 - Valid Accounts</span>
                     <span class="mitre-tag">T1133 - External Remote Services</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Correct attack type identification</span><span class="points">20 pts</span></div>
                         <div class="rubric-item"><span>Tor exit node significance explained</span><span class="points">15 pts</span></div>
@@ -960,7 +980,9 @@
                     <span class="mitre-tag">T1021.002 - SMB/Windows Admin Shares</span>
                     <span class="mitre-tag">T1003 - Credential Dumping</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>TrickBot capability research</span><span class="points">15 pts</span></div>
                         <div class="rubric-item"><span>Correct isolation priority with justification</span><span class="points">25 pts</span></div>
@@ -1026,7 +1048,9 @@
                     <span class="mitre-tag">T1567 - Exfiltration Over Web Service</span>
                     <span class="mitre-tag">T1041 - Exfiltration Over C2 Channel</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Suspicious indicator analysis</span><span class="points">25 pts</span></div>
                         <div class="rubric-item"><span>Network traffic correlation</span><span class="points">15 pts</span></div>
@@ -1092,7 +1116,9 @@
                     <span class="mitre-tag">T1566.002 - Spearphishing Link</span>
                     <span class="mitre-tag">T1204 - User Execution</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Complete IOC documentation</span><span class="points">20 pts</span></div>
                         <div class="rubric-item"><span>Credential compromise response plan</span><span class="points">25 pts</span></div>
@@ -1164,7 +1190,9 @@
                     <span class="mitre-tag">T1490 - Inhibit System Recovery</span>
                     <span class="mitre-tag">T1489 - Service Stop</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Complete playbook execution with notes</span><span class="points">30 pts</span></div>
                         <div class="rubric-item"><span>LockBit research and TTP identification</span><span class="points">20 pts</span></div>
@@ -1246,7 +1274,9 @@
                     <span class="mitre-tag">T1071 - Application Layer Protocol</span>
                     <span class="mitre-tag">T1053 - Scheduled Task</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Quality of threat hunting hypothesis</span><span class="points">20 pts</span></div>
                         <div class="rubric-item"><span>SIEM search methodology</span><span class="points">20 pts</span></div>
@@ -1302,7 +1332,9 @@
                         <li>Determine: At which point could this attack have been stopped most effectively?</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Correct ATT&CK mapping</span><span class="points">30 pts</span></div>
                         <div class="rubric-item"><span>Attack chain visualization</span><span class="points">20 pts</span></div>
@@ -1375,7 +1407,9 @@
                     <span class="mitre-tag">T1567 - Exfiltration Over Web Service</span>
                     <span class="mitre-tag">T1074 - Data Staged</span>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Activity indicator analysis</span><span class="points">25 pts</span></div>
                         <div class="rubric-item"><span>Additional data requirements</span><span class="points">20 pts</span></div>
@@ -1441,7 +1475,9 @@
                         <li>Write a CISO briefing on exposure and mitigation status</li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Inventory identification approach</span><span class="points">20 pts</span></div>
                         <div class="rubric-item"><span>Risk assessment quality</span><span class="points">25 pts</span></div>
@@ -1511,7 +1547,9 @@
                         </li>
                     </ul>
 
-                    <div class="rubric">
+                    
+                        
+                        <div class="rubric">
                         <h4>Grading Rubric</h4>
                         <div class="rubric-item"><span>Metric analysis and concern identification</span><span class="points">25 pts</span></div>
                         <div class="rubric-item"><span>Calculated metrics accuracy</span><span class="points">20 pts</span></div>
@@ -1576,7 +1614,10 @@
                             <li>Explain the precision/recall tradeoff of your rule: what do you gain, what do you give up?</li>
                             <li>Propose a metric and threshold for automatically rolling back your rule if it misbehaves</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Rule logic correctness</span><span class="points">30 pts</span></div>
                             <div class="rubric-item"><span>Indicator selection quality</span><span class="points">25 pts</span></div>
@@ -1617,7 +1658,10 @@
                             <li>Handle the edge case where an alert stops repeating &#8212; when should the dedup group close?</li>
                             <li>What happens if two analysts view the dedup group at the same time? (concurrency)</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Identity definition</span><span class="points">25 pts</span></div>
                             <div class="rubric-item"><span>Window strategy justification</span><span class="points">25 pts</span></div>
@@ -1674,7 +1718,10 @@
                             <li>Recommend two interventions &#8212; one staffing, one technical &#8212; with expected impact per metric</li>
                             <li>Design a single composite KPI that would have caught this trend at Week 2 instead of Week 4</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Trend description accuracy</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Hypothesis quality</span><span class="points">25 pts</span></div>
@@ -1717,7 +1764,10 @@
                             <li>Define the thresholds that split scores into Critical / High / Medium / Low buckets, and explain how you picked them</li>
                             <li>Describe how you'd validate the score against the next 30 days of triage outcomes</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Metric computation accuracy</span><span class="points">25 pts</span></div>
                             <div class="rubric-item"><span>Weighting scheme reasonableness</span><span class="points">25 pts</span></div>
@@ -1770,7 +1820,10 @@
                             <li>Avoid all jargon &#8212; no T-codes, no acronyms except ones a board member would know</li>
                             <li>Close with one specific budget ask tied to one specific risk reduction</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>ALE computation accuracy</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Compliance risk modeling</span><span class="points">20 pts</span></div>
@@ -1812,7 +1865,10 @@
                             <li>Draft a 3-sentence internal all-hands notification and a 3-sentence external holding statement</li>
                             <li>Describe one scenario where notification timing conflicts with ongoing forensic investigation, and how to resolve it</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Framework identification completeness</span><span class="points">25 pts</span></div>
                             <div class="rubric-item"><span>Timeline construction</span><span class="points">25 pts</span></div>
@@ -1864,7 +1920,10 @@
                             <li>Identify three common IR actions that would harm admissibility if done casually, and their safe alternatives</li>
                             <li>Name the primary legal standard evidence will be measured against (e.g., Federal Rules of Evidence 901 and 902)</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Source identification</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Preservation method specificity</span><span class="points">25 pts</span></div>
@@ -1906,7 +1965,10 @@
                             <li>Identify what non-criminal remedies are available (sanctions designation, indictment-in-absentia, cyber insurance claim, private civil action)</li>
                             <li>Recommend the sequence: which authority gets engaged first, second, third, and why</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Authority identification</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Cooperation map accuracy</span><span class="points">20 pts</span></div>
@@ -1964,7 +2026,10 @@
                             <li>For employee C, apply the Critical Pathway framework (predisposition + stressors + concerning behaviors + technical activity)</li>
                             <li>Propose one humane, effective intervention for each case that balances security with employee wellbeing</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Categorization accuracy</span><span class="points">15 pts</span></div>
                             <div class="rubric-item"><span>Escalation analysis (A)</span><span class="points">20 pts</span></div>
@@ -2005,7 +2070,10 @@
                             <li>Design a measurement that would distinguish "rules got worse" from "analysts got tired" as the root cause</li>
                             <li>Describe how you would communicate this analysis to a skeptical leadership team without blaming analysts</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Cognitive mechanism explanation</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Signal detection theory application</span><span class="points">20 pts</span></div>
@@ -2058,7 +2126,10 @@
                             <li>Explain the FDA regulatory constraint: why can't IT just "update" or "reimage" the device?</li>
                             <li>Draft a 3-sentence briefing for the radiology department head that doesn't use security jargon</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Decision tree quality</span><span class="points">25 pts</span></div>
                             <div class="rubric-item"><span>Stakeholder engagement</span><span class="points">20 pts</span></div>
@@ -2099,7 +2170,10 @@
                             <li>Describe three technical controls that could reduce this type of event</li>
                             <li>Discuss the workforce implications: what's the appropriate response spectrum from "no action" to "termination and OCR notification"?</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Access vs. permission distinction</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Investigation questions</span><span class="points">25 pts</span></div>
@@ -2152,7 +2226,10 @@
                             <li>Identify what would make you override the cost calculation and stop the batch anyway</li>
                             <li>Propose an OT/IT coordination protocol that would speed up the next incident</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Purdue Model application</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Operational questions quality</span><span class="points">20 pts</span></div>
@@ -2193,7 +2270,10 @@
                             <li>Propose a network architecture change that reduces blast radius if the BMS is compromised</li>
                             <li>Write a 1-paragraph case for why facilities should care about this, framed for a facilities director</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Exposure ranking</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Mitigation practicality</span><span class="points">25 pts</span></div>
@@ -2245,7 +2325,10 @@
                             <li>Draft a policy addition that defines how the SOC should handle potential whistleblower activity</li>
                             <li>Reflect on the ethics: when does employee monitoring itself become a harm?</li>
                         </ul>
-                    <div class="rubric">
+
+                        
+
+                        <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Legal framework identification</span><span class="points">20 pts</span></div>
                             <div class="rubric-item"><span>Legal risk analysis</span><span class="points">20 pts</span></div>
@@ -2309,6 +2392,7 @@
                             <p>At the end of the session, the team produces a <strong>unified incident briefing</strong> that could be delivered to the hospital's Board of Directors. It must integrate all eight perspectives into a single coherent narrative: what happened, who was affected, what we did, what obligations we now have, and what must change.</p>
                             <p>The grading is on integration quality, not on any single role's output. The best briefings show where the roles handed off to each other, disagreed productively, and resolved tradeoffs explicitly.</p>
                         </div>
+
                         <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Per-role analysis quality (avg across roles)</span><span class="points">40 pts</span></div>
@@ -2358,6 +2442,7 @@
                         <div class="scenario-box">
                             <p>Two outputs: (1) a confidential executive briefing and (2) a public statement. The team must demonstrate awareness of the tension between those documents: executives need honest risk, the public needs honest reassurance without revealing operational details. The best teams will articulate explicitly where they chose to simplify, where they chose to be vague, and why.</p>
                         </div>
+
                         <div class="rubric">
                             <h4>Grading Rubric</h4>
                             <div class="rubric-item"><span>Per-role analysis quality (avg across roles)</span><span class="points">35 pts</span></div>

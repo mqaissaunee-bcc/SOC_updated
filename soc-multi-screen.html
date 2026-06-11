@@ -910,6 +910,9 @@
         // Track screen visibility
         const screenState = { 1: true, 2: true, 3: true, 4: true };
 
+        let SIM_SEED = null;
+        try { SIM_SEED = new URLSearchParams(window.location.search).get('seed'); } catch (e) {}
+
         const screenFiles = {
             1: 'soc-screen1-siem-dashboard-fixed.html',
             2: 'soc-screen2-network-monitor-enhanced.html',
@@ -968,7 +971,7 @@
                     if (!iframe.getAttribute('src')) {
                         const loader = document.getElementById(`loader${i}`);
                         loader.classList.remove('loaded');
-                        iframe.src = screenFiles[i];
+                        iframe.src = screenFiles[i] + (SIM_SEED ? '?seed=' + encodeURIComponent(SIM_SEED) : '');
                         setTimeout(() => loader.classList.add('loaded'), 6000); // failsafe
                     } else if (iframe.contentWindow) {
                         try { iframe.contentWindow.postMessage({ type: 'soc-sim', cmd: 'resume' }, '*'); } catch (e) {}
@@ -1042,9 +1045,9 @@
         // Clock
         function updateClock() {
             const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
             document.getElementById('clockDisplay').textContent = `${h}:${m}:${s} UTC`;
         }
         let clockTimer = setInterval(updateClock, 1000);

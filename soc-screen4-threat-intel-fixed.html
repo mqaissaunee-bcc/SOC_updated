@@ -967,6 +967,36 @@
     </main>
     
     <script>
+        /* ============ Seeded randomness (punch list item 13) ============
+           Pass ?seed=<anything> in the URL and every student sees the same
+           sequence of generated alerts, incidents, and IOCs (mulberry32 PRNG).
+           Without a seed, behaves like simRandom(). */
+        var SimRandom = (function () {
+            'use strict';
+            var seedParam = null;
+            try { seedParam = new URLSearchParams(window.location.search).get('seed'); } catch (e) {}
+            var seed;
+            if (seedParam !== null && seedParam !== '') {
+                seed = 0;
+                for (var i = 0; i < seedParam.length; i++) {
+                    seed = (Math.imul(seed, 31) + seedParam.charCodeAt(i)) >>> 0;
+                }
+            } else {
+                seed = (Date.now() & 0xffffffff) >>> 0;
+                seedParam = null;
+            }
+            var state = seed >>> 0;
+            function next() {
+                state = (state + 0x6D2B79F5) | 0;
+                var t = Math.imul(state ^ (state >>> 15), 1 | state);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            }
+            if (seedParam) { document.title += ' [seed: ' + seedParam + ']'; }
+            return { next: next, seed: seedParam };
+        })();
+        function simRandom() { return SimRandom.next(); }
+
         /* ============ Simulation timer manager (punch list item 3) ============
            Pauses all interval-driven activity when the browser tab is hidden,
            or when the parent multi-screen viewer hides this panel. Eliminates
@@ -1175,15 +1205,15 @@
             const statuses = ['healthy', 'healthy', 'healthy', 'healthy', 'healthy', 'warning', 'warning', 'critical', 'offline'];
             
             for (let i = 0; i < 100; i++) {
-                const typeInfo = types[Math.floor(Math.random() * types.length)];
-                const dept = departments[Math.floor(Math.random() * departments.length)];
+                const typeInfo = types[Math.floor(simRandom() * types.length)];
+                const dept = departments[Math.floor(simRandom() * departments.length)];
                 endpoints.push({
-                    id: `${typeInfo.prefix}-${dept}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`,
+                    id: `${typeInfo.prefix}-${dept}-${String(Math.floor(simRandom() * 999) + 1).padStart(3, '0')}`,
                     type: typeInfo.type,
                     icon: typeInfo.icon,
-                    status: statuses[Math.floor(Math.random() * statuses.length)],
-                    lastSeen: new Date(Date.now() - Math.random() * 3600000),
-                    ip: `10.${Math.floor(Math.random() * 50)}.${Math.floor(Math.random() * 254)}.${Math.floor(Math.random() * 254) + 1}`
+                    status: statuses[Math.floor(simRandom() * statuses.length)],
+                    lastSeen: new Date(Date.now() - simRandom() * 3600000),
+                    ip: `10.${Math.floor(simRandom() * 50)}.${Math.floor(simRandom() * 254)}.${Math.floor(simRandom() * 254) + 1}`
                 });
             }
         }
@@ -1191,25 +1221,25 @@
         // Generate IOC
         function generateIOC() {
             const types = ['ip', 'hash', 'domain', 'url', 'cve'];
-            const type = types[Math.floor(Math.random() * types.length)];
+            const type = types[Math.floor(simRandom() * types.length)];
             let value;
             
             switch(type) {
                 case 'ip':
-                    value = `${Math.floor(Math.random() * 223) + 1}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+                    value = `${Math.floor(simRandom() * 223) + 1}.${Math.floor(simRandom() * 255)}.${Math.floor(simRandom() * 255)}.${Math.floor(simRandom() * 255)}`;
                     break;
                 case 'hash':
-                    value = Array(64).fill(0).map(() => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
+                    value = Array(64).fill(0).map(() => '0123456789abcdef'[Math.floor(simRandom() * 16)]).join('');
                     break;
                 case 'domain':
                     const domains = ['malware-c2.xyz', 'evil-payload.net', 'data-exfil.com', 'phish-server.io', 'backdoor.club'];
-                    value = `${Math.random().toString(36).substring(7)}.${domains[Math.floor(Math.random() * domains.length)]}`;
+                    value = `${simRandom().toString(36).substring(7)}.${domains[Math.floor(simRandom() * domains.length)]}`;
                     break;
                 case 'url':
-                    value = `https://mal${Math.random().toString(36).substring(7)}.com/payload.exe`;
+                    value = `https://mal${simRandom().toString(36).substring(7)}.com/payload.exe`;
                     break;
                 case 'cve':
-                    value = `CVE-2024-${Math.floor(Math.random() * 9999)}`;
+                    value = `CVE-2024-${Math.floor(simRandom() * 9999)}`;
                     break;
             }
             
@@ -1218,22 +1248,22 @@
             return {
                 type,
                 value,
-                confidence: confidences[Math.floor(Math.random() * confidences.length)],
-                source: threatSources[Math.floor(Math.random() * threatSources.length)]
+                confidence: confidences[Math.floor(simRandom() * confidences.length)],
+                source: threatSources[Math.floor(simRandom() * threatSources.length)]
             };
         }
         
         // Generate EDR Alert
         function generateEDRAlert() {
-            const template = edrAlertTypes[Math.floor(Math.random() * edrAlertTypes.length)];
-            const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
+            const template = edrAlertTypes[Math.floor(simRandom() * edrAlertTypes.length)];
+            const endpoint = endpoints[Math.floor(simRandom() * endpoints.length)];
             
             return {
                 type: template.type,
                 category: template.category,
-                detail: template.details[Math.floor(Math.random() * template.details.length)],
+                detail: template.details[Math.floor(simRandom() * template.details.length)],
                 endpoint: endpoint.id,
-                user: ['SYSTEM', 'admin', 'jsmith', 'svc_account'][Math.floor(Math.random() * 4)],
+                user: ['SYSTEM', 'admin', 'jsmith', 'svc_account'][Math.floor(simRandom() * 4)],
                 time: new Date()
             };
         }
@@ -1245,8 +1275,8 @@
                 <div class="threat-card ${threat.severity}">
                     <div class="threat-source">
                         <span>&#128225;</span>
-                        <span>${threatSources[Math.floor(Math.random() * threatSources.length)]}</span>
-                        <span style="margin-left: auto; color: #666;">${Math.floor(Math.random() * 60)}m ago</span>
+                        <span>${threatSources[Math.floor(simRandom() * threatSources.length)]}</span>
+                        <span style="margin-left: auto; color: #666;">${Math.floor(simRandom() * 60)}m ago</span>
                     </div>
                     <div class="threat-title">${threat.title}</div>
                     <div class="threat-tags">
@@ -1374,7 +1404,7 @@
         function renderCompliance() {
             const grid = document.getElementById('compliance-grid');
             grid.innerHTML = complianceFrameworks.map(fw => {
-                const score = Math.floor(Math.random() * 30) + 70;
+                const score = Math.floor(simRandom() * 30) + 70;
                 const color = score >= 90 ? '#2ed573' : score >= 75 ? '#ffa502' : '#ff4757';
                 return `
                     <div class="compliance-item">
@@ -1406,9 +1436,9 @@
         
         // Update endpoint status randomly
         function updateEndpointStatus() {
-            const idx = Math.floor(Math.random() * endpoints.length);
+            const idx = Math.floor(simRandom() * endpoints.length);
             const statuses = ['healthy', 'warning', 'critical'];
-            endpoints[idx].status = statuses[Math.floor(Math.random() * statuses.length)];
+            endpoints[idx].status = statuses[Math.floor(simRandom() * statuses.length)];
             renderEndpoints();
         }
         
@@ -1453,7 +1483,7 @@
             // Generate initial EDR alerts
             for (let i = 0; i < 10; i++) {
                 const alert = generateEDRAlert();
-                alert.time = new Date(Date.now() - Math.random() * 3600000);
+                alert.time = new Date(Date.now() - simRandom() * 3600000);
                 edrAlerts.push(alert);
             }
             edrAlerts.sort((a, b) => b.time - a.time);
