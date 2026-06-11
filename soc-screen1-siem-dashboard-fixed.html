@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Screen 1: SIEM Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #0f4c75;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            color: #3498db;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .datetime {
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        /* FIXED: Changed height to min-height, added minmax for rows */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto minmax(300px, 1fr) minmax(200px, auto);
+            gap: 15px;
+            padding: 15px;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* FIXED: Changed overflow to visible, added min-height */
+        .card {
+            background: linear-gradient(145deg, #1e1e30 0%, #252540 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+            flex-shrink: 0;
+        }
+        
+        .card-title {
+            font-size: 1.1em;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        /* Stats Cards Row */
+        .stats-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, #1e1e30 0%, #252540 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+            min-height: 100px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #3498db;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .critical { color: #ff4757; text-shadow: 0 0 15px rgba(255,71,87,0.5); }
+        .high { color: #ffa502; text-shadow: 0 0 15px rgba(255,165,2,0.5); }
+        .medium { color: #ffd43b; text-shadow: 0 0 15px rgba(255,212,59,0.5); }
+        .low { color: #2ed573; text-shadow: 0 0 15px rgba(46,213,115,0.5); }
+        .info { color: #3498db; text-shadow: 0 0 15px rgba(52,152,219,0.5); }
+
+        /* SOC Metrics Panel */
+        .metrics-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+        }
+        .metric-card {
+            background: linear-gradient(145deg, #1a2332 0%, #1f2b3d 100%);
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1px solid #2d3e52;
+            border-left: 3px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            border-left-color: #5dade2;
+            transform: translateY(-2px);
+        }
+        .metric-label {
+            font-size: 0.72em;
+            color: #8090a5;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .metric-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #d0dae5;
+            margin-bottom: 4px;
+        }
+        .metric-trend {
+            font-size: 0.75em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .metric-trend.up { color: #ff6b6b; }
+        .metric-trend.down { color: #2ed573; }
+        .metric-trend.neutral { color: #8090a5; }
+        .metric-sub {
+            font-size: 0.72em;
+            color: #607080;
+            margin-top: 2px;
+        }
+        
+        /* Alert Queue - FIXED: proper spanning and scrolling */
+        .alert-queue {
+            grid-column: 1 / 3;
+            grid-row: 2 / 4;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+        
+        /* FIXED: Added flex-grow and proper overflow */
+        .alert-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            min-height: 0; /* Important for flex overflow */
+        }
+        
+        .alert-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .alert-list::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        .alert-list::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 3px;
+        }
+        
+        .alert-item {
+            background: linear-gradient(90deg, rgba(30,30,48,0.8) 0%, rgba(37,37,64,0.8) 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .alert-item:hover {
+            background: linear-gradient(90deg, rgba(40,40,60,0.9) 0%, rgba(50,50,80,0.9) 100%);
+            transform: translateX(5px);
+        }
+        
+        .alert-item.severity-critical { border-left-color: #ff4757; }
+        .alert-item.severity-high { border-left-color: #ffa502; }
+        .alert-item.severity-medium { border-left-color: #ffd43b; }
+        .alert-item.severity-low { border-left-color: #2ed573; }
+        
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            font-size: 1em;
+        }
+        
+        .alert-time {
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .alert-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            font-size: 0.85em;
+            color: #aaa;
+        }
+        
+        .alert-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .alert-detail-label {
+            color: #666;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .severity-badge.critical { background: rgba(255,71,87,0.2); color: #ff4757; }
+        .severity-badge.high { background: rgba(255,165,2,0.2); color: #ffa502; }
+        .severity-badge.medium { background: rgba(255,212,59,0.2); color: #ffd43b; }
+        .severity-badge.low { background: rgba(46,213,115,0.2); color: #2ed573; }
+        
+        /* Activity Timeline */
+        .activity-timeline {
+            grid-column: 3;
+            grid-row: 2;
+            min-height: 250px;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-content-inner {
+            flex: 1;
+        }
+        
+        .timeline-time {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        /* MITRE ATT&CK Heatmap */
+        .mitre-section {
+            grid-column: 3;
+            grid-row: 3;
+            min-height: 200px;
+        }
+        
+        .mitre-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+        }
+        
+        .mitre-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mitre-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        .mitre-low { background: rgba(46,213,115,0.3); }
+        .mitre-medium { background: rgba(255,212,59,0.4); }
+        .mitre-high { background: rgba(255,165,2,0.5); }
+        .mitre-critical { background: rgba(255,71,87,0.6); }
+        
+        /* Charts Area */
+        .chart-container {
+            height: 150px;
+            position: relative;
+        }
+        
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            padding: 10px 0;
+        }
+        
+        .bar {
+            width: 30px;
+            background: linear-gradient(to top, #3498db, #00d4ff);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+        
+        .bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        
+        .bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            color: #888;
+        }
+        
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #444;
+            background: transparent;
+            color: #888;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+        
+        /* Audio indicator */
+        .audio-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .sound-wave {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 20px;
+        }
+        
+        .sound-bar {
+            width: 3px;
+            background: #00ff88;
+            border-radius: 2px;
+            animation: soundWave 0.5s ease-in-out infinite;
+        }
+        
+        .sound-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+        .sound-bar:nth-child(2) { animation-delay: 0.1s; height: 15px; }
+        .sound-bar:nth-child(3) { animation-delay: 0.2s; height: 10px; }
+        .sound-bar:nth-child(4) { animation-delay: 0.3s; height: 18px; }
+        .sound-bar:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+        
+        @keyframes soundWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+        
+        /* New Alert Animation */
+        .new-alert {
+            animation: newAlert 0.5s ease;
+        }
+        
+        @keyframes newAlert {
+            0% { background: rgba(255,71,87,0.3); }
+            100% { background: transparent; }
+        }
+        
+        /* FIXED: Improved responsive design */
+        @media (max-width: 1400px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto minmax(350px, 1fr) minmax(250px, auto) minmax(250px, auto);
+            }
+            .stats-row {
+                grid-column: 1 / -1;
+            }
+            .alert-queue {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+            .activity-timeline {
+                grid-column: 1;
+                grid-row: 3;
+            }
+            .mitre-section {
+                grid-column: 2;
+                grid-row: 3;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto minmax(400px, auto) minmax(300px, auto) minmax(250px, auto);
+            }
+            .alert-queue,
+            .activity-timeline,
+            .mitre-section {
+                grid-column: 1;
+            }
+            .alert-queue { grid-row: 2; }
+            .activity-timeline { grid-row: 3; }
+            .mitre-section { grid-row: 4; }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 1.4em;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .stat-value {
+                font-size: 1.8em;
+            }
+            .header-info {
+                justify-content: center;
+            }
+        }
+    
+        /* -- Display Info Button & Panel -- */
+        .display-info-btn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 900;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(8px);
+            color: rgba(122, 138, 158, 0.9);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .display-info-btn:hover {
+            color: #00d4ff;
+            border-color: rgba(0, 212, 255, 0.5);
+            background: rgba(26, 26, 46, 0.95);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.15);
+        }
+        .display-info-btn svg { width: 15px; height: 15px; }
+
+        .di-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 6, 17, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .di-overlay.visible { display: flex; }
+
+        .di-panel {
+            background: #0c0c1d;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 820px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 212, 255, 0.08);
+            animation: diSlideIn 0.3s ease;
+            color: #e8ecf0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        @keyframes diSlideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .di-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        .di-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .di-header h2 svg { width: 20px; height: 20px; }
+        .di-close {
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: #7a8a9e;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .di-close:hover { color: #ff4444; border-color: rgba(255,68,68,0.4); }
+
+        .di-body { padding: 24px; }
+
+        .di-detect {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .di-detect-item { text-align: center; }
+        .di-detect-label { font-size: 10px; letter-spacing: 0.08em; color: #7a8a9e; text-transform: uppercase; margin-bottom: 4px; }
+        .di-detect-value { font-size: 16px; font-weight: 700; color: #e8ecf0; font-family: 'JetBrains Mono', monospace; }
+        .di-detect-divider { width: 1px; height: 36px; background: rgba(0, 212, 255, 0.2); }
+        .di-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .di-badge.optimal { background: rgba(46,213,115,0.15); color: #2ed573; border: 1px solid rgba(46,213,115,0.3); }
+        .di-badge.good { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+        .di-badge.acceptable { background: rgba(255,170,0,0.15); color: #ffaa00; border: 1px solid rgba(255,170,0,0.3); }
+        .di-badge.limited { background: rgba(255,68,68,0.15); color: #ff4444; border: 1px solid rgba(255,68,68,0.3); }
+
+        .di-section { margin-bottom: 20px; }
+        .di-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+        .di-section p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #9ab;
+            margin-bottom: 8px;
+        }
+
+        .di-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .di-table th {
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: #7a8a9e;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+            background: rgba(0, 212, 255, 0.03);
+        }
+        .di-table td {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #c8d0d8;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .di-table tr:hover td { background: rgba(0, 212, 255, 0.03); }
+
+    
+        /* ============ Accessibility (a11y pass) ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        :focus-visible {
+            outline: 2px solid #00d4ff;
+            outline-offset: 2px;
+        }
+        [role="button"] { cursor: pointer; }
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            z-index: 10000;
+            background: #0f1320;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 0 0 8px 0;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Display Info Button -->
+    <button class="display-info-btn" data-action="toggleDisplayInfo()" title="Display Recommendations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span>Display Info</span>
+    </button>
+
+    <!-- Display Info Overlay -->
+    <div class="di-overlay" id="diOverlay" data-dismiss="toggleDisplayInfo">
+        <div class="di-panel" role="dialog" aria-modal="true" aria-label="Display recommendations">
+            <div class="di-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    DISPLAY RECOMMENDATIONS
+                </h2>
+                <button class="di-close" data-action="toggleDisplayInfo()" title="Close">&times;</button>
+            </div>
+            <div class="di-body">
+                <!-- Live Detection -->
+                <div class="di-detect" id="diDetect">
+                    <div class="di-detect-item">
+                        <div class="di-detect-label">Your Display</div>
+                        <div class="di-detect-value" id="diResolution">--</div>
+                    </div>
+                    <div class="di-detect-divider"></div>
+                    <div class="di-detect-item">
+                        <div class="di-detect-label">Pixel Ratio</div>
+                        <div class="di-detect-value" id="diDPR">--</div>
+                    </div>
+                    <div class="di-detect-divider"></div>
+                    <div class="di-detect-item">
+                        <div class="di-detect-label">Viewport</div>
+                        <div class="di-detect-value" id="diViewport">--</div>
+                    </div>
+                    <div class="di-detect-divider"></div>
+                    <div class="di-detect-item">
+                        <div class="di-detect-label">Rating</div>
+                        <span class="di-badge" id="diBadge">--</span>
+                    </div>
+                </div>
+
+                <!-- Reference Table -->
+                <div class="di-section">
+                    <h3>&#x1F4CA; Quick Reference</h3>
+                    <table class="di-table">
+                        <thead>
+                            <tr>
+                                <th>Setup</th>
+                                <th>Minimum</th>
+                                <th>Recommended</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Individual Screen</td>
+                                <td>1280 &times; 720</td>
+                                <td>1920 &times; 1080+</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-Screen (Quad)</td>
+                                <td>1920 &times; 1080</td>
+                                <td>2560 &times; 1440+</td>
+                            </tr>
+                            <tr>
+                                <td>Physical Display</td>
+                                <td>24&rdquo; monitor</td>
+                                <td>32&rdquo;&ndash;55&rdquo; or larger</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Individual Screen Guidance -->
+                <div class="di-section">
+                    <h3>&#x1F5A5;&#xFE0F; Individual Screen (This View)</h3>
+                    <p>This dashboard is optimized for <strong>1920&times;1080 (Full HD)</strong> or higher. At this resolution, all panels, charts, and data feeds display at full fidelity without collapsing.</p>
+                    <p>At <strong>1280&times;720</strong>, the layout still works but some elements may wrap or compress. Below 720p, content may be difficult to read.</p>
+                </div>
+
+                <!-- Practical Tips -->
+                <div class="di-section">
+                    <h3>&#x1F4A1; Practical Tips</h3>
+                    <p><strong>Classroom TVs (55&rdquo;&ndash;65&rdquo;):</strong> Use 4K resolution for maximum clarity. At 1080p, text remains readable from 6&ndash;10 feet but may appear softer on larger panels.</p>
+                    <p><strong>Desktop Monitors (24&rdquo;&ndash;32&rdquo;):</strong> 1080p is fine for individual screens. For the multi-screen quad view, 1440p or 4K is strongly recommended.</p>
+                    <p><strong>Projectors:</strong> Ensure native 1080p or higher. Lower-resolution projectors will cause text to blur, making alert details difficult to read.</p>
+                    <p><strong>Browser Zoom:</strong> If text appears too small, use Ctrl/Cmd + to increase zoom. The dashboards respond well to 110&ndash;125% zoom on high-resolution displays.</p>
+                </div>
+
+                <!-- Font & Readability -->
+                <div class="di-section">
+                    <h3>&#x1F524; Font Scaling &amp; Readability</h3>
+                    <p>Dashboard fonts are set in pixels (11&ndash;14px base). These don&rsquo;t scale with display DPI. On a large low-resolution display (e.g. 65&rdquo; 1080p TV at 10ft), text will be physically large but may appear soft. On a 27&rdquo; 4K monitor up close, everything is crisp but physically small.</p>
+                    <p>The sweet spot depends on the combination of <strong>resolution</strong>, <strong>physical screen size</strong>, and <strong>viewing distance</strong>. For classroom settings, a 55&rdquo;&ndash;65&rdquo; 4K TV viewed from 6&ndash;10 feet is the ideal range.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <header class="header">
+        <h1>&#128737;&#65039; SIEM Dashboard - Security Operations Center</h1>
+        <div class="header-info">
+            <div class="audio-indicator">
+                <div class="sound-wave">
+                    <div class="sound-bar"></div>
+                    <div class="sound-bar"></div>
+                    <div class="sound-bar"></div>
+                    <div class="sound-bar"></div>
+                    <div class="sound-bar"></div>
+                </div>
+                <span>MONITORING ACTIVE</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>OPERATIONAL</span>
+            </div>
+            <div class="datetime" id="datetime"></div>
+        </div>
+    </header>
+    
+    <main class="main-container">
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value critical" id="critical-count">0</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value high" id="high-count">0</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value medium" id="medium-count">0</div>
+                <div class="stat-label">Medium</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value low" id="low-count">0</div>
+                <div class="stat-label">Low</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value info" id="total-count">0</div>
+                <div class="stat-label">Total Today</div>
+            </div>
+        </div>
+
+        <!-- SOC Operational Metrics -->
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-label">MTTD &#8212; Mean Time to Detect</div>
+                <div class="metric-value" id="metric-mttd">8m 24s</div>
+                <div class="metric-trend down">&#9660; 12% vs last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">MTTR &#8212; Mean Time to Respond</div>
+                <div class="metric-value" id="metric-mttr">42m 11s</div>
+                <div class="metric-trend up">&#9650; 8% vs last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">False Positive Rate</div>
+                <div class="metric-value" id="metric-fpr">31.4%</div>
+                <div class="metric-trend neutral">&#9644; stable</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Alerts per Analyst</div>
+                <div class="metric-value" id="metric-apa">127</div>
+                <div class="metric-sub">shift avg &#183; capacity: 150</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Dwell Time (30d avg)</div>
+                <div class="metric-value" id="metric-dwell">4.2 days</div>
+                <div class="metric-trend down">&#9660; 0.8d vs last month</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">SLA Compliance</div>
+                <div class="metric-value" id="metric-sla">94.2%</div>
+                <div class="metric-sub">target: 95% &#183; 168 incidents</div>
+            </div>
+        </div>
+        
+        <!-- Alert Queue -->
+        <div class="card alert-queue">
+            <div class="card-header">
+                <span class="card-title">&#128203; Real-Time Alert Queue</span>
+                <span id="queue-count">0 alerts</span>
+            </div>
+            <div class="filter-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="critical">Critical</button>
+                <button class="filter-btn" data-filter="high">High</button>
+                <button class="filter-btn" data-filter="medium">Medium</button>
+                <button class="filter-btn" data-filter="low">Low</button>
+            </div>
+            <div class="alert-list" id="alert-list"></div>
+        </div>
+        
+        <!-- Activity Timeline -->
+        <div class="card activity-timeline">
+            <div class="card-header">
+                <span class="card-title">&#128202; Alerts Per Hour</span>
+            </div>
+            <div class="chart-container">
+                <div class="bar-chart" id="hourly-chart"></div>
+            </div>
+            <div class="card-header" style="margin-top: 20px;">
+                <span class="card-title">&#9201;&#65039; Recent Activity</span>
+            </div>
+            <div class="timeline-content" id="timeline"></div>
+        </div>
+        
+        <!-- MITRE ATT&CK Heatmap -->
+        <div class="card mitre-section">
+            <div class="card-header">
+                <span class="card-title">&#127919; MITRE ATT&CK Coverage</span>
+            </div>
+            <div class="mitre-grid" id="mitre-grid"></div>
+            <div style="margin-top: 15px; display: flex; justify-content: space-around; font-size: 0.75em; flex-wrap: wrap; gap: 10px;">
+                <span><span class="mitre-cell mitre-low" style="display:inline-block;width:15px;height:15px;"></span> Low</span>
+                <span><span class="mitre-cell mitre-medium" style="display:inline-block;width:15px;height:15px;"></span> Medium</span>
+                <span><span class="mitre-cell mitre-high" style="display:inline-block;width:15px;height:15px;"></span> High</span>
+                <span><span class="mitre-cell mitre-critical" style="display:inline-block;width:15px;height:15px;"></span> Critical</span>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        /* ============ Simulation timer manager (punch list item 3) ============
+           Pauses all interval-driven activity when the browser tab is hidden,
+           or when the parent multi-screen viewer hides this panel. Eliminates
+           wasted CPU on classroom and projector machines. */
+        var SimTimers = (function () {
+            'use strict';
+            var timers = [];
+            var running = !document.hidden;
+            var parentPaused = false;
+            function startAll() {
+                timers.forEach(function (t) {
+                    if (t.id === null) { t.id = setInterval(t.fn, t.ms); }
+                });
+            }
+            function stopAll() {
+                timers.forEach(function (t) {
+                    if (t.id !== null) { clearInterval(t.id); t.id = null; }
+                });
+            }
+            function sync() {
+                var shouldRun = !document.hidden && !parentPaused;
+                if (shouldRun && !running) { running = true; startAll(); }
+                else if (!shouldRun && running) { running = false; stopAll(); }
+            }
+            document.addEventListener('visibilitychange', sync);
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.type === 'soc-sim') {
+                    if (d.cmd === 'pause') { parentPaused = true; sync(); }
+                    else if (d.cmd === 'resume') { parentPaused = false; sync(); }
+                }
+            });
+            return {
+                add: function (fn, ms) {
+                    var t = { fn: fn, ms: ms, id: null };
+                    timers.push(t);
+                    if (running) { t.id = setInterval(fn, ms); }
+                    return t.id;
+                }
+            };
+        })();
+
+        // Alert Types Database - EXPANDED for 2+ hour viewing sessions
+        const alertTypes = [
+            // Authentication Attacks (15)
+            { type: 'Brute Force Attack', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Password Spraying', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Credential Stuffing Attack', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Kerberoasting Detected', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'AS-REP Roasting Attack', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Golden Ticket Attack', category: 'Authentication', tactics: ['TA0006', 'TA0008'] },
+            { type: 'Silver Ticket Attack', category: 'Authentication', tactics: ['TA0006', 'TA0008'] },
+            { type: 'Pass-the-Hash Detected', category: 'Authentication', tactics: ['TA0006', 'TA0008'] },
+            { type: 'Pass-the-Ticket Detected', category: 'Authentication', tactics: ['TA0006', 'TA0008'] },
+            { type: 'NTLM Relay Attack', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'OAuth Token Theft', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'SAML Token Forgery', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'MFA Bypass Attempt', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'SSO Abuse Detected', category: 'Authentication', tactics: ['TA0006'] },
+            { type: 'Session Hijacking', category: 'Authentication', tactics: ['TA0006'] },
+            
+            // Credential Access (12)
+            { type: 'Credential Dumping', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'LSASS Memory Access', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'SAM Database Access', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'DCSync Attack Detected', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Mimikatz Activity', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Keylogger Detected', category: 'Credential', tactics: ['TA0006', 'TA0009'] },
+            { type: 'Browser Credential Theft', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Password Manager Access', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Vault Credential Access', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Cloud Credential Harvesting', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Private Key Extraction', category: 'Credential', tactics: ['TA0006'] },
+            { type: 'Credential File Access', category: 'Credential', tactics: ['TA0006'] },
+            
+            // Endpoint/Malware (18)
+            { type: 'Malware Detected', category: 'Endpoint', tactics: ['TA0002', 'TA0005'] },
+            { type: 'Ransomware Behavior', category: 'Endpoint', tactics: ['TA0040'] },
+            { type: 'Trojan Detected', category: 'Endpoint', tactics: ['TA0002'] },
+            { type: 'Rootkit Activity', category: 'Endpoint', tactics: ['TA0005', 'TA0003'] },
+            { type: 'Bootkit Detected', category: 'Endpoint', tactics: ['TA0003'] },
+            { type: 'Fileless Malware', category: 'Endpoint', tactics: ['TA0002', 'TA0005'] },
+            { type: 'Cryptominer Detected', category: 'Endpoint', tactics: ['TA0040'] },
+            { type: 'Wiper Malware Detected', category: 'Endpoint', tactics: ['TA0040'] },
+            { type: 'RAT Activity Detected', category: 'Endpoint', tactics: ['TA0011'] },
+            { type: 'Backdoor Communication', category: 'Endpoint', tactics: ['TA0011', 'TA0003'] },
+            { type: 'Spyware Activity', category: 'Endpoint', tactics: ['TA0009'] },
+            { type: 'Adware Installation', category: 'Endpoint', tactics: ['TA0002'] },
+            { type: 'PUP Detected', category: 'Endpoint', tactics: ['TA0002'] },
+            { type: 'Dropper Execution', category: 'Endpoint', tactics: ['TA0002'] },
+            { type: 'Loader Activity', category: 'Endpoint', tactics: ['TA0002'] },
+            { type: 'Infostealer Detected', category: 'Endpoint', tactics: ['TA0009', 'TA0010'] },
+            { type: 'Banking Trojan Activity', category: 'Endpoint', tactics: ['TA0009'] },
+            { type: 'Worm Propagation', category: 'Endpoint', tactics: ['TA0008'] },
+            
+            // Execution (14)
+            { type: 'Suspicious PowerShell', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'Encoded PowerShell Command', category: 'Execution', tactics: ['TA0002', 'TA0005'] },
+            { type: 'WMI Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'WMIC Abuse', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'Mshta Execution', category: 'Execution', tactics: ['TA0002', 'TA0005'] },
+            { type: 'Regsvr32 Abuse', category: 'Execution', tactics: ['TA0002', 'TA0005'] },
+            { type: 'Rundll32 Abuse', category: 'Execution', tactics: ['TA0002', 'TA0005'] },
+            { type: 'CMSTP Bypass', category: 'Execution', tactics: ['TA0002', 'TA0005'] },
+            { type: 'Script Host Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'Macro Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'HTA File Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'JavaScript Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'VBScript Execution', category: 'Execution', tactics: ['TA0002'] },
+            { type: 'Scheduled Task Creation', category: 'Execution', tactics: ['TA0002', 'TA0003'] },
+            
+            // Network/C2 (16)
+            { type: 'C2 Communication', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Lateral Movement Detected', category: 'Network', tactics: ['TA0008'] },
+            { type: 'DNS Tunneling', category: 'Network', tactics: ['TA0011', 'TA0010'] },
+            { type: 'ICMP Tunneling', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Beaconing Activity', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Domain Fronting', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Fast Flux DNS', category: 'Network', tactics: ['TA0011'] },
+            { type: 'DGA Domain Contact', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Tor Network Access', category: 'Network', tactics: ['TA0011'] },
+            { type: 'VPN Tunnel Detected', category: 'Network', tactics: ['TA0011'] },
+            { type: 'Proxy Chain Detected', category: 'Network', tactics: ['TA0011'] },
+            { type: 'RDP Tunnel Detected', category: 'Network', tactics: ['TA0008', 'TA0011'] },
+            { type: 'SSH Tunnel Detected', category: 'Network', tactics: ['TA0008', 'TA0011'] },
+            { type: 'SMB Lateral Movement', category: 'Network', tactics: ['TA0008'] },
+            { type: 'WinRM Abuse', category: 'Network', tactics: ['TA0008'] },
+            { type: 'DCOM Exploitation', category: 'Network', tactics: ['TA0008'] },
+            
+            // Email (10)
+            { type: 'Phishing Email Detected', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Spear Phishing Attempt', category: 'Email', tactics: ['TA0001'] },
+            { type: 'BEC Attack Detected', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Malicious Attachment', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Malicious Link Clicked', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Email Forwarding Rule', category: 'Email', tactics: ['TA0009', 'TA0010'] },
+            { type: 'Inbox Rule Manipulation', category: 'Email', tactics: ['TA0003'] },
+            { type: 'Email Account Compromise', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Whaling Attack Detected', category: 'Email', tactics: ['TA0001'] },
+            { type: 'Vishing Attempt Reported', category: 'Email', tactics: ['TA0001'] },
+            
+            // Web (12)
+            { type: 'SQL Injection Attempt', category: 'Web', tactics: ['TA0001'] },
+            { type: 'XSS Attack Detected', category: 'Web', tactics: ['TA0001'] },
+            { type: 'CSRF Attack Blocked', category: 'Web', tactics: ['TA0001'] },
+            { type: 'Path Traversal Attempt', category: 'Web', tactics: ['TA0001'] },
+            { type: 'LFI Attack Detected', category: 'Web', tactics: ['TA0001'] },
+            { type: 'RFI Attack Detected', category: 'Web', tactics: ['TA0001'] },
+            { type: 'Command Injection', category: 'Web', tactics: ['TA0001', 'TA0002'] },
+            { type: 'SSRF Attack Detected', category: 'Web', tactics: ['TA0001'] },
+            { type: 'XXE Attack Blocked', category: 'Web', tactics: ['TA0001'] },
+            { type: 'Deserialization Attack', category: 'Web', tactics: ['TA0001'] },
+            { type: 'API Abuse Detected', category: 'Web', tactics: ['TA0001'] },
+            { type: 'Web Scraping Activity', category: 'Web', tactics: ['TA0043'] },
+            
+            // Reconnaissance (10)
+            { type: 'Port Scan Detected', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'Network Enumeration', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'Service Discovery', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'LDAP Enumeration', category: 'Reconnaissance', tactics: ['TA0043', 'TA0007'] },
+            { type: 'AD Enumeration', category: 'Reconnaissance', tactics: ['TA0043', 'TA0007'] },
+            { type: 'DNS Zone Transfer', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'SNMP Enumeration', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'Share Enumeration', category: 'Reconnaissance', tactics: ['TA0007'] },
+            { type: 'User Enumeration', category: 'Reconnaissance', tactics: ['TA0043'] },
+            { type: 'Vulnerability Scanning', category: 'Reconnaissance', tactics: ['TA0043'] },
+            
+            // Persistence (12)
+            { type: 'Web Shell Detected', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Registry Run Key Added', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Startup Folder Modified', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Service Installation', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'DLL Hijacking', category: 'Persistence', tactics: ['TA0003', 'TA0004'] },
+            { type: 'COM Hijacking', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'WMI Subscription', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Scheduled Task Persistence', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Account Creation', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'SSH Key Added', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'Cron Job Added', category: 'Persistence', tactics: ['TA0003'] },
+            { type: 'BITS Job Persistence', category: 'Persistence', tactics: ['TA0003'] },
+            
+            // Privilege Escalation (10)
+            { type: 'Privilege Escalation', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'UAC Bypass Detected', category: 'Privilege', tactics: ['TA0004', 'TA0005'] },
+            { type: 'Token Manipulation', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Sudo Abuse', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'SUID Exploitation', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Kernel Exploit Detected', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Named Pipe Impersonation', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Potato Attack Detected', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Print Spooler Exploit', category: 'Privilege', tactics: ['TA0004'] },
+            { type: 'Service Account Abuse', category: 'Privilege', tactics: ['TA0004'] },
+            
+            // Defense Evasion (14)
+            { type: 'Log Clearing', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Timestomping Detected', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Process Injection', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Process Hollowing', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'DLL Side-Loading', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Masquerading Detected', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Hidden Files Created', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'AV Disabled', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Firewall Rule Modified', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'AMSI Bypass', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'ETW Tampering', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Indicator Removal', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Binary Padding', category: 'Defense Evasion', tactics: ['TA0005'] },
+            { type: 'Code Signing Abuse', category: 'Defense Evasion', tactics: ['TA0005'] },
+            
+            // Exfiltration (8)
+            { type: 'Data Exfiltration Attempt', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'Large File Upload', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'Cloud Storage Upload', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'USB Data Copy', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'Email Data Exfil', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'FTP Data Transfer', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'Encrypted Channel Exfil', category: 'Exfiltration', tactics: ['TA0010'] },
+            { type: 'Steganography Detected', category: 'Exfiltration', tactics: ['TA0010'] },
+            
+            // Collection (8)
+            { type: 'Screen Capture Detected', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Audio Capture Detected', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Clipboard Data Access', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Email Collection', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Archive Created', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Database Dump', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Sensitive File Access', category: 'Collection', tactics: ['TA0009'] },
+            { type: 'Browser Data Collection', category: 'Collection', tactics: ['TA0009'] },
+            
+            // Impact (8)
+            { type: 'Service Stopped', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Data Encrypted', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Data Destroyed', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Defacement Detected', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Resource Hijacking', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'System Shutdown', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Firmware Corruption', category: 'Impact', tactics: ['TA0040'] },
+            { type: 'Disk Wipe Detected', category: 'Impact', tactics: ['TA0040'] },
+            
+            // Cloud (10)
+            { type: 'Cloud IAM Change', category: 'Cloud', tactics: ['TA0003', 'TA0004'] },
+            { type: 'S3 Bucket Exposed', category: 'Cloud', tactics: ['TA0010'] },
+            { type: 'Cloud Instance Launched', category: 'Cloud', tactics: ['TA0042'] },
+            { type: 'Cloud API Abuse', category: 'Cloud', tactics: ['TA0002'] },
+            { type: 'Cloud Trail Disabled', category: 'Cloud', tactics: ['TA0005'] },
+            { type: 'Cloud Key Compromised', category: 'Cloud', tactics: ['TA0006'] },
+            { type: 'Container Escape', category: 'Cloud', tactics: ['TA0004'] },
+            { type: 'Kubernetes Abuse', category: 'Cloud', tactics: ['TA0002'] },
+            { type: 'Serverless Injection', category: 'Cloud', tactics: ['TA0002'] },
+            { type: 'Cloud Storage Enumeration', category: 'Cloud', tactics: ['TA0007'] }
+        ];
+        
+        const severities = ['critical', 'high', 'medium', 'low'];
+        
+        // Expanded sources (25+)
+        const sources = [
+            'Firewall', 'EDR', 'IDS/IPS', 'WAF', 'Email Gateway', 'SIEM', 'Proxy',
+            'Antivirus', 'DLP', 'CASB', 'NDR', 'Sandbox', 'Honeypot', 'DNS Security',
+            'Load Balancer', 'VPN Gateway', 'Cloud WAF', 'API Gateway', 'SOAR',
+            'Threat Intel', 'User Behavior', 'Network TAP', 'Packet Broker', 'Deception',
+            'Container Security', 'CWPP', 'CSPM', 'Zero Trust', 'PAM'
+        ];
+        
+        // Expanded users (50+)
+        const users = [
+            'jsmith', 'admin', 'svc_backup', 'guest', 'dev_user', 'db_admin', 'SYSTEM',
+            'mjohnson', 'agarcia', 'rwilliams', 'kbrown', 'ldavis', 'cmiller', 'dwilson',
+            'jmoore', 'tanderson', 'jthomas', 'mwhite', 'dharris', 'smartin', 'jthompson',
+            'svc_sql', 'svc_web', 'svc_app', 'svc_scan', 'svc_deploy', 'svc_monitor',
+            'administrator', 'root', 'LOCAL_SERVICE', 'NETWORK_SERVICE', 'DefaultAccount',
+            'cjackson', 'blee', 'nwalker', 'ahall', 'jallen', 'pyoung', 'mking', 'lwright',
+            'kscott', 'btorres', 'phill', 'jgreen', 'badams', 'rnelson', 'mcarter',
+            'svc_backup2', 'svc_replica', 'svc_audit', 'service_acct', 'automation',
+            'deploy_user', 'jenkins', 'gitlab', 'ansible', 'terraform'
+        ];
+        
+        // Expanded internal IP ranges (15+)
+        const internalIPs = [
+            '10.0.1.', '10.0.2.', '10.0.3.', '10.0.4.', '10.0.5.', 
+            '10.1.1.', '10.1.2.', '10.2.0.', '10.10.10.', '10.20.30.',
+            '192.168.1.', '192.168.2.', '192.168.10.', '192.168.100.',
+            '172.16.0.', '172.16.1.', '172.17.0.', '172.18.0.', '172.31.0.'
+        ];
+        
+        // Expanded external IP ranges (40+ representing various threat origins)
+        const externalIPs = [
+            '45.33.', '185.220.', '91.121.', '104.248.', '23.129.', '51.15.', '62.210.',
+            '77.247.', '89.248.', '94.102.', '103.75.', '109.70.', '116.202.', '128.199.',
+            '134.209.', '138.68.', '139.162.', '141.98.', '142.93.', '143.110.',
+            '157.245.', '159.65.', '159.89.', '161.35.', '164.90.', '165.22.',
+            '167.71.', '167.172.', '170.64.', '174.138.', '178.128.', '178.62.',
+            '185.56.', '185.129.', '188.166.', '192.81.', '193.26.', '194.5.',
+            '195.123.', '198.211.', '206.189.', '207.154.', '209.97.', '212.71.'
+        ];
+        
+        let alerts = [];
+        let alertId = 1000;
+        let counts = { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
+        let hourlyData = Array(12).fill(0).map(() => Math.floor(Math.random() * 50) + 10);
+        let currentFilter = 'all';
+        
+        const mitreTactics = [
+            'TA0043', 'TA0042', 'TA0001', 'TA0002', 'TA0003', 'TA0004',
+            'TA0005', 'TA0006', 'TA0007', 'TA0008', 'TA0009', 'TA0011',
+            'TA0010', 'TA0040', 'TA0041', 'TA0042', 'TA0043', 'TA0001'
+        ];
+        
+        const tacticNames = {
+            'TA0043': 'Recon', 'TA0042': 'Resource', 'TA0001': 'Initial', 
+            'TA0002': 'Execution', 'TA0003': 'Persist', 'TA0004': 'Priv Esc',
+            'TA0005': 'Defense', 'TA0006': 'Cred Access', 'TA0007': 'Discovery',
+            'TA0008': 'Lateral', 'TA0009': 'Collection', 'TA0011': 'C2',
+            'TA0010': 'Exfil', 'TA0040': 'Impact', 'TA0041': 'Resource'
+        };
+        
+        function randomIP(type) {
+            const base = type === 'internal' ? 
+                internalIPs[Math.floor(Math.random() * internalIPs.length)] :
+                externalIPs[Math.floor(Math.random() * externalIPs.length)];
+            return base + Math.floor(Math.random() * 254) + 1 + '.' + Math.floor(Math.random() * 254);
+        }
+        
+        function generateAlert() {
+            const alertType = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+            const weight = { critical: 0.1, high: 0.2, medium: 0.35, low: 0.35 };
+            const rand = Math.random();
+            let actualSeverity = 'low';
+            let cumulative = 0;
+            for (const [sev, w] of Object.entries(weight)) {
+                cumulative += w;
+                if (rand < cumulative) {
+                    actualSeverity = sev;
+                    break;
+                }
+            }
+            
+            return {
+                id: alertId++,
+                type: alertType.type,
+                category: alertType.category,
+                severity: actualSeverity,
+                source: sources[Math.floor(Math.random() * sources.length)],
+                sourceIP: randomIP('external'),
+                destIP: randomIP('internal'),
+                user: users[Math.floor(Math.random() * users.length)],
+                timestamp: new Date(),
+                tactics: alertType.tactics,
+                status: 'new'
+            };
+        }
+        
+        function renderAlert(alert) {
+            return `
+                <div class="alert-item severity-${alert.severity} new-alert" data-severity="${alert.severity}" data-id="${alert.id}">
+                    <div class="alert-header">
+                        <div>
+                            <span class="severity-badge ${alert.severity}">${alert.severity}</span>
+                            <span class="alert-title">${alert.type}</span>
+                        </div>
+                        <span class="alert-time">${formatTime(alert.timestamp)}</span>
+                    </div>
+                    <div class="alert-details">
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">Source</span>
+                            <span>${alert.source}</span>
+                        </div>
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">Source IP</span>
+                            <span>${alert.sourceIP}</span>
+                        </div>
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">Dest IP</span>
+                            <span>${alert.destIP}</span>
+                        </div>
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">User</span>
+                            <span>${alert.user}</span>
+                        </div>
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">Category</span>
+                            <span>${alert.category}</span>
+                        </div>
+                        <div class="alert-detail-item">
+                            <span class="alert-detail-label">ID</span>
+                            <span>#${alert.id}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', { hour12: false });
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('datetime').textContent = 
+                now.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                }) + ' ' + formatTime(now);
+        }
+        
+        function updateCounts() {
+            document.getElementById('critical-count').textContent = counts.critical;
+            document.getElementById('high-count').textContent = counts.high;
+            document.getElementById('medium-count').textContent = counts.medium;
+            document.getElementById('low-count').textContent = counts.low;
+            document.getElementById('total-count').textContent = counts.total;
+            document.getElementById('queue-count').textContent = `${alerts.length} alerts`;
+        }
+        
+        function addAlert() {
+            const alert = generateAlert();
+            alerts.unshift(alert);
+            counts[alert.severity]++;
+            counts.total++;
+            
+            if (alerts.length > 100) {
+                alerts.pop();
+            }
+            
+            renderAlerts();
+            updateCounts();
+            updateTimeline(alert);
+        }
+        
+        function renderAlerts() {
+            const list = document.getElementById('alert-list');
+            const filtered = currentFilter === 'all' ? 
+                alerts : 
+                alerts.filter(a => a.severity === currentFilter);
+            
+            list.innerHTML = filtered.map(renderAlert).join('');
+        }
+        
+        function updateTimeline(alert) {
+            const timeline = document.getElementById('timeline');
+            const colors = {
+                critical: '#ff4757',
+                high: '#ffa502',
+                medium: '#ffd43b',
+                low: '#2ed573'
+            };
+            
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            item.innerHTML = `
+                <div class="timeline-dot" style="background: ${colors[alert.severity]}"></div>
+                <div class="timeline-content-inner">
+                    <div>${alert.type}</div>
+                    <div class="timeline-time">${formatTime(alert.timestamp)} - ${alert.source}</div>
+                </div>
+            `;
+            
+            timeline.insertBefore(item, timeline.firstChild);
+            
+            while (timeline.children.length > 8) {
+                timeline.removeChild(timeline.lastChild);
+            }
+        }
+        
+        function renderHourlyChart() {
+            const chart = document.getElementById('hourly-chart');
+            const max = Math.max(...hourlyData);
+            const hours = ['00', '02', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22'];
+            
+            chart.innerHTML = hourlyData.map((value, i) => `
+                <div class="bar" style="height: ${(value / max) * 100}%" data-value="${value}">
+                    <span class="bar-label">${hours[i]}</span>
+                </div>
+            `).join('');
+        }
+        
+        function renderMitreGrid() {
+            const grid = document.getElementById('mitre-grid');
+            grid.innerHTML = mitreTactics.map(tactic => {
+                const levels = ['mitre-low', 'mitre-medium', 'mitre-high', 'mitre-critical'];
+                const level = levels[Math.floor(Math.random() * levels.length)];
+                return `<div class="mitre-cell ${level}" title="${tacticNames[tactic] || tactic}">${tacticNames[tactic] || ''}</div>`;
+            }).join('');
+        }
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderAlerts();
+            });
+        });
+        
+        function init() {
+            for (let i = 0; i < 15; i++) {
+                const alert = generateAlert();
+                alert.timestamp = new Date(Date.now() - Math.random() * 3600000);
+                alerts.push(alert);
+                counts[alert.severity]++;
+                counts.total++;
+            }
+            
+            alerts.sort((a, b) => b.timestamp - a.timestamp);
+            
+            renderAlerts();
+            updateCounts();
+            renderHourlyChart();
+            renderMitreGrid();
+            updateDateTime();
+            
+            alerts.slice(0, 5).forEach(updateTimeline);
+            
+            SimTimers.add(updateDateTime, 1000);
+            SimTimers.add(addAlert, 3000 + Math.random() * 5000);
+            SimTimers.add(() => {
+                hourlyData.shift();
+                hourlyData.push(Math.floor(Math.random() * 50) + 10);
+                renderHourlyChart();
+            }, 30000);
+        }
+        
+        init();
+    
+
+        // -- Display Info Panel --
+        function toggleDisplayInfo() {
+            var overlay = document.getElementById('diOverlay');
+            if (overlay.classList.contains('visible')) {
+                overlay.classList.remove('visible');
+                if (window.__diReturnFocus && window.__diReturnFocus.focus) { window.__diReturnFocus.focus(); }
+                window.__diReturnFocus = null;
+            } else {
+                window.__diReturnFocus = document.activeElement;
+                overlay.classList.add('visible');
+                updateDI();
+                var closeBtn = overlay.querySelector('.di-close');
+                if (closeBtn) closeBtn.focus();
+            }
+        }
+        function updateDI() {
+            var w = screen.width, h = screen.height;
+            var dpr = window.devicePixelRatio || 1;
+            var vpW = window.innerWidth, vpH = window.innerHeight;
+            document.getElementById('diResolution').textContent = w + ' x ' + h;
+            document.getElementById('diDPR').textContent = dpr.toFixed(1) + 'x';
+            document.getElementById('diViewport').textContent = vpW + ' x ' + vpH;
+            var badge = document.getElementById('diBadge');
+            var rating, cls;
+            if (vpW >= 1920) { rating = 'Optimal'; cls = 'optimal'; }
+            else if (vpW >= 1400) { rating = 'Good'; cls = 'good'; }
+            else if (vpW >= 1200) { rating = 'Acceptable'; cls = 'acceptable'; }
+            else { rating = 'Limited'; cls = 'limited'; }
+            badge.textContent = rating;
+            badge.className = 'di-badge ' + cls;
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var overlay = document.getElementById('diOverlay');
+                if (overlay && overlay.classList.contains('visible')) {
+                    overlay.classList.remove('visible');
+                }
+            }
+        });
+        window.addEventListener('resize', function() {
+            if (document.getElementById('diOverlay').classList.contains('visible')) updateDI();
+        });
+
+    </script>
+
+<script>
+/* CSP-safe delegated event dispatcher + accessibility helpers (a11y pass). */
+(function () {
+    'use strict';
+    function parseArg(tok, el, ev) {
+        tok = tok.trim();
+        if (tok === 'this') return el;
+        if (tok === 'event') return ev;
+        if (tok === 'true') return true;
+        if (tok === 'false') return false;
+        var qs = tok.match(/^this\.querySelector\('([^']+)'\)$/);
+        if (qs) return el.querySelector(qs[1]);
+        var str = tok.match(/^'([^']*)'$/);
+        if (str) return str[1];
+        if (/^-?\d+(\.\d+)?$/.test(tok)) return Number(tok);
+        return undefined;
+    }
+    function splitArgs(s) {
+        var out = [], depth = 0, q = false, cur = '';
+        for (var i = 0; i < s.length; i++) {
+            var c = s[i];
+            if (c === "'" ) { q = !q; cur += c; }
+            else if (!q && c === '(') { depth++; cur += c; }
+            else if (!q && c === ')') { depth--; cur += c; }
+            else if (!q && depth === 0 && c === ',') { out.push(cur); cur = ''; }
+            else cur += c;
+        }
+        if (cur.trim()) out.push(cur);
+        return out;
+    }
+    function runAction(expr, el, ev) {
+        var m = expr.match(/^\s*([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/);
+        if (!m) return;
+        var fn = window[m[1]];
+        if (typeof fn !== 'function') return;
+        var args = m[2].trim() ? splitArgs(m[2]).map(function (t) { return parseArg(t, el, ev); }) : [];
+        fn.apply(null, args);
+    }
+    document.addEventListener('click', function (ev) {
+        var dis = ev.target.closest('[data-dismiss]');
+        if (dis && ev.target === dis) {
+            var f = window[dis.getAttribute('data-dismiss')];
+            if (typeof f === 'function') f();
+            return;
+        }
+        var t = ev.target.closest('[data-action]');
+        if (t) runAction(t.getAttribute('data-action'), t, ev);
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+            var t = ev.target.closest('[role="button"][data-action]');
+            if (t) { ev.preventDefault(); runAction(t.getAttribute('data-action'), t, ev); }
+        }
+        if (ev.key === 'Tab') { /* basic focus trap for the display-info dialog */
+            var ov = document.getElementById('diOverlay');
+            if (!ov || !ov.classList.contains('visible')) return;
+            var f = ov.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]');
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+            else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+        }
+    });
+})();
+</script>
+</body>
+</html>

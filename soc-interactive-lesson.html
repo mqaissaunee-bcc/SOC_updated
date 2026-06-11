@@ -1,0 +1,2980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Analyst Foundations &#8212; Interactive Pre-Training Lesson</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #06090f;
+            --bg-panel: #0c1219;
+            --bg-card: #111923;
+            --bg-elevated: #182231;
+            --border-dim: #1e2d3d;
+            --border-active: #2a7fff;
+            --accent-blue: #3b9eff;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-red: #f87171;
+            --accent-purple: #a78bfa;
+            --text-primary: #e8edf4;
+            --text-secondary: #8899ab;
+            --text-dim: #4a5e73;
+            --glow-blue: rgba(59, 158, 255, 0.15);
+            --glow-cyan: rgba(34, 211, 238, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* &#9472;&#9472; HERO SECTION &#9472;&#9472; */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59,158,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 20% 80%, rgba(34,211,238,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border-dim) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-dim) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.15;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 99px;
+            padding: 6px 18px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: fadeSlideUp 0.8s ease-out;
+        }
+
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeSlideUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin-bottom: 3rem;
+            animation: fadeSlideUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: fadeSlideUp 0.8s ease-out 0.3s both;
+            font-family: inherit;
+        }
+
+        .hero-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(59, 158, 255, 0.3);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 4rem;
+            animation: fadeSlideUp 0.8s ease-out 0.4s both;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .num {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .hero-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* &#9472;&#9472; NAVIGATION &#9472;&#9472; */
+        .lesson-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(6, 9, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-dim);
+            padding: 0 2rem;
+            display: none;
+        }
+
+        .lesson-nav.visible { display: block; }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-inner::-webkit-scrollbar { display: none; }
+
+        .nav-btn {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 16px 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover { color: var(--text-secondary); }
+        .nav-btn.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .nav-progress {
+            margin-left: auto;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            padding: 0 8px;
+        }
+
+        .progress-bar-mini {
+            width: 100px;
+            height: 3px;
+            background: var(--bg-elevated);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar-mini .fill {
+            height: 100%;
+            background: var(--accent-blue);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        /* &#9472;&#9472; LESSON CONTENT &#9472;&#9472; */
+        .lesson-body {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+            display: none;
+        }
+
+        .lesson-body.visible { display: block; }
+
+        /* &#9472;&#9472; SECTIONS &#9472;&#9472; */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active { display: block; }
+
+        .section-eyebrow {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .section-intro {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+        }
+
+        /* &#9472;&#9472; CONTENT BLOCKS &#9472;&#9472; */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s;
+        }
+
+        .content-card:hover {
+            border-color: rgba(59, 158, 255, 0.2);
+        }
+
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-card h3 .icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glow-blue);
+            border-radius: 8px;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .content-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .content-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* &#9472;&#9472; KEY TERM &#9472;&#9472; */
+        .key-term {
+            display: inline-block;
+            background: var(--glow-blue);
+            color: var(--accent-blue);
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.88em;
+            cursor: help;
+            border-bottom: 1px dashed var(--accent-blue);
+        }
+
+        /* &#9472;&#9472; TIER CARDS &#9472;&#9472; */
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .tier-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 14px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tier-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .tier-card.t1::before { background: var(--accent-green); }
+        .tier-card.t2::before { background: var(--accent-amber); }
+        .tier-card.t3::before { background: var(--accent-red); }
+
+        .tier-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-card.t1 .tier-label { color: var(--accent-green); }
+        .tier-card.t2 .tier-label { color: var(--accent-amber); }
+        .tier-card.t3 .tier-label { color: var(--accent-red); }
+
+        .tier-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tier-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .tier-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tier-card ul li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .tier-card ul li::before {
+            content: '\2192';
+            position: absolute;
+            left: 0;
+            color: var(--text-dim);
+        }
+
+        /* &#9472;&#9472; SCREEN PREVIEW CARDS &#9472;&#9472; */
+        .screen-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            .screen-grid { grid-template-columns: 1fr; }
+        }
+
+        .screen-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .screen-preview:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .screen-preview .preview-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-dim);
+        }
+
+        .screen-num {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .screen-preview:nth-child(1) .screen-num { background: rgba(59,158,255,0.15); color: var(--accent-blue); }
+        .screen-preview:nth-child(2) .screen-num { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
+        .screen-preview:nth-child(3) .screen-num { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
+        .screen-preview:nth-child(4) .screen-num { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+
+        .preview-header h4 { font-size: 1rem; }
+
+        .screen-preview .preview-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .screen-preview .preview-body p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin: 2px 3px 2px 0;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* &#9472;&#9472; EXPANDABLE DETAIL PANELS &#9472;&#9472; */
+        .expand-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .expand-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .expand-header:hover { background: var(--bg-elevated); }
+
+        .expand-header h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .expand-arrow {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .expand-panel.open .expand-arrow { transform: rotate(180deg); }
+
+        .expand-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .expand-panel.open .expand-body {
+            max-height: 2000px;
+        }
+
+        .expand-content {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .expand-content p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            margin-bottom: 1rem;
+        }
+
+        /* &#9472;&#9472; DIAGRAM / FLOW &#9472;&#9472; */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: 14px;
+        }
+
+        .flow-step {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 10px;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            min-width: 110px;
+            transition: all 0.3s;
+        }
+
+        .flow-step:hover {
+            border-color: var(--accent-blue);
+            background: var(--glow-blue);
+        }
+
+        .flow-step .step-num {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .flow-arrow {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+        }
+
+        /* &#9472;&#9472; MITRE TACTIC GRID &#9472;&#9472; */
+        .tactic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .tactic-cell {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tactic-cell:hover,
+        .tactic-cell.active-tip {
+            border-color: var(--accent-red);
+            background: rgba(248, 113, 113, 0.08);
+            color: var(--accent-red);
+        }
+
+        .tactic-cell .tactic-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .tactic-cell.active-tip .tactic-id { color: #fca5a5; }
+
+        .tactic-tip-display {
+            background: var(--bg-elevated);
+            border: 1px solid var(--accent-red);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            display: none;
+            animation: fadeSlideUp 0.25s ease;
+        }
+
+        .tactic-tip-display.show { display: block; }
+
+        .tactic-tip-display .tip-name {
+            font-weight: 600;
+            color: var(--accent-red);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .tactic-tip-display .tip-text {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* &#9472;&#9472; VIDEO CARDS &#9472;&#9472; */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .video-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .video-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .video-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .video-thumb iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            padding: 14px 16px;
+        }
+
+        .video-info h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .video-info .video-meta {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .video-info p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .video-tag {
+            display: inline-block;
+            background: var(--glow-blue);
+            color: var(--accent-blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-family: 'IBM Plex Mono', monospace;
+            margin-top: 8px;
+        }
+
+        /* &#9472;&#9472; QUIZ SECTION &#9472;&#9472; */
+        .quiz-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quiz-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+        }
+
+        .quiz-question {
+            margin-bottom: 2rem;
+        }
+
+        .quiz-question p {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .quiz-question .q-num {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--accent-blue);
+            margin-right: 6px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quiz-option {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: var(--text-primary);
+            text-align: left;
+            width: 100%;
+        }
+
+        .quiz-option:hover:not(.selected) {
+            border-color: var(--accent-blue);
+            background: var(--glow-blue);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--accent-green);
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--accent-green);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+        }
+
+        .quiz-explanation {
+            margin-top: 10px;
+            padding: 12px 16px;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: none;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .quiz-explanation.show { display: block; animation: fadeIn 0.3s ease; }
+
+        /* &#9472;&#9472; ALERT SEVERITY DEMO &#9472;&#9472; */
+        .severity-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .severity-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            border-left: 4px solid;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .severity-row:hover { transform: translateX(4px); }
+
+        .severity-row.critical { border-left-color: #ef4444; }
+        .severity-row.high { border-left-color: #f97316; }
+        .severity-row.medium { border-left-color: #eab308; }
+        .severity-row.low { border-left-color: #22c55e; }
+        .severity-row.info { border-left-color: #3b82f6; }
+
+        .sev-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 3px 10px;
+            border-radius: 4px;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .severity-row.critical .sev-badge { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .severity-row.high .sev-badge { background: rgba(249,115,22,0.15); color: #f97316; }
+        .severity-row.medium .sev-badge { background: rgba(234,179,8,0.15); color: #eab308; }
+        .severity-row.low .sev-badge { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .severity-row.info .sev-badge { background: rgba(59,130,246,0.15); color: #3b82f6; }
+
+        .sev-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        /* &#9472;&#9472; IOC TYPE BADGES &#9472;&#9472; */
+        .ioc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .ioc-type {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+
+        .ioc-type:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .ioc-type h5 {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--accent-cyan);
+        }
+
+        .ioc-type p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .ioc-example {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            background: var(--bg-panel);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* &#9472;&#9472; INFO CALLOUT &#9472;&#9472; */
+        .callout {
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-size: 0.92rem;
+        }
+
+        .callout.info {
+            background: rgba(59,158,255,0.06);
+            border: 1px solid rgba(59,158,255,0.15);
+            color: var(--text-secondary);
+        }
+
+        .callout.tip {
+            background: rgba(34,211,238,0.06);
+            border: 1px solid rgba(34,211,238,0.15);
+        }
+
+        .callout.warning {
+            background: rgba(251,191,36,0.06);
+            border: 1px solid rgba(251,191,36,0.15);
+        }
+
+        .callout-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .callout.info .callout-label { color: var(--accent-blue); }
+        .callout.tip .callout-label { color: var(--accent-cyan); }
+        .callout.warning .callout-label { color: var(--accent-amber); }
+
+        /* &#9472;&#9472; GLOSSARY &#9472;&#9472; */
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .glossary-item {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .glossary-item dt {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-bottom: 4px;
+        }
+
+        .glossary-item dd {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        /* &#9472;&#9472; SECTION NAVIGATION &#9472;&#9472; */
+        .section-nav-bottom {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-dim);
+        }
+
+        .nav-prev, .nav-next {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .nav-prev:hover, .nav-next:hover {
+            border-color: var(--accent-blue);
+            background: var(--glow-blue);
+        }
+
+        .nav-prev:disabled, .nav-next:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        /* &#9472;&#9472; INTERACTIVE ALERT SIM &#9472;&#9472; */
+        .alert-sim {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .sim-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .sim-header h4 {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sim-alert {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .sim-alert .alert-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .sim-alert .alert-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .sim-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sim-btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .sim-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .sim-btn.selected-correct {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(52,211,153,0.1);
+        }
+
+        .sim-btn.selected-wrong {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            background: rgba(248,113,113,0.1);
+        }
+
+        .sim-feedback {
+            margin-top: 1rem;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .sim-feedback.show { display: block; animation: fadeIn 0.3s ease; }
+        .sim-feedback.correct { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--accent-green); }
+        .sim-feedback.wrong { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--accent-red); }
+
+        /* &#9472;&#9472; ANIMATIONS &#9472;&#9472; */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* &#9472;&#9472; RESPONSIVE &#9472;&#9472; */
+        @media (max-width: 600px) {
+            .hero-stats { flex-direction: column; gap: 1.5rem; }
+            .tier-grid { grid-template-columns: 1fr; }
+            .tactic-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .section-nav-bottom { flex-direction: column; gap: 10px; }
+        }
+
+        /* &#9472;&#9472; COMPLETION &#9472;&#9472; */
+        .completion-screen {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .completion-icon {
+            width: 80px; height: 80px;
+            background: rgba(52,211,153,0.1);
+            border: 2px solid var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 2rem;
+        }
+
+        .completion-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-screen p {
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .score-display {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        /* &#9472;&#9472; VIDEO SECTION &#9472;&#9472; */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+        }
+
+        .video-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .video-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .video-embed {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #000;
+        }
+
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            padding: 14px 16px;
+        }
+
+        .video-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.35;
+        }
+
+        .video-source {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .video-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+    
+        /* ============ Accessibility (a11y pass) ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        :focus-visible {
+            outline: 2px solid #a55eea;
+            outline-offset: 2px;
+        }
+        [role="button"] { cursor: pointer; }
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            z-index: 10000;
+            background: #0f1320;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 0 0 8px 0;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            left: 0;
+        }
+    
+        .completion-code {
+            margin-top: 16px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        .completion-code strong {
+            color: #2ed573;
+            font-size: 1.2rem;
+            letter-spacing: 1.5px;
+        }
+        .completion-code .code-note {
+            display: block;
+            font-size: 0.8rem;
+            opacity: 0.75;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#lessonBody" class="skip-link">Skip to main content</a>
+
+<!-- &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; HERO &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; -->
+<section class="hero" id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-badge"><span class="dot"></span> Pre-Training Module</div>
+    <h1>Inside the <span class="gradient-text">Security Operations Center</span></h1>
+    <p class="hero-subtitle">
+        An interactive lesson covering everything you need to know before stepping into the SOC simulation. Learn the tools, the terminology, and the analyst mindset.
+    </p>
+    <button class="hero-start-btn" data-action="startLesson()">Begin Lesson &#8595;</button>
+    <div class="hero-stats">
+        <div class="hero-stat"><div class="num">10</div><div class="label">Modules</div></div>
+        <div class="hero-stat"><div class="num">20</div><div class="label">Quiz Questions</div></div>
+        <div class="hero-stat"><div class="num">~45</div><div class="label">Minutes</div></div>
+    </div>
+</section>
+
+<!-- &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; NAV &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; -->
+<nav class="lesson-nav" id="lessonNav">
+    <div class="nav-inner">
+        <button class="nav-btn active" data-section="0">What is a SOC?</button>
+        <button class="nav-btn" data-section="1">SOC Team</button>
+        <button class="nav-btn" data-section="2">Core Tools</button>
+        <button class="nav-btn" data-section="3">MITRE ATT&CK</button>
+        <button class="nav-btn" data-section="4">IOCs</button>
+        <button class="nav-btn" data-section="5">Alert Triage</button>
+        <button class="nav-btn" data-section="6">Your 4 Screens</button>
+        <button class="nav-btn" data-section="7">Video Resources</button>
+        <button class="nav-btn" data-section="8">Multidisciplinary</button>
+        <button class="nav-btn" data-section="9">Knowledge Check</button>
+        <div class="nav-progress">
+            <div class="progress-bar-mini"><div class="fill" id="progressFill" style="width:12.5%"></div></div>
+            <span id="progressText">1/9</span>
+        </div>
+    </div>
+</nav>
+
+<!-- &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; LESSON BODY &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; -->
+<div class="lesson-body" id="lessonBody" role="main">
+
+<!-- &#9472;&#9472; SECTION 0: WHAT IS A SOC &#9472;&#9472; -->
+<div class="section active" data-idx="0">
+    <div class="section-eyebrow">Module 01</div>
+    <h2 class="section-title">What Is a Security Operations Center?</h2>
+    <p class="section-intro">The SOC is the nerve center of an organization's cybersecurity defense. It's where threats are detected, analyzed, and neutralized in real time &#8212; 24 hours a day, 365 days a year.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#127970;</span> The Mission</h3>
+        <p>A <span class="key-term">Security Operations Center (SOC)</span> is a centralized facility &#8212; or virtual team &#8212; responsible for continuously monitoring, detecting, analyzing, and responding to cybersecurity threats across an organization's entire IT infrastructure. Think of it as a command center for digital defense.</p>
+        <p>The SOC exists to reduce the time between a breach happening and the organization knowing about it (called <span class="key-term">dwell time</span>). The faster threats are discovered, the less damage they cause.</p>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#9881;&#65039;</span> Core Functions</h3>
+        <p>Every SOC performs five essential functions that form a continuous security cycle:</p>
+        <div class="flow-diagram">
+            <div class="flow-step"><span class="step-num">Step 1</span>Monitor</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">Step 2</span>Detect</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">Step 3</span>Analyze</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">Step 4</span>Respond</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">Step 5</span>Improve</div>
+        </div>
+        <p><strong>Monitor:</strong> Continuously watch networks, endpoints, servers, and cloud environments for suspicious activity.</p>
+        <p><strong>Detect:</strong> Use automated tools and human analysis to identify potential threats from the flood of data.</p>
+        <p><strong>Analyze:</strong> Investigate detected events to determine if they are real attacks or harmless false positives.</p>
+        <p><strong>Respond:</strong> Contain threats, eradicate malicious activity, and recover affected systems.</p>
+        <p><strong>Improve:</strong> Document lessons learned, update detection rules, and strengthen defenses for the future.</p>
+    </div>
+
+    <div class="callout info">
+        <span class="callout-label">Key Concept</span>
+        A SOC's effectiveness is measured by metrics like <strong>Mean Time to Detect (MTTD)</strong> and <strong>Mean Time to Respond (MTTR)</strong>. Faster detection and response means less damage from cyberattacks.
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#127760;</span> Why SOCs Matter</h3>
+        <p>Modern organizations face thousands of security events every day. Without a SOC, attacks can go undetected for weeks or even months. The average SOC receives tens of thousands of alerts daily &#8212; but only a small fraction point to real threats. The SOC team's job is to find those real needles in an enormous haystack of data.</p>
+        <p>SOCs protect sensitive data (customer records, financial information, intellectual property), ensure regulatory compliance (HIPAA, PCI-DSS, GDPR), maintain business continuity, and serve as the organization's first line of defense against cyber criminals, nation-state actors, and insider threats.</p>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" disabled>&#8592; Previous</button>
+        <button class="nav-next" data-action="goToSection(1)">SOC Team Structure &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 1: SOC TEAM &#9472;&#9472; -->
+<div class="section" data-idx="1">
+    <div class="section-eyebrow">Module 02</div>
+    <h2 class="section-title">The SOC Team Structure</h2>
+    <p class="section-intro">SOC teams are organized into tiers based on experience and responsibility. Each tier handles different types of work, from initial alert review to advanced threat hunting.</p>
+
+    <div class="tier-grid">
+        <div class="tier-card t1">
+            <div class="tier-label">Tier 1 &#8212; Triage Analyst</div>
+            <h4>Alert Monitoring & Initial Response</h4>
+            <p>The front line. Tier 1 analysts are the first to see alerts as they come in and make the initial call on whether they're real threats.</p>
+            <ul>
+                <li>Monitor SIEM dashboards 24/7</li>
+                <li>Review and classify incoming alerts</li>
+                <li>Distinguish true positives from false positives</li>
+                <li>Escalate confirmed threats to Tier 2</li>
+                <li>Document all triage decisions</li>
+            </ul>
+        </div>
+        <div class="tier-card t2">
+            <div class="tier-label">Tier 2 &#8212; Incident Responder</div>
+            <h4>Deep Investigation & Containment</h4>
+            <p>When Tier 1 escalates a confirmed threat, Tier 2 dives deeper to understand the full scope and contain the damage.</p>
+            <ul>
+                <li>Perform deep-dive investigation of escalated alerts</li>
+                <li>Determine scope and impact of incidents</li>
+                <li>Use threat intelligence (IOCs, TTPs) for correlation</li>
+                <li>Coordinate containment and remediation</li>
+                <li>Escalate critical incidents to Tier 3</li>
+            </ul>
+        </div>
+        <div class="tier-card t3">
+            <div class="tier-label">Tier 3 &#8212; Threat Hunter</div>
+            <h4>Proactive Hunting & Advanced Analysis</h4>
+            <p>The most experienced analysts. They don't wait for alerts &#8212; they proactively search for threats hiding in the network.</p>
+            <ul>
+                <li>Proactively hunt for unknown threats</li>
+                <li>Perform vulnerability assessments</li>
+                <li>Conduct malware reverse engineering</li>
+                <li>Optimize detection rules and tools</li>
+                <li>Lead response for critical breaches</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <span class="callout-label">Your Role in the Simulation</span>
+        During the SOC simulation exercises, you'll primarily work at the <strong>Tier 1</strong> level (alert triage and monitoring), progressing through <strong>Tier 2</strong> (incident investigation) and into <strong>Tier 3</strong> (threat hunting) activities as you advance through the training scenarios.
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128101;</span> Additional SOC Roles</h3>
+        <p><strong>SOC Manager:</strong> Supervises the entire team, sets priorities, creates processes, handles staffing, and reports security posture to executive leadership (the CISO).</p>
+        <p><strong>Security Engineer:</strong> Builds and maintains the tools and infrastructure the analysts use &#8212; SIEM rules, firewall configurations, detection signatures, and automation playbooks.</p>
+        <p><strong>Forensics Analyst:</strong> Investigates completed incidents to reconstruct what happened, preserve evidence, and support legal or compliance proceedings.</p>
+        <p><strong>Malware Analyst:</strong> Reverse-engineers malicious software to understand how it works, what it does, and how to detect it in the future.</p>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(0)">&#8592; What is a SOC?</button>
+        <button class="nav-next" data-action="goToSection(2)">Core Tools &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 2: CORE TOOLS &#9472;&#9472; -->
+<div class="section" data-idx="2">
+    <div class="section-eyebrow">Module 03</div>
+    <h2 class="section-title">Core SOC Tools & Technologies</h2>
+    <p class="section-intro">SOC analysts rely on a suite of specialized tools to monitor, detect, and respond to threats. Here are the essential technologies you'll encounter in the simulation.</p>
+
+    <div class="expand-panel" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this)">
+        <div class="expand-header">
+            <h4>&#128269; SIEM &#8212; Security Information & Event Management</h4>
+            <div class="expand-arrow">&#9660;</div>
+        </div>
+        <div class="expand-body">
+            <div class="expand-content">
+                <p>The SIEM is the <strong>central nervous system</strong> of the SOC. It collects, aggregates, and correlates log data from every device on the network &#8212; servers, firewalls, endpoints, applications, cloud services &#8212; and analyzes it to detect suspicious patterns.</p>
+                <p><strong>What it does:</strong> Ingests millions of log events per day. Applies correlation rules to identify attack patterns. Generates alerts when suspicious activity is detected. Provides dashboards for real-time visibility. Stores historical data for forensic investigation.</p>
+                <p><strong>In your simulation:</strong> Screen 1 (SIEM Dashboard) shows the alert queue, severity filters, alert volume trends, and MITRE ATT&CK heatmap. This is where you'll spend most of your time as a Tier 1 analyst.</p>
+                <p><strong>Real-world examples:</strong> Splunk, IBM QRadar, Microsoft Sentinel, Elastic SIEM, LogRhythm.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="expand-panel" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this)">
+        <div class="expand-header">
+            <h4>&#127760; Network Monitoring & IDS/IPS</h4>
+            <div class="expand-arrow">&#9660;</div>
+        </div>
+        <div class="expand-body">
+            <div class="expand-content">
+                <p>Network monitoring tools watch all traffic flowing through the organization's network. They look for suspicious patterns, unauthorized connections, and known malicious traffic signatures.</p>
+                <p><strong>IDS (Intrusion Detection System)</strong> passively monitors traffic and generates alerts when it sees something suspicious. <strong>IPS (Intrusion Prevention System)</strong> goes further by actively blocking malicious traffic in real time.</p>
+                <p><strong>What to watch for:</strong> Unusual traffic volumes or destinations. Connections to known malicious IP addresses. Port scanning activity. Data exfiltration patterns (large outbound transfers). Command-and-control (C2) beaconing behavior.</p>
+                <p><strong>In your simulation:</strong> Screen 2 (Network Monitor) shows the global threat map, live traffic graphs, firewall logs, top talkers, and port activity.</p>
+                <p><strong>Real-world examples:</strong> Snort, Suricata, Zeek (Bro), Palo Alto NGFW, Wireshark for packet analysis.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="expand-panel" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this)">
+        <div class="expand-header">
+            <h4>&#128680; Incident Response Platform</h4>
+            <div class="expand-arrow">&#9660;</div>
+        </div>
+        <div class="expand-body">
+            <div class="expand-content">
+                <p>When an alert is confirmed as a real incident, it moves into the incident response platform. This is where the SOC team manages the full lifecycle of a security incident &#8212; from detection through containment, eradication, recovery, and lessons learned.</p>
+                <p><strong>Key capabilities:</strong> Case management and ticketing for tracking incidents. Timeline reconstruction to understand the attack sequence. Playbooks with step-by-step response procedures. Communication and escalation workflows. Evidence collection and chain-of-custody tracking.</p>
+                <p><strong>In your simulation:</strong> Screen 3 (Incident Response Console) shows active cases, IOC details, affected assets, response actions, and response playbooks.</p>
+                <p><strong>Real-world examples:</strong> ServiceNow SecOps, Palo Alto XSOAR, Splunk SOAR, TheHive, IBM Resilient.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="expand-panel" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this)">
+        <div class="expand-header">
+            <h4>&#129504; Threat Intelligence Platform</h4>
+            <div class="expand-arrow">&#9660;</div>
+        </div>
+        <div class="expand-body">
+            <div class="expand-content">
+                <p>Threat intelligence is information about known threats &#8212; who the attackers are, what tools they use, what they target, and how they operate. A threat intelligence platform collects, organizes, and distributes this information to the SOC team.</p>
+                <p><strong>Types of threat intelligence:</strong> <em>Strategic</em> &#8212; high-level trends for leadership. <em>Tactical</em> &#8212; TTPs (tactics, techniques, procedures) for security teams. <em>Operational</em> &#8212; details about specific campaigns or attacks. <em>Technical</em> &#8212; specific IOCs like malicious IP addresses, file hashes, and domains.</p>
+                <p><strong>In your simulation:</strong> Screen 4 (Threat Intel & Endpoints) shows live threat feeds, endpoint health status, vulnerability management data, and compliance scores.</p>
+                <p><strong>Real-world examples:</strong> Recorded Future, Mandiant Threat Intelligence, MISP (open-source), AlienVault OTX, VirusTotal.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="expand-panel" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this)">
+        <div class="expand-header">
+            <h4>&#128187; EDR &#8212; Endpoint Detection & Response</h4>
+            <div class="expand-arrow">&#9660;</div>
+        </div>
+        <div class="expand-body">
+            <div class="expand-content">
+                <p>EDR solutions are installed on individual endpoints (laptops, desktops, servers) to monitor and protect them against threats at the device level. They provide visibility into what's happening on each machine in real time.</p>
+                <p><strong>Key capabilities:</strong> Real-time monitoring of processes, file changes, and network connections on endpoints. Behavioral analysis to detect suspicious activity that signature-based tools miss. Remote isolation of compromised machines. Forensic data collection from endpoints. Automated response actions like killing processes or quarantining files.</p>
+                <p><strong>In your simulation:</strong> Endpoint status data appears on Screen 4, showing which machines are healthy, which have active agents, and which may be compromised.</p>
+                <p><strong>Real-world examples:</strong> CrowdStrike Falcon, SentinelOne, Microsoft Defender for Endpoint, Carbon Black.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(1)">&#8592; SOC Team</button>
+        <button class="nav-next" data-action="goToSection(3)">MITRE ATT&CK &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 3: MITRE ATT&CK &#9472;&#9472; -->
+<div class="section" data-idx="3">
+    <div class="section-eyebrow">Module 04</div>
+    <h2 class="section-title">The MITRE ATT&CK Framework</h2>
+    <p class="section-intro">ATT&CK is the industry-standard language for describing how cyberattacks work. Understanding it is essential for every SOC analyst.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128214;</span> What is ATT&CK?</h3>
+        <p><span class="key-term">MITRE ATT&CK</span> (Adversarial Tactics, Techniques, and Common Knowledge) is a globally accessible knowledge base that catalogs real-world adversary behaviors. It was created by the MITRE Corporation based on observations of actual cyberattacks.</p>
+        <p>Think of it as a <strong>dictionary of attack methods</strong>. It gives every type of attacker action a standard name and ID number, so security teams worldwide can communicate clearly about threats. When your SIEM dashboard shows an alert mapped to "T1059 &#8212; Command and Scripting Interpreter," every analyst knows exactly what type of behavior was detected.</p>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#129513;</span> The Three Building Blocks</h3>
+        <p><strong>Tactics</strong> &#8212; The "why." These are the attacker's high-level goals at each phase of an attack. Think of them as the columns of the ATT&CK matrix. Example: "Initial Access" is the tactic of getting a foothold in the target network.</p>
+        <p><strong>Techniques</strong> &#8212; The "how." These are the specific methods attackers use to achieve each tactic. Example: Under "Initial Access," one technique is "Phishing" (T1566) &#8212; sending deceptive emails to trick users into opening malicious attachments.</p>
+        <p><strong>Procedures</strong> &#8212; The "exact steps." These are specific implementations of a technique by a particular threat group. Example: APT29 (a Russian state-sponsored group) uses spear-phishing emails with malicious links as their specific phishing procedure.</p>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128506;&#65039;</span> The 14 ATT&CK Tactics</h3>
+        <p>These are the stages of a cyberattack, from initial foothold to final objective. <strong>Click any tactic</strong> to learn more about it.</p>
+        <div class="tactic-grid">
+            <div class="tactic-cell" data-tip="Gathering information about the target before the attack. Includes scanning for open ports, looking up employee names on LinkedIn, and mapping the network.">Reconnaissance<span class="tactic-id">TA0043</span></div>
+            <div class="tactic-cell" data-tip="Setting up infrastructure for the attack &#8212; purchasing domains, creating phishing emails, developing malware, and compromising third-party accounts.">Resource Development<span class="tactic-id">TA0042</span></div>
+            <div class="tactic-cell" data-tip="Getting the first foothold in the target network. Methods include phishing, exploiting public-facing applications, and using stolen credentials.">Initial Access<span class="tactic-id">TA0001</span></div>
+            <div class="tactic-cell" data-tip="Running malicious code on the target system. Includes running scripts (PowerShell, Python), exploiting command interpreters, or using scheduled tasks.">Execution<span class="tactic-id">TA0002</span></div>
+            <div class="tactic-cell" data-tip="Maintaining access even after reboots or credential changes. Techniques include registry run keys, scheduled tasks, and implanted backdoors.">Persistence<span class="tactic-id">TA0003</span></div>
+            <div class="tactic-cell" data-tip="Gaining higher-level permissions on the system. Attackers exploit vulnerabilities or misconfigurations to go from regular user to admin access.">Privilege Escalation<span class="tactic-id">TA0004</span></div>
+            <div class="tactic-cell" data-tip="Avoiding detection by security tools. Includes obfuscating files, disabling antivirus, clearing logs, and masquerading as legitimate processes.">Defense Evasion<span class="tactic-id">TA0005</span></div>
+            <div class="tactic-cell" data-tip="Stealing usernames and passwords. Techniques include keylogging, password dumping (Mimikatz), brute force attacks, and credential harvesting.">Credential Access<span class="tactic-id">TA0006</span></div>
+            <div class="tactic-cell" data-tip="Exploring the compromised environment &#8212; what systems exist, what accounts are available, what data is accessible, and how the network is configured.">Discovery<span class="tactic-id">TA0007</span></div>
+            <div class="tactic-cell" data-tip="Moving from one system to another within the network. Attackers use stolen credentials, remote services, and shared drives to pivot across the environment.">Lateral Movement<span class="tactic-id">TA0008</span></div>
+            <div class="tactic-cell" data-tip="Gathering the data the attacker wants to steal. Includes taking screenshots, capturing keystrokes, accessing email archives, and staging files.">Collection<span class="tactic-id">TA0009</span></div>
+            <div class="tactic-cell" data-tip="Communicating with compromised systems to send commands. Attackers use encrypted channels, DNS tunneling, and web protocols to blend in with normal traffic.">Command &amp; Control<span class="tactic-id">TA0011</span></div>
+            <div class="tactic-cell" data-tip="Stealing data by transferring it out of the network. Methods include uploading to cloud storage, sending data over encrypted connections, or using DNS queries.">Exfiltration<span class="tactic-id">TA0010</span></div>
+            <div class="tactic-cell" data-tip="Disrupting or destroying systems and data. Includes ransomware encryption, data wiping, defacing websites, and denial-of-service attacks.">Impact<span class="tactic-id">TA0040</span></div>
+        </div>
+        <div class="tactic-tip-display" id="tacticTipDisplay">
+            <div class="tip-name" id="tacticTipName"></div>
+            <div class="tip-text" id="tacticTipText"></div>
+        </div>
+    </div>
+
+    <div class="callout warning">
+        <span class="callout-label">In Your Simulation</span>
+        Screen 1 (SIEM Dashboard) includes a <strong>MITRE ATT&CK Heatmap</strong> that shows which tactics and techniques are being detected across the network. Hot spots on the heatmap indicate areas where the most suspicious activity is concentrated &#8212; this helps you quickly identify what stage of an attack may be underway.
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(2)">&#8592; Core Tools</button>
+        <button class="nav-next" data-action="goToSection(4)">Indicators of Compromise &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 4: IOCs &#9472;&#9472; -->
+<div class="section" data-idx="4">
+    <div class="section-eyebrow">Module 05</div>
+    <h2 class="section-title">Indicators of Compromise (IOCs)</h2>
+    <p class="section-intro">IOCs are the digital breadcrumbs that attackers leave behind. Learning to recognize them is one of the most important skills for any SOC analyst.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128270;</span> What are IOCs?</h3>
+        <p>An <span class="key-term">Indicator of Compromise (IOC)</span> is a piece of forensic evidence that suggests a system or network may have been breached. IOCs are the clues that help analysts detect, investigate, and respond to cyberattacks.</p>
+        <p>IOCs are <strong>reactive</strong> by nature &#8212; they're evidence that something has already happened. This is different from <span class="key-term">Indicators of Attack (IOA)</span>, which signal that an attack may be happening right now. A good SOC uses both together.</p>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128194;</span> Types of IOCs</h3>
+        <div class="ioc-grid">
+            <div class="ioc-type">
+                <h5>Network-Based</h5>
+                <p>Suspicious network activity and traffic patterns</p>
+                <span class="ioc-example">Malicious IP: 185.220.101.xx</span><br>
+                <span class="ioc-example">C2 domain: evil-update.xyz</span>
+            </div>
+            <div class="ioc-type">
+                <h5>Host-Based</h5>
+                <p>Suspicious activity on individual computers/servers</p>
+                <span class="ioc-example">Registry key: HKLM\...\Run</span><br>
+                <span class="ioc-example">Unexpected process: svchost2.exe</span>
+            </div>
+            <div class="ioc-type">
+                <h5>File-Based</h5>
+                <p>Malicious files, suspicious hashes, or altered system files</p>
+                <span class="ioc-example">MD5: a3f2b8c...d4e1f0</span><br>
+                <span class="ioc-example">File: invoice.pdf.exe</span>
+            </div>
+            <div class="ioc-type">
+                <h5>Behavioral</h5>
+                <p>Unusual patterns in user or system behavior</p>
+                <span class="ioc-example">500 failed logins in 2 min</span><br>
+                <span class="ioc-example">Admin login at 3:00 AM</span>
+            </div>
+            <div class="ioc-type">
+                <h5>Email-Based</h5>
+                <p>Signs of phishing or email compromise</p>
+                <span class="ioc-example">Spoofed sender domain</span><br>
+                <span class="ioc-example">Macro-enabled .docm attachment</span>
+            </div>
+            <div class="ioc-type">
+                <h5>Geographic</h5>
+                <p>Activity from unexpected locations</p>
+                <span class="ioc-example">Login from 2 countries in 1 hr</span><br>
+                <span class="ioc-example">Traffic to sanctioned nations</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#9889;</span> Common Warning Signs</h3>
+        <div class="severity-demo">
+            <div class="severity-row critical">
+                <span class="sev-badge">Critical</span>
+                <span class="sev-text">Data exfiltration detected &#8212; large outbound transfer to unknown external IP</span>
+            </div>
+            <div class="severity-row critical">
+                <span class="sev-badge">Critical</span>
+                <span class="sev-text">Ransomware signature detected in endpoint memory</span>
+            </div>
+            <div class="severity-row high">
+                <span class="sev-badge">High</span>
+                <span class="sev-text">Mimikatz credential dumping tool detected on domain controller</span>
+            </div>
+            <div class="severity-row medium">
+                <span class="sev-badge">Medium</span>
+                <span class="sev-text">DNS queries to newly registered domain &#8212; potential C2 communication</span>
+            </div>
+            <div class="severity-row low">
+                <span class="sev-badge">Low</span>
+                <span class="sev-text">Single failed SSH login attempt from internal IP address</span>
+            </div>
+            <div class="severity-row info">
+                <span class="sev-badge">Info</span>
+                <span class="sev-text">Scheduled vulnerability scan completed from authorized security scanner</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(3)">&#8592; MITRE ATT&CK</button>
+        <button class="nav-next" data-action="goToSection(5)">Alert Triage &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 5: ALERT TRIAGE &#9472;&#9472; -->
+<div class="section" data-idx="5">
+    <div class="section-eyebrow">Module 06</div>
+    <h2 class="section-title">Alert Triage & Prioritization</h2>
+    <p class="section-intro">With thousands of alerts per day, knowing which to investigate first is the most critical skill for a Tier 1 analyst. Let's practice.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128202;</span> Severity Levels</h3>
+        <p>Alerts are classified by severity &#8212; a quick indicator of how dangerous the threat is and how fast you need to act.</p>
+        <div class="severity-demo">
+            <div class="severity-row critical"><span class="sev-badge">Critical</span><span class="sev-text"><strong>Immediate action required.</strong> Active breach, ransomware execution, confirmed data exfiltration. Drop everything and respond.</span></div>
+            <div class="severity-row high"><span class="sev-badge">High</span><span class="sev-text"><strong>Urgent investigation.</strong> Strong indicators of compromise, credential theft, malware detected. Investigate within minutes.</span></div>
+            <div class="severity-row medium"><span class="sev-badge">Medium</span><span class="sev-text"><strong>Investigate soon.</strong> Suspicious activity that could be malicious &#8212; unusual DNS, policy violations, anomalous behavior.</span></div>
+            <div class="severity-row low"><span class="sev-badge">Low</span><span class="sev-text"><strong>Monitor and document.</strong> Minor policy violations, single failed logins, low-risk anomalies. Review during normal workflow.</span></div>
+            <div class="severity-row info"><span class="sev-badge">Info</span><span class="sev-text"><strong>Awareness only.</strong> Routine events, completed scans, system health updates. No action typically needed.</span></div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#129517;</span> The Triage Decision Process</h3>
+        <div class="flow-diagram">
+            <div class="flow-step"><span class="step-num">1</span>New Alert Arrives</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">2</span>Check Severity</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">3</span>Validate: Real or False Positive?</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">4</span>Investigate Context</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step"><span class="step-num">5</span>Act or Escalate</div>
+        </div>
+        <p><strong>Step 1 &#8212; New alert arrives:</strong> The SIEM generates an alert based on a detection rule matching suspicious activity.</p>
+        <p><strong>Step 2 &#8212; Check severity:</strong> Look at the assigned severity level. Critical and High alerts get immediate attention.</p>
+        <p><strong>Step 3 &#8212; Validate:</strong> Is this a true positive (real threat) or false positive (harmless activity triggering a rule)? Check if the source is a known security scanner, scheduled task, or legitimate business process.</p>
+        <p><strong>Step 4 &#8212; Investigate context:</strong> Cross-reference with other data sources. Check the threat intel feed. Look at the user's history. Review network traffic for corroborating evidence.</p>
+        <p><strong>Step 5 &#8212; Act or escalate:</strong> If confirmed as benign, mark as false positive and document. If confirmed as a real threat, begin containment or escalate to Tier 2.</p>
+    </div>
+
+    <div class="callout tip">
+        <span class="callout-label">Analyst Tip &#8212; Identifying False Positives</span>
+        Common sources of false positives: authorized security scanners and vulnerability assessment tools, scheduled backup jobs running at night, legitimate software updates downloading large files, IT admin accounts performing authorized maintenance, marketing tools syncing data with cloud services. Always check the asset inventory and the user's role before classifying an alert.
+    </div>
+
+    <!-- INTERACTIVE TRIAGE EXERCISE -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Triage This Alert</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">PowerShell encoded command execution detected on WKS-089</div>
+            <div class="alert-meta">Source: WKS-089 (Marketing Dept) &#183; User: jsmith &#183; Time: 14:32 UTC &#183; Rule: Suspicious PowerShell Activity</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the correct first action?</p>
+        <div class="sim-actions" id="triageSim1">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim1')">Immediately isolate the machine</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim1')">Investigate context &#8212; check if jsmith runs authorized scripts</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim1')">Mark as false positive &#8212; PowerShell is normal</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim1')">Ignore &#8212; marketing doesn't have sensitive data</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback1"></div>
+    </div>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Prioritize These Two Alerts</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Alert A: Port scan detected from 10.0.5.100 (IT Security Scanner)</div>
+            <div class="alert-meta">Source: Internal IT subnet &#183; Scheduled scan window &#183; Weekly vulnerability assessment</div>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Alert B: Unusual 500MB outbound transfer to 185.x.x.x (Unknown external IP)</div>
+            <div class="alert-meta">Source: FIN-SERVER-02 (Finance) &#183; User: svc_backup &#183; Time: 02:17 UTC (off-hours)</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which alert should be investigated first?</p>
+        <div class="sim-actions" id="triageSim2">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim2')">Alert A &#8212; port scans are always dangerous</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim2')">Alert B &#8212; large off-hours transfer from finance server is highly suspicious</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim2')">Both equally &#8212; investigate in order received</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback2"></div>
+    </div>
+
+    <!-- TRIAGE EXERCISE 3: Brute Force -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Brute Force or Pen Test?</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">47 failed SSH login attempts from 203.0.113.42 to DMZ-WEB-01 in 3 minutes</div>
+            <div class="alert-meta">Source: DMZ-WEB-01 (Public Web Server) &#183; External IP: 203.0.113.42 (Geo: Romania) &#183; Time: 09:15 UTC &#183; Rule: Brute Force Detection</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the correct first action?</p>
+        <div class="sim-actions" id="triageSim3">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim3')">Block the IP immediately at the firewall</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim3')">Check the pen test schedule, then verify if any login succeeded</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim3')">Ignore &#8212; DMZ servers always get scanned</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim3')">Shut down the SSH service on the server</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback3"></div>
+    </div>
+
+    <!-- TRIAGE EXERCISE 4: Phishing Click -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Phishing Response</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">User reported clicking a link in a suspicious email; a login page appeared before they closed the tab</div>
+            <div class="alert-meta">Source: Email Security Gateway &#183; User: arodriguez (Accounting) &#183; Time: 11:04 UTC &#183; URL: hxxps://m1crosoft-verify[.]com/signin</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the most important immediate action?</p>
+        <div class="sim-actions" id="triageSim4">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim4')">Tell the user to run a virus scan and monitor for a week</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim4')">Block the domain and close the ticket &#8212; the user didn't enter credentials</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim4')">Ask if credentials were entered, then reset the password and check for suspicious logins</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim4')">Escalate directly to Tier 3 &#8212; this requires threat hunting</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback4"></div>
+    </div>
+
+    <!-- TRIAGE EXERCISE 5: Ransomware Indicator -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: File Integrity Alert</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">File Integrity Monitor: 1,247 files renamed with .locked extension on FS-HR-03 in the last 90 seconds</div>
+            <div class="alert-meta">Source: FS-HR-03 (HR File Server) &#183; Process: svchost.exe spawning unknown child process &#183; Time: 03:42 UTC &#183; Rule: Mass File Modification</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the correct response?</p>
+        <div class="sim-actions" id="triageSim5">
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim5')">Immediately isolate FS-HR-03 from the network and escalate as a critical incident</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim5')">Investigate what application is renaming the files before acting</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim5')">Check if this is a scheduled backup encryption job</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim5')">Submit a ticket to the sysadmin team for review in the morning</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback5"></div>
+    </div>
+
+    <!-- TRIAGE EXERCISE 6: Insider Threat Indicators -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Unusual Data Access</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">DLP Alert: User downloaded 340 files from SharePoint "Confidential &#8212; M&A Projects" folder in 12 minutes</div>
+            <div class="alert-meta">Source: DLP Gateway &#183; User: kwilson (Corporate Development) &#183; Time: 17:55 UTC (near end of business) &#183; Rule: Bulk Sensitive File Download</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What should you do first?</p>
+        <div class="sim-actions" id="triageSim6">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim6')">Immediately disable kwilson's account</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim6')">Verify kwilson's role and check HR for any upcoming status changes (resignation, termination)</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim6')">Mark as false positive &#8212; Corporate Development works with M&A files</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim6')">Ignore until the download exceeds 1,000 files</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback6"></div>
+    </div>
+
+    <!-- TRIAGE EXERCISE 7: Multi-Alert Correlation -->
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#127919; Practice: Correlate These Three Alerts</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Alert 1: Successful VPN login for dchung from 91.x.x.x (Ukraine) at 01:14 UTC</div>
+            <div class="alert-meta">Source: VPN Gateway &#183; User: dchung (Engineering) &#183; Rule: Geolocation Anomaly &#8212; user's last login was from San Jose, CA 6 hours ago</div>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Alert 2: dchung accessed source code repo "core-platform" and cloned 3 repositories at 01:22 UTC</div>
+            <div class="alert-meta">Source: GitLab Audit Log &#183; Unusual: dchung typically works on "mobile-app" repo only</div>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Alert 3: New SSH key added to dchung's GitHub account at 01:25 UTC</div>
+            <div class="alert-meta">Source: GitHub Enterprise Audit &#183; Key fingerprint does not match any known device in asset inventory</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">How should these alerts be handled?</p>
+        <div class="sim-actions" id="triageSim7">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim7')">Investigate each alert independently &#8212; they triggered different rules</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim7')">Contact dchung to verify the VPN login &#8212; handle the others later</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim7')">Correlate as one incident &#8212; likely compromised credentials. Disable VPN session, lock the account, and escalate immediately</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim7')">Flag for review in the morning &#8212; engineers sometimes work late</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback7"></div>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(4)">&#8592; IOCs</button>
+        <button class="nav-next" data-action="goToSection(6)">Your 4 Screens &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 6: THE 4 SCREENS &#9472;&#9472; -->
+<div class="section" data-idx="6">
+    <div class="section-eyebrow">Module 07</div>
+    <h2 class="section-title">Your SOC Simulation: The 4 Screens</h2>
+    <p class="section-intro">Now let's walk through each of the four screens you'll use in the simulation. Each represents a critical operational area of a real SOC.</p>
+
+    <div class="screen-grid">
+        <div class="screen-preview" role="button" tabindex="0" aria-expanded="false" data-action="toggleExpand(this.querySelector('.expand-panel-inline'))">
+            <div class="preview-header">
+                <div class="screen-num">1</div>
+                <h4>SIEM Dashboard</h4>
+            </div>
+            <div class="preview-body">
+                <p>Your primary alert management interface. This is where alerts arrive, get classified, and begin investigation.</p>
+                <span class="feature-tag">Alert Queue</span>
+                <span class="feature-tag">Severity Filters</span>
+                <span class="feature-tag">ATT&CK Heatmap</span>
+                <span class="feature-tag">Alert Volume Trends</span>
+                <span class="feature-tag">Event Timeline</span>
+            </div>
+        </div>
+        <div class="screen-preview">
+            <div class="preview-header">
+                <div class="screen-num">2</div>
+                <h4>Network Monitor</h4>
+            </div>
+            <div class="preview-body">
+                <p>Real-time visibility into network traffic patterns across the globe. Watch for suspicious connections and traffic anomalies.</p>
+                <span class="feature-tag">Global Threat Map</span>
+                <span class="feature-tag">Traffic Graphs</span>
+                <span class="feature-tag">Firewall Logs</span>
+                <span class="feature-tag">Top Talkers</span>
+                <span class="feature-tag">Port Activity</span>
+            </div>
+        </div>
+        <div class="screen-preview">
+            <div class="preview-header">
+                <div class="screen-num">3</div>
+                <h4>Incident Response Console</h4>
+            </div>
+            <div class="preview-body">
+                <p>Manage active security incidents from detection through resolution. Track cases, evidence, and response actions.</p>
+                <span class="feature-tag">Case Management</span>
+                <span class="feature-tag">IOC Details</span>
+                <span class="feature-tag">Affected Assets</span>
+                <span class="feature-tag">Response Actions</span>
+                <span class="feature-tag">Playbooks</span>
+            </div>
+        </div>
+        <div class="screen-preview">
+            <div class="preview-header">
+                <div class="screen-num">4</div>
+                <h4>Threat Intel & Endpoints</h4>
+            </div>
+            <div class="preview-body">
+                <p>External threat intelligence feeds and internal endpoint health monitoring. Know the threat landscape and your asset status.</p>
+                <span class="feature-tag">Threat Feeds</span>
+                <span class="feature-tag">Endpoint Status</span>
+                <span class="feature-tag">Vulnerability Mgmt</span>
+                <span class="feature-tag">Compliance Scores</span>
+                <span class="feature-tag">CVE Database</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128279;</span> How the Screens Work Together</h3>
+        <p>In a real investigation, you'll constantly move your attention between screens. Here's a typical workflow:</p>
+        <div class="flow-diagram">
+            <div class="flow-step" style="border-color: rgba(59,158,255,0.3);"><span class="step-num">Screen 1</span>Alert triggers in SIEM</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color: rgba(34,211,238,0.3);"><span class="step-num">Screen 2</span>Check network traffic for corroboration</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color: rgba(167,139,250,0.3);"><span class="step-num">Screen 4</span>Cross-reference with threat intel</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color: rgba(251,191,36,0.3);"><span class="step-num">Screen 3</span>Open incident case & begin response</div>
+        </div>
+        <p><strong>Example scenario:</strong> Screen 1 alerts you to "Suspicious DNS query to newly registered domain." You check Screen 2 and see unusual outbound traffic to that domain from a specific workstation. Screen 4's threat feed confirms the domain is associated with the APT41 threat group. You open a case on Screen 3, document the IOCs, and begin containment by isolating the affected workstation.</p>
+    </div>
+
+    <div class="callout info">
+        <span class="callout-label">Simulation Tip</span>
+        Don't stare at one screen the entire time. Effective SOC analysts develop a <strong>scanning pattern</strong> &#8212; regularly rotating attention across all four screens. Start each shift by getting a "big picture" overview from all screens before focusing on specific alerts.
+    </div>
+
+    <div style="text-align:center; margin:1.5rem 0;">
+        <a href="soc-multi-screen.html" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:14px 32px; background:linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); color:#06090f; font-weight:700; font-size:0.95rem; border-radius:10px; text-decoration:none; letter-spacing:0.02em; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 0 20px rgba(59,158,255,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 30px rgba(59,158,255,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 0 20px rgba(59,158,255,0.25)';">&#128421;&#65039; Launch SOC Simulator</a>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(5)">&#8592; Alert Triage</button>
+        <button class="nav-next" data-action="goToSection(7)">Video Resources &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 7: VIDEO RESOURCES &#9472;&#9472; -->
+<div class="section" data-idx="7">
+    <div class="section-eyebrow">Module 08</div>
+    <h2 class="section-title">Video Resources</h2>
+    <p class="section-intro">Watch these curated videos to deepen your understanding of SOC operations, SIEM tools, MITRE ATT&CK, and real-world analyst workflows.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#127916;</span> SOC Fundamentals & Analyst Roles</h3>
+        <p>Understand what a SOC does, how teams are structured, and what a day in the life of an analyst looks like.</p>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/OHkWXFheSKM" title="Security Operations Center (SOC) Explained &#8211; IBM Technology" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">Security Operations Center (SOC) Explained</div>
+                    <div class="video-source">IBM Technology</div>
+                    <div class="video-desc">IBM breaks down the function and importance of a SOC, including how analysts detect and respond to threats in real time.</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/jbH662x4vUw" title="A Day in the Life of a Cyber Security (SOC) Analyst &#8211; MyDFIR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">A Day in the Life of a Cyber Security (SOC) Analyst</div>
+                    <div class="video-source">MyDFIR</div>
+                    <div class="video-desc">Walk through a typical day for a SOC analyst at an MSSP &#8212; from shift handoff and alert triage to escalation and incident documentation.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128202;</span> SIEM Tools & Log Analysis</h3>
+        <p>See how SIEM platforms collect, correlate, and visualize security events to help analysts detect threats.</p>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/9RfsRn7m7OE" title="What Is SIEM? &#8211; IBM Technology" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">What Is SIEM? Security Information & Event Management</div>
+                    <div class="video-source">IBM Technology</div>
+                    <div class="video-desc">IBM explains how SIEM systems collect logs from across the enterprise, apply correlation rules, and generate actionable alerts for SOC teams.</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/3CiRs6WaWaU" title="Splunk Tutorial for Beginners &#8211; Jon Good" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">Splunk Tutorial for Beginners (Cyber Security Tools)</div>
+                    <div class="video-source">Jon Good</div>
+                    <div class="video-desc">Hands-on walkthrough of Splunk, one of the most widely used SIEM platforms, demonstrating searches, dashboards, and alert configuration.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128506;&#65039;</span> MITRE ATT&CK Framework</h3>
+        <p>Learn how the ATT&CK framework maps real-world adversary behavior and how SOC teams use it daily.</p>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/Yxv1suJYMI8" title="MITRE ATT&CK Framework &#8211; The MITRE Corporation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">MITRE ATT&CK&#174; Framework</div>
+                    <div class="video-source">The MITRE Corporation</div>
+                    <div class="video-desc">The official overview of the ATT&CK matrix &#8212; covering tactics, techniques, and how the framework maps real-world adversary behavior.</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/78RIsFqo9pM" title="How to Use the MITRE ATT&CK Navigator &#8211; Elasticito" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">How to Use the MITRE ATT&CK Navigator</div>
+                    <div class="video-source">Elasticito</div>
+                    <div class="video-desc">Practical tutorial showing how to use the ATT&CK Navigator to visualize coverage, identify gaps, and plan defensive strategies.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128269;</span> Incident Response & Threat Hunting</h3>
+        <p>See how real SOC teams investigate incidents, contain threats, and conduct proactive threat hunts.</p>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/X2UiMLxRdhE" title="Incident Response &#8211; Professor Messer CompTIA Security+" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">Incident Response &#8211; CompTIA Security+ SY0-701</div>
+                    <div class="video-source">Professor Messer</div>
+                    <div class="video-desc">Step-by-step breakdown of the incident response lifecycle: preparation, identification, containment, eradication, recovery, and lessons learned.</div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/VNp35Uw_bSM" title="Cybersecurity Threat Hunting Explained &#8211; IBM Technology" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">Cybersecurity Threat Hunting Explained</div>
+                    <div class="video-source">IBM Technology</div>
+                    <div class="video-desc">IBM explains proactive threat hunting methodologies &#8212; how analysts move beyond alerts to hypothesis-driven investigations that uncover hidden adversaries.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <span class="callout-label">Viewing Tips</span>
+        You don't need to watch all videos before the simulation &#8212; they're here as reference material. We recommend watching at least one video from <strong>"SOC Fundamentals"</strong> and one from <strong>"SIEM Tools"</strong> before your hands-on session. Bookmark this page to revisit the others after training.
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(6)">&#8592; Your 4 Screens</button>
+        <button class="nav-next" data-action="goToSection(8)">Multidisciplinary &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 8: MULTIDISCIPLINARY SCENARIOS &#9472;&#9472; -->
+<div class="section" data-idx="8">
+    <div class="section-eyebrow">Module 09</div>
+    <h2 class="section-title">Multidisciplinary Scenarios</h2>
+    <p class="section-intro">A security incident is rarely just a security problem. The same SOC data gets read through very different professional lenses &#8212; a compliance officer, a nurse, an engineer, and a psychologist will all see different things in the same alert. These scenarios practice applying each lens to the SOC dashboards.</p>
+
+    <div class="content-card">
+        <h3><span class="icon">&#128302;</span> Why Multidisciplinary?</h3>
+        <p>Cybersecurity sits at the intersection of many fields. A ransomware incident at a hospital isn't resolved by the security team alone &#8212; it involves clinicians deciding patient safety protocols, legal counsel assessing HIPAA obligations, communications drafting disclosures, and leadership making business continuity decisions. The best analysts understand how their work connects to the rest of the organization.</p>
+        <p>Each scenario below frames a real SOC data point through a different discipline's viewpoint. Try to answer from that discipline's perspective &#8212; not just the security-analyst perspective.</p>
+    </div>
+
+    <!-- COMPUTER SCIENCE -->
+    <h3 style="color:#3b9eff; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#128187; Computer Science Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Read the SOC as a systems and software problem. Focus on detection logic, data pipelines, rule design, and algorithmic behavior &#8212; not the threat itself.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Broken Detection Rule</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">New detection rule "Suspicious PowerShell v2" is generating ~10,400 alerts/day (previous rule generated ~140/day)</div>
+            <div class="alert-meta">Rule logic: <code>EventID=4104 AND ScriptBlockText CONTAINS "Invoke"</code> &#183; Deployed 18 hours ago &#183; 97%+ flagged as false positives by analysts</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is most likely wrong with the rule?</p>
+        <div class="sim-actions" id="triageSim8">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim8')">The SIEM is broken &#8212; roll back to a previous version</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim8')">The match string is too broad &#8212; "Invoke" appears in benign cmdlets like Invoke-WebRequest, Invoke-Command, Invoke-Expression used by admin scripts</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim8')">Attackers have scaled up PowerShell usage overnight</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim8')">This is expected &#8212; new rules always produce high alert volume initially</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback8"></div>
+    </div>
+
+    <!-- DATA SCIENCE -->
+    <h3 style="color:#22d3ee; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#128202; Data Science Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Read the SOC as a dataset. Focus on distributions, baselines, anomalies, and the statistical story the numbers are telling.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Volume Anomaly Analysis</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Tuesday 02:00&#8211;06:00 UTC: Alert volume was 3.2&times; baseline (304% of normal). Confirmed incidents for the same window: 2 (baseline: 2).</div>
+            <div class="alert-meta">Screen 1 Metrics: MTTD unchanged &#183; MTTR unchanged &#183; False Positive Rate jumped from 31% to 74% &#183; Analyst fatigue score: elevated</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the most supported conclusion from the data?</p>
+        <div class="sim-actions" id="triageSim9">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim9')">There was a sophisticated attack that analysts missed</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim9')">The SOC handled a surge efficiently &#8212; MTTR held steady</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim9')">Something generated noise, not threats &#8212; true positives held flat while false positive rate more than doubled. Investigate for a noisy data source, failed scheduled job, or misconfigured rule.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim9')">Insufficient data &#8212; one night isn't enough signal</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback9"></div>
+    </div>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Detection Model Drift</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">The ML-based lateral movement detector's alert count dropped 60% overnight; no model changes, no infrastructure changes logged.</div>
+            <div class="alert-meta">Precision last week: 0.78 &#183; Recall last week: 0.81 &#183; Current week precision: 0.94 &#183; Current week recall: &#8212; cannot compute (too few positives to measure)</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which hypothesis should you investigate first?</p>
+        <div class="sim-actions" id="triageSim10">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim10')">Celebrate &#8212; higher precision means the model improved</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim10')">A data-pipeline issue is starving the model of inputs &#8212; check log ingestion, feature freshness, and whether upstream sensors are reporting</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim10')">Attackers learned to evade the model</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim10')">Retrain the model immediately with recent data</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback10"></div>
+    </div>
+
+    <!-- BUSINESS & RISK MANAGEMENT -->
+    <h3 style="color:#fbbf24; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#128188; Business &amp; Risk Management Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Translate technical indicators into business language: risk, dollars, obligations, reputational exposure, and decisions an executive can act on.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: 2-Minute Executive Briefing</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Active Incident INC-2024118: Ransomware on FIN-ERP-02 (finance ERP). 340 files encrypted so far; spread contained to one host. Sector tag: Finance/PCI. Last confirmed backup: 4 hours ago.</div>
+            <div class="alert-meta">CISO needs a 2-minute briefing for the CEO in 5 minutes. You have the Screen 3 incident view open.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which briefing leads best?</p>
+        <div class="sim-actions" id="triageSim11">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim11')">"We detected a T1486 data-encryption event via the EDR; the IR playbook is executing."</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim11')">"We have an isolated ransomware incident on one finance server; no data loss expected because backups are 4 hours old; no customer-facing systems affected; estimated restoration window: 6&#8211;8 hours; PCI notification obligations being evaluated."</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim11')">"Everything is under control &#8212; I'll update you when we know more."</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim11')">"Critical ransomware incident in progress &#8212; we're considering paying the ransom to minimize downtime."</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback11"></div>
+    </div>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Breach Notification Trigger</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Confirmed data exfiltration from a SharePoint site containing 12,400 patient records (names, diagnoses, insurance IDs). Sector tag: Healthcare/PHI. Exfiltration window: 23 hours before detection.</div>
+            <div class="alert-meta">Data was transferred to an external IP now associated with a known data-broker marketplace. Regulatory footprint: US (HIPAA), California (CMIA + CCPA), EU patients included (GDPR).</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which is the correct first business/legal obligation?</p>
+        <div class="sim-actions" id="triageSim12">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim12')">Notify affected patients within 24 hours</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim12')">Wait for forensics to confirm full scope before any notification</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim12')">Activate the incident response legal track immediately &#8212; engage counsel, preserve evidence, start the clock on HIPAA (60 days), GDPR (72 hours to DPA), and state-level notification deadlines in parallel</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim12')">Issue a press release before the data broker does</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback12"></div>
+    </div>
+
+    <!-- CRIMINAL JUSTICE -->
+    <h3 style="color:#a78bfa; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#9878;&#65039; Criminal Justice Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Treat the incident as an investigation. Focus on evidence, chain of custody, jurisdictional authority, and what a prosecutor would need.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Cross-Border Jurisdiction</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Confirmed unauthorized access. Attacker source IP geolocates to Russia. Victim asset is a cloud VM hosted in Frankfurt, Germany. The company's legal entity and data owners are in New York, USA. Records accessed include EU-resident PII.</div>
+            <div class="alert-meta">Loss estimate: $4.2M. The FBI field office, the BKA (German federal police), and the company's EU DPO all have a stake.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which authority has primary jurisdiction?</p>
+        <div class="sim-actions" id="triageSim13">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim13')">Russia &#8212; the attacker originated there</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim13')">Germany only &#8212; the server is located there</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim13')">No single authority has exclusive jurisdiction &#8212; the case has concurrent US, German, and EU footprints. Coordinate via MLAT channels and expect FBI, BKA, and the relevant DPA to each assert a role.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim13')">The US company's state of incorporation has sole authority</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback13"></div>
+    </div>
+
+    <!-- PSYCHOLOGY -->
+    <h3 style="color:#ec4899; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#129504; Psychology Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Read behavior, not bytes. Focus on what the pattern of activity reveals about intent, pressure, deception, or analyst cognition.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Behavioral Escalation</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">Employee jwhitfield (Sales) &#8212; 3-week DLP log review. Week 1: printed 12 pages of customer lists (normal). Week 2: emailed 3 client contact lists to personal Gmail (flagged, not blocked). Week 3: downloaded the entire CRM export (8,200 records) at 17:50 Friday (flagged).</div>
+            <div class="alert-meta">HR context: jwhitfield gave 2-week notice on Monday of Week 3. Going to a direct competitor per LinkedIn update.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Which behavioral pattern best describes this?</p>
+        <div class="sim-actions" id="triageSim14">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim14')">Random, opportunistic theft triggered by the resignation</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim14')">Classic pre-departure data exfiltration with escalating boldness &#8212; each week tests the system's response, and silence is interpreted as permission. The Friday-evening timing is a deliberate low-supervision window.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim14')">Legitimate end-of-employment wrap-up</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim14')">Insufficient signal to conclude intent</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback14"></div>
+    </div>
+
+    <!-- HEALTHCARE -->
+    <h3 style="color:#34d399; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#129302; Healthcare Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Patient safety comes before everything. Read the alert asking: "What happens to care if I act &#8212; and what happens to care if I don't?"</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Infected Medical Device</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">EDR Alert: MRI-RAD-03 (MRI Imaging System, Radiology dept) shows malware signature match. Device is currently in the middle of a patient scan. Clinical workflow: 6 scans scheduled today, next in 40 minutes.</div>
+            <div class="alert-meta">Device is a 12-year-old Windows-embedded system. Vendor confirms no patch available. Connected to PACS-01 for image routing.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the correct response sequence?</p>
+        <div class="sim-actions" id="triageSim15">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim15')">Immediately power down the MRI to contain the threat</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim15')">Do nothing until the scan finishes, then reimage the device</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim15')">Let the current scan complete safely, immediately notify the radiology charge nurse and clinical engineering, network-isolate the device (not power-cycle) once the patient is off the table, reroute scheduled scans, and engage the vendor &#8212; all in parallel</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim15')">Block all network traffic to PACS-01 to prevent spread</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback15"></div>
+    </div>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: EHR Access Pattern</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">EHR audit log: user rthompson (Nurse, ICU) accessed the record of patient "M. Thompson" (same last name) 14 times over 3 days. Patient is not assigned to ICU.</div>
+            <div class="alert-meta">No other unusual activity. No data exported or printed. The user has legitimate EHR access for their unit.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the likely HIPAA implication?</p>
+        <div class="sim-actions" id="triageSim16">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim16')">No issue &#8212; the user has valid EHR access</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim16')">Automatic HIPAA breach &#8212; notify patients within 24 hours</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim16')">Potential HIPAA violation (&#8220;snooping&#8221;) &#8212; access without a treatment, payment, or operations purpose. Refer to the Privacy Officer for investigation; outcome determines whether it rises to a reportable breach.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim16')">Terminate the employee immediately</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback16"></div>
+    </div>
+
+    <!-- ENGINEERING -->
+    <h3 style="color:#f97316; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#9881;&#65039; Engineering Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">OT and safety-critical systems have different rules. Availability often outranks confidentiality; a "clean" response can cause physical harm.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: SCADA Anomalous Traffic</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">SCADA-PLANT-07 (SCADA Controller, production line) showing unusual outbound HTTPS connections to a legitimate-looking but previously unseen vendor domain.</div>
+            <div class="alert-meta">Plant floor: currently running a batch process that has 14 hours remaining. Abruptly stopping the batch would cause a $180K material loss plus 36-hour safety-cooldown requirement on the line.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Should you block the traffic at the firewall?</p>
+        <div class="sim-actions" id="triageSim17">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim17')">Yes &#8212; block immediately, any unknown destination from SCADA is unacceptable</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim17')">Not yet &#8212; investigate first with plant operators and OT engineers. SCADA blocks can cause safety-critical failures; the correct path is to verify whether the domain is a legitimate vendor telemetry endpoint, then stage containment around the batch cycle.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim17')">No &#8212; never touch OT traffic, it's not SOC's responsibility</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim17')">Block but alert the plant manager afterward</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback17"></div>
+    </div>
+
+    <!-- SOCIAL SCIENCE -->
+    <h3 style="color:#60a5fa; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#128101; Social Science Lens</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">Security policies operate inside a social and ethical fabric. Consider power dynamics, employee rights, legitimate dissent, and the consequences of surveillance.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Whistleblower or Insider Threat?</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">DLP flagged user kharris (Compliance dept) sending encrypted files to an external law firm domain. Files relate to internal audit findings about a suspected financial reporting irregularity.</div>
+            <div class="alert-meta">Context from HR: kharris recently filed a concern through the internal ethics hotline; was told it had been "handled." Files sent appear to be copies of the same audit documents.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">What is the correct handling?</p>
+        <div class="sim-actions" id="triageSim18">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim18')">Treat as insider threat &#8212; disable account, preserve evidence for termination</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim18')">Ignore &#8212; compliance staff can send to law firms</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim18')">Escalate to Legal and the Ethics/Compliance Officer, not through normal insider-threat channels. Many jurisdictions legally protect whistleblower communications; treating this as a security incident could expose the company to retaliation claims.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim18')">Alert kharris's manager so they can address it</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback18"></div>
+    </div>
+
+    <!-- CROSS-DISCIPLINARY CAPSTONE -->
+    <h3 style="color:#fb7185; margin:2rem 0 0.5rem 0; font-size:1.1rem; letter-spacing:0.05em; text-transform:uppercase;">&#127919; Cross-Disciplinary Capstone</h3>
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">One incident. Many disciplines. Practice identifying which lens to apply when.</p>
+
+    <div class="alert-sim">
+        <div class="sim-header">
+            <h4>&#129504; Practice: Hospital Ransomware &#8212; Whose Job First?</h4>
+        </div>
+        <div class="sim-alert">
+            <div class="alert-title">03:14 UTC: Ransomware detonated across a 340-bed hospital network. EHR offline, imaging systems unresponsive, two IV infusion pumps stuck at last-known settings. Sector tag: Healthcare/PHI. Estimated 48,000 patient records at risk.</div>
+            <div class="alert-meta">You're the on-call SOC lead. In the first 15 minutes, you need to decide who gets pulled in first. All of the roles below will eventually be involved.</div>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Who must be engaged in the first 15 minutes?</p>
+        <div class="sim-actions" id="triageSim19">
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim19')">Legal counsel &#8212; for the HIPAA notification clock</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim19')">Communications &#8212; to prepare a public statement</button>
+            <button class="sim-btn" data-action="checkTriage(this, true, 'triageSim19')">Clinical leadership and biomedical engineering &#8212; because patients are on active medical devices right now. Legal, comms, forensics, and executives all matter, but patient safety is the only ticking clock measured in minutes.</button>
+            <button class="sim-btn" data-action="checkTriage(this, false, 'triageSim19')">Law enforcement &#8212; to start the criminal investigation</button>
+        </div>
+        <div class="sim-feedback" role="status" aria-live="polite" id="triageFeedback19"></div>
+    </div>
+
+    <div class="callout info">
+        <span class="callout-label">Takeaway</span>
+        None of these lenses make anyone a "better analyst" on their own &#8212; but an analyst who knows these lenses exist can raise the right flag to the right colleague at the right moment. In the hands-on exercises, practice narrating what you see out loud: "From a <em>business</em> perspective, this means... From a <em>legal</em> perspective... From a <em>patient safety</em> perspective..."
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(7)">&#8592; Video Resources</button>
+        <button class="nav-next" data-action="goToSection(9)">Knowledge Check &#8594;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; SECTION 9: KNOWLEDGE CHECK &#9472;&#9472; -->
+<div class="section" data-idx="9">
+    <div class="section-eyebrow">Module 10</div>
+    <h2 class="section-title">Knowledge Check</h2>
+    <p class="section-intro">Test your understanding before heading into the simulation. Answer these questions to verify you're ready.</p>
+
+    <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+            <h3>&#128221; Final Assessment</h3>
+            <div class="quiz-score" role="status" aria-live="polite" id="quizScoreDisplay">Score: 0 / 10</div>
+        </div>
+
+        <div class="quiz-question" id="q1">
+            <p><span class="q-num">Q1.</span> What does SIEM stand for?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q1',false)">Security Incident and Emergency Management</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q1',true)">Security Information and Event Management</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q1',false)">System Integration and Endpoint Monitoring</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q1',false)">Secure Infrastructure and Event Mitigation</button>
+            </div>
+            <div class="quiz-explanation" id="q1-exp">SIEM stands for <strong>Security Information and Event Management</strong>. It collects and correlates log data from across the network to detect threats and generate alerts for analysts.</div>
+        </div>
+
+        <div class="quiz-question" id="q2">
+            <p><span class="q-num">Q2.</span> Which SOC tier is responsible for initial alert triage and monitoring?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q2',true)">Tier 1</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q2',false)">Tier 2</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q2',false)">Tier 3</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q2',false)">SOC Manager</button>
+            </div>
+            <div class="quiz-explanation" id="q2-exp">Tier 1 analysts are the front line &#8212; they monitor SIEM dashboards, review incoming alerts, classify them as true or false positives, and escalate confirmed threats to Tier 2.</div>
+        </div>
+
+        <div class="quiz-question" id="q3">
+            <p><span class="q-num">Q3.</span> In the MITRE ATT&CK framework, what do "Tactics" represent?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q3',false)">Specific malware tools used by attackers</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q3',false)">The exact steps taken during a specific attack</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q3',true)">The attacker's high-level goals (the "why")</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q3',false)">Defensive countermeasures used by SOC teams</button>
+            </div>
+            <div class="quiz-explanation" id="q3-exp">Tactics are the "why" &#8212; the attacker's high-level goals at each phase. Techniques are the "how," and Procedures are the specific implementation details.</div>
+        </div>
+
+        <div class="quiz-question" id="q4">
+            <p><span class="q-num">Q4.</span> A scheduled vulnerability scan from an authorized IT security tool triggers a "port scan detected" alert. This is most likely a:</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q4',false)">True Positive &#8212; investigate immediately</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q4',true)">False Positive &#8212; authorized activity triggering a detection rule</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q4',false)">True Negative &#8212; no alert was needed</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q4',false)">Indicator of Attack &#8212; block the source</button>
+            </div>
+            <div class="quiz-explanation" id="q4-exp">This is a <strong>false positive</strong> &#8212; the alert is technically correct (a port scan is happening), but it's from an authorized security tool performing its job. The detection rule should be tuned with an exception for this scanner's IP.</div>
+        </div>
+
+        <div class="quiz-question" id="q5">
+            <p><span class="q-num">Q5.</span> What is an Indicator of Compromise (IOC)?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q5',false)">A firewall rule that blocks malicious traffic</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q5',false)">A prediction that an attack is about to happen</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q5',true)">Forensic evidence suggesting a system has been breached</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q5',false)">A software patch that fixes a vulnerability</button>
+            </div>
+            <div class="quiz-explanation" id="q5-exp">IOCs are digital breadcrumbs &#8212; forensic evidence like malicious IP addresses, suspicious file hashes, unusual traffic patterns, or anomalous login behavior that indicate a breach may have occurred.</div>
+        </div>
+
+        <div class="quiz-question" id="q6">
+            <p><span class="q-num">Q6.</span> Which alert should be prioritized FIRST?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q6',false)">Failed login attempt from an internal user account</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q6',false)">Unusual DNS query to a newly registered domain</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q6',true)">Ransomware signature detected on a production server</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q6',false)">Scheduled backup job transferring files to cloud storage</button>
+            </div>
+            <div class="quiz-explanation" id="q6-exp">Ransomware on a production server is a <strong>critical</strong> threat requiring immediate action. Every second of delay allows the ransomware to encrypt more data and potentially spread to other systems.</div>
+        </div>
+
+        <div class="quiz-question" id="q7">
+            <p><span class="q-num">Q7.</span> In the SOC simulation, which screen shows the global threat map and network traffic?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q7',false)">Screen 1 &#8212; SIEM Dashboard</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q7',true)">Screen 2 &#8212; Network Monitor</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q7',false)">Screen 3 &#8212; Incident Response Console</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q7',false)">Screen 4 &#8212; Threat Intel & Endpoints</button>
+            </div>
+            <div class="quiz-explanation" id="q7-exp">Screen 2 is the Network Monitor &#8212; it displays the global threat map, live traffic graphs, firewall logs, top talkers, and port activity, giving you visibility into network-level threats.</div>
+        </div>
+
+        <div class="quiz-question" id="q8">
+            <p><span class="q-num">Q8.</span> What does "Lateral Movement" mean in the ATT&CK framework?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q8',false)">Stealing data by transferring it outside the network</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q8',true)">Moving from one compromised system to another within the network</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q8',false)">Gaining the initial foothold in the target environment</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q8',false)">Hiding malicious activity from detection tools</button>
+            </div>
+            <div class="quiz-explanation" id="q8-exp">Lateral Movement (TA0008) is when an attacker moves from one compromised system to others within the network, using stolen credentials, remote services, or shared drives to pivot deeper into the environment.</div>
+        </div>
+
+        <div class="quiz-question" id="q9">
+            <p><span class="q-num">Q9.</span> What is the primary purpose of EDR (Endpoint Detection and Response)?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q9',false)">Blocking spam emails from reaching user inboxes</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q9',false)">Generating compliance reports for auditors</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q9',true)">Monitoring and protecting individual devices against threats</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q9',false)">Managing firewall rules at the network perimeter</button>
+            </div>
+            <div class="quiz-explanation" id="q9-exp">EDR solutions are installed on endpoints (laptops, servers, etc.) to monitor processes, file changes, and network connections in real time, detect suspicious behavior, and enable rapid response like isolating compromised machines.</div>
+        </div>
+
+        <div class="quiz-question" id="q10">
+            <p><span class="q-num">Q10.</span> During an investigation, you discover a suspicious DNS query from an internal workstation to a newly registered domain. Screen 4's threat feed confirms this domain is linked to a known threat group. What is the correct next step?</p>
+            <div class="quiz-options">
+                <button class="quiz-option" data-action="checkQuiz(this,'q10',false)">Ignore it &#8212; DNS queries are normal network behavior</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q10',false)">Delete the DNS logs to prevent further queries</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q10',false)">Email the user and ask them to stop visiting that website</button>
+                <button class="quiz-option" data-action="checkQuiz(this,'q10',true)">Open an incident case, document IOCs, and initiate containment of the workstation</button>
+            </div>
+            <div class="quiz-explanation" id="q10-exp">With a corroborated threat intelligence match, this is a confirmed true positive. The correct procedure is to open a formal incident case on Screen 3, document all IOCs (the domain, the source IP, timestamps), and begin containment &#8212; typically by isolating the workstation to prevent further C2 communication.</div>
+        </div>
+    </div>
+
+    <!-- GLOSSARY -->
+    <div class="content-card" style="margin-top:3rem;">
+        <h3><span class="icon">&#128218;</span> Quick Reference Glossary</h3>
+        <div class="glossary-grid">
+            <div class="glossary-item"><dt>SOC</dt><dd>Security Operations Center &#8212; the centralized team and facility for monitoring and responding to cyber threats</dd></div>
+            <div class="glossary-item"><dt>SIEM</dt><dd>Security Information and Event Management &#8212; tool that collects and correlates log data to detect threats</dd></div>
+            <div class="glossary-item"><dt>IOC</dt><dd>Indicator of Compromise &#8212; forensic evidence of a breach (malicious IPs, file hashes, anomalous behavior)</dd></div>
+            <div class="glossary-item"><dt>IOA</dt><dd>Indicator of Attack &#8212; real-time evidence that an attack is currently in progress</dd></div>
+            <div class="glossary-item"><dt>MITRE ATT&CK</dt><dd>Framework cataloging adversary tactics, techniques, and procedures (TTPs) based on real attacks</dd></div>
+            <div class="glossary-item"><dt>TTP</dt><dd>Tactics, Techniques, and Procedures &#8212; the complete description of how an attacker operates</dd></div>
+            <div class="glossary-item"><dt>EDR</dt><dd>Endpoint Detection and Response &#8212; security agents on individual devices that monitor for threats</dd></div>
+            <div class="glossary-item"><dt>IDS / IPS</dt><dd>Intrusion Detection / Prevention System &#8212; monitors network traffic for malicious activity</dd></div>
+            <div class="glossary-item"><dt>C2 / C&C</dt><dd>Command and Control &#8212; attacker infrastructure used to remotely control compromised systems</dd></div>
+            <div class="glossary-item"><dt>Dwell Time</dt><dd>Time between initial compromise and detection &#8212; shorter is better</dd></div>
+            <div class="glossary-item"><dt>False Positive</dt><dd>An alert that fires on legitimate activity &#8212; not an actual threat</dd></div>
+            <div class="glossary-item"><dt>True Positive</dt><dd>An alert that correctly identifies a real threat or attack</dd></div>
+            <div class="glossary-item"><dt>Lateral Movement</dt><dd>Attacker technique of moving between systems within a compromised network</dd></div>
+            <div class="glossary-item"><dt>Exfiltration</dt><dd>The unauthorized transfer of data out of an organization's network</dd></div>
+            <div class="glossary-item"><dt>Playbook</dt><dd>Step-by-step procedure for responding to a specific type of incident</dd></div>
+            <div class="glossary-item"><dt>CVE</dt><dd>Common Vulnerabilities and Exposures &#8212; standardized identifier for known security vulnerabilities</dd></div>
+            <div class="glossary-item"><dt>MTTD / MTTR</dt><dd>Mean Time to Detect / Respond &#8212; key metrics for SOC performance</dd></div>
+            <div class="glossary-item"><dt>Threat Intel</dt><dd>Information about known threats, attackers, and their methods shared across the security community</dd></div>
+        </div>
+    </div>
+
+    <div class="section-nav-bottom">
+        <button class="nav-prev" data-action="goToSection(8)">&#8592; Multidisciplinary</button>
+        <button class="nav-next" data-action="showCompletion()">Complete Lesson &#10003;</button>
+    </div>
+</div>
+
+<!-- &#9472;&#9472; COMPLETION SCREEN &#9472;&#9472; -->
+<div class="section" data-idx="99" id="completionSection" style="display:none;">
+    <div class="completion-screen">
+        <div class="completion-icon">&#10003;</div>
+        <h2>Lesson Complete</h2>
+        <div class="score-display" id="finalScore">0%</div>
+        <div class="score-label">Quiz Accuracy</div>
+        <div class="completion-code" id="completionCode" role="status"></div>
+        <p id="completionMessage" style="margin-top:1.5rem;">You've completed the SOC Foundations lesson. Review any sections you'd like to revisit using the navigation above, then proceed to the hands-on simulation exercises.</p>
+        <a href="soc-multi-screen.html" target="_blank" class="hero-start-btn" style="margin-top:1.5rem; display:inline-block; text-decoration:none; color:inherit;">Launch SOC Simulator &#8594;</a>
+        <button class="hero-start-btn" data-action="goToSection(0)" style="margin-top:0.75rem; background:transparent; border:1px solid var(--border-dim); color:var(--text-secondary);">Review Lesson</button>
+        <button class="hero-start-btn" data-action="resetLessonProgress()" style="margin-top:0.75rem; margin-left:0.75rem; background:transparent; border:1px solid var(--border-dim); color:var(--text-secondary);">Reset Progress</button>
+    </div>
+</div>
+
+</div><!-- end lesson-body -->
+
+<script>
+    let currentSection = 0;
+    const totalSections = 10;
+    let quizScore = 0;
+    /* ============ Progress persistence (punch list item 5) ============ */
+    const LESSON_KEY = 'soc-lesson-v1';
+    function saveLessonState(state) {
+        try { localStorage.setItem(LESSON_KEY, JSON.stringify(state)); } catch (e) { /* private mode etc. */ }
+    }
+    function loadLessonState() {
+        try { return JSON.parse(localStorage.getItem(LESSON_KEY)) || null; } catch (e) { return null; }
+    }
+
+    let lessonState = { started: false, section: 0, quiz: {}, triage: {}, completed: false };
+
+    function buildCompletionCode(pct) {
+        var input = 'SOC-FOUNDATIONS|' + pct + '|' + quizScore + '|' + totalQuizQuestions;
+        var h = 0x811c9dc5;
+        for (var i = 0; i < input.length; i++) {
+            h ^= input.charCodeAt(i);
+            h = Math.imul(h, 0x01000193) >>> 0;
+        }
+        return 'SOC-' + pct + '-' + h.toString(36).toUpperCase().slice(0, 6);
+    }
+
+    function resetLessonProgress() {
+        try { localStorage.removeItem(LESSON_KEY); } catch (e) {}
+        location.reload();
+    }
+
+    let quizAnswered = 0;
+    const totalQuizQuestions = 10;
+
+    function startLesson() {
+        document.getElementById('hero').style.display = 'none';
+        document.getElementById('lessonNav').classList.add('visible');
+        document.getElementById('lessonBody').classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+            lessonState.started = true;
+        saveLessonState(lessonState);
+    }
+
+    function goToSection(idx) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const target = document.querySelector(`.section[data-idx="${idx}"]`);
+        if (target) {
+            target.classList.add('active');
+            currentSection = idx;
+            updateNav();
+            window.scrollTo({ top: document.getElementById('lessonNav').offsetTop - 10, behavior: 'smooth' });
+        }
+            lessonState.section = idx;
+        saveLessonState(lessonState);
+    }
+
+    function updateNav() {
+        document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
+            const isCur = parseInt(btn.dataset.section) === currentSection;
+            btn.classList.toggle('active', isCur);
+            if (isCur) { btn.setAttribute('aria-current', 'step'); } else { btn.removeAttribute('aria-current'); }
+        });
+        const pct = ((currentSection + 1) / totalSections * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressText').textContent = `${currentSection + 1}/${totalSections}`;
+    }
+
+    // Nav button clicks
+    document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
+        btn.addEventListener('click', () => goToSection(parseInt(btn.dataset.section)));
+    });
+
+    // Expandable panels
+    function toggleExpand(el) {
+        if (!el || !el.classList.contains('expand-panel')) {
+            // Find nearest expand-panel parent
+            el = el?.closest?.('.expand-panel');
+            if (!el) return;
+        }
+        el.classList.toggle('open');
+            if (el && el.hasAttribute('role')) { el.setAttribute('aria-expanded', el.classList.contains('expanded')); }
+    }
+
+    document.querySelectorAll('.expand-panel').forEach(panel => {
+        panel.querySelector('.expand-header')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            panel.classList.toggle('open');
+        });
+    });
+
+    // Quiz logic
+    function checkQuiz(btn, qId, correct) {
+        const container = document.getElementById(qId);
+        if (container.dataset.answered) return;
+        container.dataset.answered = 'true';
+
+        const options = container.querySelectorAll('.quiz-option');
+        options.forEach(o => {
+            o.style.pointerEvents = 'none';
+        });
+
+        if (correct) {
+            btn.classList.add('correct');
+            quizScore++;
+        } else {
+            btn.classList.add('incorrect');
+            // Highlight correct answer
+            options.forEach(o => {
+                if (o.getAttribute('data-action')?.includes('true')) {
+                    o.classList.add('correct');
+                }
+            });
+        }
+
+        quizAnswered++;
+        document.getElementById('quizScoreDisplay').textContent = `Score: ${quizScore} / ${totalQuizQuestions}`;
+
+        // Show explanation
+        const exp = document.getElementById(qId + '-exp');
+        if (exp) exp.classList.add('show');
+    
+        // persist this answer (item 5)
+        const persistOpts = Array.from(container.querySelectorAll('.quiz-option'));
+        lessonState.quiz[qId] = persistOpts.indexOf(btn);
+        saveLessonState(lessonState);
+    }
+
+    // Triage sim logic
+    function checkTriage(btn, correct, simId) {
+        const container = document.getElementById(simId);
+        if (container.dataset.answered) return;
+        container.dataset.answered = 'true';
+
+        const buttons = container.querySelectorAll('.sim-btn');
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        if (correct) {
+            btn.classList.add('selected-correct');
+        } else {
+            btn.classList.add('selected-wrong');
+            buttons.forEach(b => {
+                if (b.getAttribute('data-action')?.includes('true')) {
+                    b.classList.add('selected-correct');
+                }
+            });
+        }
+
+        const feedbackId = simId.replace('triageSim', 'triageFeedback');
+        const feedback = document.getElementById(feedbackId);
+        if (feedback) {
+            feedback.classList.add('show', correct ? 'correct' : 'wrong');
+            const messages = {
+                triageSim1: {
+                    correct: '\u2713 Correct! Always investigate context first. PowerShell can be legitimate \u2014 check if the user is authorized to run scripts before escalating or isolating.',
+                    wrong: '\u2717 Not quite. Before taking drastic action, you need to investigate the context. PowerShell is used legitimately by many departments \u2014 check if jsmith has authorization to run scripts.'
+                },
+                triageSim2: {
+                    correct: '\u2713 Correct! Alert A is a false positive (authorized scanner). Alert B shows classic exfiltration indicators: large transfer, finance server, off-hours, unknown destination. Investigate immediately.',
+                    wrong: '\u2717 Not quite. Alert A is from a known, authorized security scanner during its scheduled window \u2014 it\'s a false positive. Alert B has multiple red flags: large data transfer, off-hours, finance server, unknown external IP.'
+                },
+                triageSim3: {
+                    correct: '\u2713 Correct! Before blocking, verify it isn\'t a scheduled pen test. Then check authentication logs \u2014 if any login succeeded, this becomes a much higher priority. Blocking without context could disrupt authorized security testing.',
+                    wrong: '\u2717 Not quite. While this looks concerning, your first step should be checking the pen test schedule and verifying whether any of those 47 attempts actually succeeded. A successful login changes this from a nuisance to a potential breach.'
+                },
+                triageSim4: {
+                    correct: '\u2713 Correct! The defanged URL mimics Microsoft \u2014 this is a credential harvesting page. You need to determine exposure immediately: did the user enter their password? If so (or if uncertain), reset credentials right away and check for unauthorized logins from new locations.',
+                    wrong: '\u2717 Not quite. This is a credential harvesting phishing page (note the typosquatted domain "m1crosoft"). The critical question is whether the user entered credentials. A password reset and login audit should happen immediately \u2014 waiting or just blocking the domain leaves a potential compromise unaddressed.'
+                },
+                triageSim5: {
+                    correct: '\u2713 Correct! Mass file renaming to a .locked extension with a suspicious parent process at 3 AM is a textbook ransomware indicator. Every second of delay means more encrypted files. Isolate immediately, then investigate. This is one of the rare cases where you act first and ask questions after.',
+                    wrong: '\u2717 Not quite. 1,247 files renamed to .locked in 90 seconds from an unknown child process of svchost.exe at 3:42 AM \u2014 this is almost certainly ransomware in progress. Speed is critical: isolate the server immediately to prevent lateral spread. Investigating first costs you files and potentially the entire network.'
+                },
+                triageSim6: {
+                    correct: '\u2713 Correct! The volume and timing are suspicious, but the user\'s department legitimately works with M&A files. Check with HR first \u2014 if kwilson recently resigned or is on a performance improvement plan, this could be data theft. Context turns this from "maybe normal" to "confirmed insider threat" or "business as usual."',
+                    wrong: '\u2717 Not quite. Before taking action, you need context. Kwilson works in Corporate Development, so M&A file access may be normal. But 340 files in 12 minutes near end-of-day is unusual volume. Check with HR for any status changes (resignation, termination) \u2014 that context determines whether this is routine work or data exfiltration.'
+                },
+                triageSim7: {
+                    correct: '\u2713 Correct! These three alerts tell a clear story when correlated: impossible travel (San Jose to Ukraine in 6 hours), access to unusual repos, and persistence via a new SSH key \u2014 classic signs of a compromised account. Treating them separately would miss the pattern. Disable the session and lock the account immediately.',
+                    wrong: '\u2717 Not quite. These alerts are strongly correlated: an impossible-travel VPN login, followed by access to unusual repositories, followed by adding a new SSH key for persistence \u2014 all within 11 minutes. This is a textbook account compromise. Each alert alone might be explainable, but together they demand immediate action: kill the VPN session, lock the account, and escalate.'
+                },
+                triageSim8: {
+                    correct: '\u2713 Correct! The match string "Invoke" is far too broad. It matches dozens of benign cmdlets (Invoke-WebRequest, Invoke-Command, Invoke-Expression, Invoke-RestMethod) used constantly by admin scripts and legitimate tooling. This is a classic detection-engineering mistake: the rule author was trying to catch "Invoke-Mimikatz"-style obfuscation but forgot that "Invoke" is a PowerShell verb, not an attacker signature.',
+                    wrong: '\u2717 Not quite. When a rule goes from ~140 to ~10,400 alerts overnight with a 97% false positive rate, the problem is almost always in the rule logic, not in the environment. "Invoke" appears in many legitimate PowerShell cmdlets \u2014 the match condition is catching normal admin activity. Roll back, refine the pattern (e.g., require suspicious modifiers like base64, hidden windows, or known malicious cmdlets), and test before redeploying.'
+                },
+                triageSim9: {
+                    correct: '\u2713 Correct! The data tells a clear story: true positives stayed flat (2 incidents vs. baseline 2), but false positive rate more than doubled (31% \u2192 74%). That means something was generating alert-like events that weren\'t real threats. Common culprits: a failed scheduled job retrying thousands of times, a misconfigured log source dumping debug data, or a noisy new detection rule. The attack hypothesis is not supported by the data.',
+                    wrong: '\u2717 Not quite. The key data point is that true positives held steady (2 incidents) while the false positive rate jumped from 31% to 74%. If this were a real attack, you\'d expect incidents to rise, not just alert volume. Noise and signal look different in the data: a spike in volume with unchanged true positives is a noise event, not a threat event.'
+                },
+                triageSim10: {
+                    correct: '\u2713 Correct! A sudden 60% drop with precision rising to 0.94 but recall uncomputable is a data-quality red flag, not a model success. It means the model is seeing very few events, and the few it sees are clean hits. That pattern is consistent with starvation \u2014 the model isn\'t getting data to score. Check the pipeline: are log sources reporting? Are features being computed? Is a sensor down?',
+                    wrong: '\u2717 Not quite. High precision with uncomputable recall is a warning sign, not a win. The model isn\'t better \u2014 it just has almost nothing to look at. Before celebrating or retraining, check the data pipeline: log ingestion, feature freshness, sensor health. A silent pipeline break is a common cause of sudden model "improvement."'
+                },
+                triageSim11: {
+                    correct: '\u2713 Correct! A good exec brief leads with scope (one server, contained), impact (no data loss, no customer-facing effect), time-to-recovery (6\u20138 hours), and open obligations (PCI evaluation). It avoids jargon like T1486 and EDR, and it doesn\'t promise either "everything\'s fine" or jump to drastic decisions like paying ransom. The CEO needs to know how to answer if asked by the board, not the MITRE technique ID.',
+                    wrong: '\u2717 Not quite. Executives need scope, impact, timeline, and obligations \u2014 in that order, in business language. Jargon-heavy briefings lose the room. Overconfidence ("everything\'s fine") creates surprises later. Jumping to dramatic decisions (ransom payment) before options are analyzed forces the CEO into a false binary. The discipline is: lead with what matters to business continuity, be honest about what you don\'t yet know, and name the open decisions.'
+                },
+                triageSim12: {
+                    correct: '\u2713 Correct! A multi-jurisdiction PHI breach has overlapping clocks: GDPR requires DPA notification within 72 hours of awareness, HIPAA gives 60 days for most notifications (but some state laws shorten this), and California adds CMIA and CCPA obligations. Engaging legal counsel immediately lets you preserve attorney-client privilege over the investigation and run the notification tracks in parallel rather than serially.',
+                    wrong: '\u2717 Not quite. The dangerous default is to wait for complete information before engaging legal \u2014 but notification clocks start ticking at "awareness of a breach," not at "final forensic report." GDPR\'s 72-hour DPA clock is the tightest here. The correct move is to activate legal immediately so notification tracks (HIPAA, GDPR, state-level) run in parallel, evidence is preserved under privilege, and communications are coordinated rather than conflicting.'
+                },
+                triageSim13: {
+                    correct: '\u2713 Correct! Cross-border cyber cases rarely have a single "primary" authority. The FBI will claim US interest (victim company), the BKA will claim German interest (affected server on German soil, potential German victims), and the relevant EU Data Protection Authority will assert regulatory authority over EU-resident data. Cooperation happens through MLAT (Mutual Legal Assistance Treaty) channels, and investigators from different countries work in parallel, not sequence. Russia, as a non-cooperating jurisdiction, is typically unreachable for enforcement.',
+                    wrong: '\u2717 Not quite. Cyber jurisdiction is rarely exclusive. Multiple authorities have legitimate interest: the US (victim company), Germany (hosted infrastructure, potential German victims), and the EU (data subject protection). These authorities coordinate via MLAT channels rather than one overriding the others. Attacker origin (Russia) matters for attribution and sanctions, but Russia doesn\'t typically cooperate on extradition, so practical investigation happens among the cooperating jurisdictions.'
+                },
+                triageSim14: {
+                    correct: '\u2713 Correct! This is a textbook pre-departure exfiltration pattern. Each week escalates deliberately: low-risk action (printing) to medium (personal email) to high (bulk download). The pattern tests the system\'s response \u2014 when week 2 wasn\'t blocked, the employee interpreted silence as permission. The 17:50 Friday timing is deliberate: low supervision, a full weekend before anyone notices, and the following Monday the employee is one week closer to departure. Behavioral signals like this are often visible weeks before the actual theft \u2014 if anyone is watching.',
+                    wrong: '\u2717 Not quite. The behavioral signature here isn\'t random opportunism \u2014 it\'s a methodical escalation. Week 1 establishes what\'s tolerated. Week 2 probes the boundary (personal email flagged but not blocked). Week 3 exploits the confirmed gap (bulk download at Friday evening, the classic low-supervision window). This graduated escalation is one of the most reliable behavioral signatures of insider data theft and is typically visible in DLP logs weeks before the final exfiltration event.'
+                },
+                triageSim15: {
+                    correct: '\u2713 Correct! In healthcare SOC work, the rule is: patient safety first, forensics second, clean containment third. You never power down a medical device mid-procedure \u2014 that can harm a patient. You never make unilateral decisions about clinical equipment without engaging clinical staff. The correct pattern runs safety and security in parallel: complete the active scan under clinical supervision, then network-isolate (which preserves the machine state for forensics), then reschedule care, then vendor engagement. Blocking PACS-01 unilaterally would break every other imaging system in the hospital.',
+                    wrong: '\u2717 Not quite. Medical device incidents have a unique rule: the patient outranks the forensics. Powering down an MRI mid-scan can harm the patient. Blocking upstream systems like PACS can break imaging for the whole hospital. Waiting passively lets the infection spread. The correct pattern is parallel execution: let the active scan finish safely under clinical supervision, then network-isolate (not power-cycle) the device, then reschedule downstream care, then engage the vendor \u2014 with clinical engineering and the radiology charge nurse involved from minute one.'
+                },
+                triageSim16: {
+                    correct: '\u2713 Correct! HIPAA violations from "snooping" (accessing a record without a treatment, payment, or operations purpose) are surprisingly common, especially when employees access records of family members, neighbors, or celebrities. The access is technically authorized by the system but not authorized by the purpose of use. This requires a Privacy Officer investigation \u2014 the outcome could range from retraining to termination, and depending on scope may or may not rise to a reportable breach. Jumping to either "no issue" or "automatic breach" skips the investigation that HIPAA actually requires.',
+                    wrong: '\u2717 Not quite. HIPAA authorizes access based on purpose of use, not just role. A nurse with valid EHR access who looks up a same-surname patient not assigned to their unit has potentially committed a "snooping" violation. This is neither automatically fine nor automatically a reportable breach \u2014 it requires a Privacy Officer investigation. Healthcare has specific procedures for this, and the SOC\'s job is to escalate cleanly rather than conclude or terminate.'
+                },
+                triageSim17: {
+                    correct: '\u2713 Correct! OT security has inverted priorities from IT security. In IT, confidentiality typically outranks availability; in OT, availability and safety outrank everything else. Abruptly cutting SCADA traffic mid-batch can trigger unsafe shutdowns, physical damage, or hazardous states that take days to recover from. The correct path is collaborative: engage plant operators and OT engineers, verify whether the destination is a legitimate vendor telemetry endpoint (many modern controllers phone home for predictive maintenance), and stage containment around the batch cycle if confirmed malicious.',
+                    wrong: '\u2717 Not quite. The instinct to "block first, ask questions later" is correct for IT but dangerous in OT. SCADA and PLCs control physical processes \u2014 improper containment can cause production damage, hazardous states, or safety incidents. The correct pattern engages OT engineers and plant operators first, verifies whether the destination is legitimate vendor telemetry, and stages any containment action around the batch cycle. "Never touch OT" is also wrong \u2014 the SOC absolutely owns OT security, just with different response playbooks.'
+                },
+                triageSim18: {
+                    correct: '\u2713 Correct! Whistleblower protections in many jurisdictions (US SOX, Dodd-Frank, state laws, EU Whistleblower Directive) explicitly protect communications to legal counsel and regulators about suspected wrongdoing. Treating a protected disclosure as an insider-threat incident can expose the company to retaliation claims and undermine the protections the law is designed to create. The right move is to route this out of the standard DLP/insider-threat workflow and into Legal/Ethics, who will evaluate the content and the protections involved.',
+                    wrong: '\u2717 Not quite. This is one of the most legally sensitive scenarios a SOC encounters. Treating a suspected whistleblower disclosure as a standard insider-threat case \u2014 disabling the account, preserving evidence for termination, or even just looping in the employee\'s manager \u2014 can expose the company to retaliation claims under laws like SOX, Dodd-Frank, or the EU Whistleblower Directive. The SOC\'s job here is to recognize the pattern and route it to Legal/Ethics rather than process it through the usual workflow.'
+                },
+                triageSim19: {
+                    correct: '\u2713 Correct! Patient safety is the only clock measured in minutes. Two IV infusion pumps stuck at last-known settings means patients could be over- or under-dosing right now. Clinical leadership needs to make immediate manual-monitoring decisions; biomedical engineering needs to assess whether devices can be safely swapped or manually operated. Legal, forensics, executives, communications, and law enforcement all matter \u2014 but they operate on timescales of hours and days. The others get called in the same hour; clinical gets called in the same minute.',
+                    wrong: '\u2717 Not quite. This scenario tests priority under pressure. HIPAA, public statements, and law enforcement are all legitimate concerns, but they operate on timescales of hours and days. The IV infusion pumps stuck mid-dose are a patient-safety issue measured in minutes. Clinical leadership and biomedical engineering must be engaged first so that manual monitoring or device swapping can begin immediately. The correct multi-disciplinary habit is to sequence by time-criticality: safety-now, investigation-today, notification-this-week.'
+                }
+            };
+            const msg = messages[simId];
+            if (msg) {
+                feedback.textContent = correct ? msg.correct : msg.wrong;
+            }
+        }
+    
+        // persist this answer (item 5)
+        const persistBtns = Array.from(container.querySelectorAll('.sim-btn'));
+        lessonState.triage[simId] = persistBtns.indexOf(btn);
+        saveLessonState(lessonState);
+    }
+
+    function showCompletion() {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const comp = document.getElementById('completionSection');
+        comp.style.display = 'block';
+        comp.classList.add('active');
+
+        const pct = totalQuizQuestions > 0 ? Math.round((quizScore / totalQuizQuestions) * 100) : 0;
+        document.getElementById('finalScore').textContent = pct + '%';
+
+        let msg;
+        if (pct >= 80) {
+            msg = "Excellent work! You've demonstrated a strong understanding of SOC fundamentals. You're well-prepared for the hands-on simulation exercises. Head to the training exercises when you're ready.";
+        } else if (pct >= 50) {
+            msg = "Good effort! You have a solid foundation, but consider reviewing the modules where you missed questions before starting the simulation. Use the navigation above to revisit any section.";
+        } else {
+            msg = "You may want to review the lesson content before starting the simulation. Use the navigation above to revisit each module, paying close attention to the concepts covered in the quiz questions.";
+        }
+        document.getElementById('completionMessage').textContent = msg;
+
+        // Update nav
+        document.querySelectorAll('.nav-btn[data-section]').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent = '&#10003;';
+
+        window.scrollTo({ top: document.getElementById('lessonNav').offsetTop - 10, behavior: 'smooth' });
+    
+        // completion code + persistence (item 5)
+        const codeEl = document.getElementById('completionCode');
+        if (codeEl) {
+            codeEl.innerHTML = 'Completion code: <strong>' + buildCompletionCode(pct) + '</strong>' +
+                '<span class="code-note">Copy this code and submit it with your assignment.</span>';
+        }
+        lessonState.completed = true;
+        saveLessonState(lessonState);
+    }
+
+    // &#9472;&#9472; INLINE TOOLTIP FOR MITRE TACTICS &#9472;&#9472;
+    (function() {
+        var tipDisplay = document.getElementById('tacticTipDisplay');
+        var tipName = document.getElementById('tacticTipName');
+        var tipText = document.getElementById('tacticTipText');
+        var activeCellEl = null;
+
+        function showInlineTip(cell) {
+            var text = cell.getAttribute('data-tip');
+            if (!text || !tipDisplay) return;
+
+            // Get name from first child text node
+            var name = '';
+            for (var i = 0; i < cell.childNodes.length; i++) {
+                if (cell.childNodes[i].nodeType === 3) {
+                    name = cell.childNodes[i].textContent.trim();
+                    if (name) break;
+                }
+            }
+            var idEl = cell.querySelector('.tactic-id');
+            var id = idEl ? idEl.textContent.trim() : '';
+
+            tipName.textContent = name + (id ? ' \u00B7 ' + id : '');
+            tipText.textContent = text;
+
+            // Remove active from previous
+            if (activeCellEl) activeCellEl.classList.remove('active-tip');
+
+            // Add active to current
+            cell.classList.add('active-tip');
+            activeCellEl = cell;
+
+            tipDisplay.classList.add('show');
+        }
+
+        // Click handler on tactic cells
+        document.addEventListener('click', function(e) {
+            var cell = e.target.closest('.tactic-cell');
+            if (cell && cell.getAttribute('data-tip')) {
+                // Toggle: if clicking same cell, hide
+                if (activeCellEl === cell && tipDisplay.classList.contains('show')) {
+                    tipDisplay.classList.remove('show');
+                    cell.classList.remove('active-tip');
+                    activeCellEl = null;
+                } else {
+                    showInlineTip(cell);
+                }
+            }
+        });
+
+        // Also show on hover for desktop
+        document.addEventListener('mouseover', function(e) {
+            var cell = e.target.closest('.tactic-cell');
+            if (cell && cell.getAttribute('data-tip')) {
+                showInlineTip(cell);
+            }
+        });
+    })();
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && currentSection < totalSections - 1) {
+            goToSection(currentSection + 1);
+        } else if (e.key === 'ArrowLeft' && currentSection > 0) {
+            goToSection(currentSection - 1);
+        }
+    });
+
+    /* ---- Restore saved progress (item 5) ---- */
+    (function restoreLessonProgress() {
+        const saved = loadLessonState();
+        if (!saved) return;
+        lessonState = Object.assign({ started: false, section: 0, quiz: {}, triage: {}, completed: false }, saved);
+        Object.keys(lessonState.quiz).forEach(function (qId) {
+            const c = document.getElementById(qId);
+            if (!c) return;
+            const opts = c.querySelectorAll('.quiz-option');
+            const btn = opts[lessonState.quiz[qId]];
+            if (btn) checkQuiz(btn, qId, (btn.getAttribute('data-action') || '').includes('true'));
+        });
+        Object.keys(lessonState.triage).forEach(function (simId) {
+            const c = document.getElementById(simId);
+            if (!c) return;
+            const btns = c.querySelectorAll('.sim-btn');
+            const btn = btns[lessonState.triage[simId]];
+            if (btn) checkTriage(btn, (btn.getAttribute('data-action') || '').includes('true'), simId);
+        });
+        if (lessonState.started) {
+            startLesson();
+            goToSection(lessonState.section || 0);
+            window.scrollTo({ top: 0 });
+        }
+    })();
+</script>
+
+
+<script>
+/* CSP-safe delegated event dispatcher + accessibility helpers (a11y pass). */
+(function () {
+    'use strict';
+    function parseArg(tok, el, ev) {
+        tok = tok.trim();
+        if (tok === 'this') return el;
+        if (tok === 'event') return ev;
+        if (tok === 'true') return true;
+        if (tok === 'false') return false;
+        var qs = tok.match(/^this\.querySelector\('([^']+)'\)$/);
+        if (qs) return el.querySelector(qs[1]);
+        var str = tok.match(/^'([^']*)'$/);
+        if (str) return str[1];
+        if (/^-?\d+(\.\d+)?$/.test(tok)) return Number(tok);
+        return undefined;
+    }
+    function splitArgs(s) {
+        var out = [], depth = 0, q = false, cur = '';
+        for (var i = 0; i < s.length; i++) {
+            var c = s[i];
+            if (c === "'" ) { q = !q; cur += c; }
+            else if (!q && c === '(') { depth++; cur += c; }
+            else if (!q && c === ')') { depth--; cur += c; }
+            else if (!q && depth === 0 && c === ',') { out.push(cur); cur = ''; }
+            else cur += c;
+        }
+        if (cur.trim()) out.push(cur);
+        return out;
+    }
+    function runAction(expr, el, ev) {
+        var m = expr.match(/^\s*([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/);
+        if (!m) return;
+        var fn = window[m[1]];
+        if (typeof fn !== 'function') return;
+        var args = m[2].trim() ? splitArgs(m[2]).map(function (t) { return parseArg(t, el, ev); }) : [];
+        fn.apply(null, args);
+    }
+    document.addEventListener('click', function (ev) {
+        var dis = ev.target.closest('[data-dismiss]');
+        if (dis && ev.target === dis) {
+            var f = window[dis.getAttribute('data-dismiss')];
+            if (typeof f === 'function') f();
+            return;
+        }
+        var t = ev.target.closest('[data-action]');
+        if (t) runAction(t.getAttribute('data-action'), t, ev);
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+            var t = ev.target.closest('[role="button"][data-action]');
+            if (t) { ev.preventDefault(); runAction(t.getAttribute('data-action'), t, ev); }
+        }
+        if (ev.key === 'Tab') { /* basic focus trap for the display-info dialog */
+            var ov = document.getElementById('diOverlay');
+            if (!ov || !ov.classList.contains('visible')) return;
+            var f = ov.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]');
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+            else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+        }
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Training Exercises - 15 Hands-On Scenarios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #00d4ff;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .intro-section {
+            background: rgba(0, 100, 150, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .intro-section h2 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+
+        .screen-reference {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .screen-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .screen-card h4 {
+            color: #ffd43b;
+            margin-bottom: 8px;
+        }
+
+        .tier-section {
+            margin-bottom: 40px;
+        }
+
+        .tier-header {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), transparent);
+            padding: 15px 20px;
+            border-left: 4px solid #00d4ff;
+            margin-bottom: 20px;
+        }
+
+        .tier-header h2 {
+            color: #00d4ff;
+            font-size: 1.5em;
+        }
+
+        .tier-header p {
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .tier-1 .tier-header { border-left-color: #2ed573; }
+        .tier-1 .tier-header h2 { color: #2ed573; }
+        
+        .tier-2 .tier-header { border-left-color: #ffa502; }
+        .tier-2 .tier-header h2 { color: #ffa502; }
+        
+        .tier-3 .tier-header { border-left-color: #ff4757; }
+        .tier-3 .tier-header h2 { color: #ff4757; }
+
+        .tier-multi .tier-header {
+            border-left-color: #a855f7;
+            background: linear-gradient(90deg, rgba(168,85,247,0.2), transparent);
+        }
+        .tier-multi .tier-header h2 { color: #a855f7; }
+        .tier-multi .exercise-number { background: #a855f7; color: #fff; }
+
+        /* Discipline sub-sections within the multidisciplinary tier */
+        .discipline-group {
+            margin-bottom: 30px;
+        }
+        .discipline-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: linear-gradient(90deg, rgba(168,85,247,0.1), transparent);
+            border-left: 3px solid #a855f7;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+        .discipline-icon {
+            font-size: 1.6em;
+        }
+        .discipline-header h3 {
+            color: #c4b5fd;
+            font-size: 1.15em;
+            margin: 0;
+        }
+        .discipline-header p {
+            color: #888;
+            font-size: 0.85em;
+            margin: 2px 0 0 0;
+        }
+        .discipline-lens {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(168,85,247,0.15);
+            border: 1px solid rgba(168,85,247,0.35);
+            border-radius: 12px;
+            color: #c4b5fd;
+            font-size: 0.72em;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        .capstone-marker {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(251,113,133,0.15);
+            border: 1px solid rgba(251,113,133,0.4);
+            border-radius: 12px;
+            color: #fb7185;
+            font-size: 0.72em;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+
+        .exercise {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .exercise-header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .exercise-header:hover {
+            background: rgba(0, 100, 150, 0.2);
+        }
+
+        .exercise-number {
+            background: #00d4ff;
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .tier-1 .exercise-number { background: #2ed573; }
+        .tier-2 .exercise-number { background: #ffa502; }
+        .tier-3 .exercise-number { background: #ff4757; }
+
+        .exercise-title {
+            flex: 1;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        .difficulty {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .difficulty.beginner { background: #2ed573; color: #000; }
+        .difficulty.intermediate { background: #ffa502; color: #000; }
+        .difficulty.advanced { background: #ff4757; color: #fff; }
+
+        .toggle-icon {
+            font-size: 1.5em;
+            color: #00d4ff;
+            transition: transform 0.3s;
+        }
+
+        .exercise.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .exercise-content {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .exercise.expanded .exercise-content {
+            display: block;
+        }
+
+        .section-label {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .section-label:first-child {
+            margin-top: 0;
+        }
+
+        .objective-list, .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .objective-list li, .task-list li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+        }
+
+        .objective-list li::before {
+            content: "\1F3AF";
+            position: absolute;
+            left: 0;
+        }
+
+        .task-list li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 5px;
+            color: #00d4ff;
+        }
+
+        .scenario-box {
+            background: rgba(0, 100, 150, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .alert-data {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .alert-data .label {
+            color: #888;
+        }
+
+        .alert-data .value {
+            color: #2ed573;
+        }
+
+        .alert-data .critical { color: #ff4757; }
+        .alert-data .high { color: #ffa502; }
+        .alert-data .medium { color: #ffd43b; }
+
+        .answer-section {
+            background: rgba(46, 213, 115, 0.1);
+            border: 1px solid #2ed573;
+            border-radius: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .answer-header {
+            background: rgba(46, 213, 115, 0.2);
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .answer-header span {
+            color: #2ed573;
+            font-weight: bold;
+        }
+
+        .answer-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .answer-section.revealed .answer-content {
+            display: block;
+        }
+
+        .answer-content.revealed {
+            display: block;
+        }
+
+        .answer-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.2);
+        }
+
+        .answer-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .answer-item strong {
+            color: #2ed573;
+        }
+
+        .screen-used {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid #00d4ff;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+
+        .time-estimate {
+            color: #888;
+            font-size: 0.9em;
+            margin-left: 15px;
+        }
+
+        .ioc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .ioc-table th, .ioc-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .ioc-table th {
+            background: rgba(0, 0, 0, 0.5);
+            color: #00d4ff;
+        }
+
+        .ioc-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .rubric {
+            background: rgba(255, 165, 2, 0.1);
+            border: 1px solid #ffa502;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .rubric h4 {
+            color: #ffa502;
+            margin-bottom: 10px;
+        }
+
+        .rubric-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed rgba(255, 165, 2, 0.3);
+        }
+
+        .rubric-item:last-child {
+            border-bottom: none;
+        }
+
+        .points {
+            color: #ffa502;
+            font-weight: bold;
+        }
+
+        .expand-all-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .expand-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .mitre-tag {
+            display: inline-block;
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid #ff4757;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 2px;
+            font-family: monospace;
+        }
+
+        .tips-box {
+            background: rgba(255, 212, 59, 0.1);
+            border: 1px solid #ffd43b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .tips-box h4 {
+            color: #ffd43b;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+
+        @media print {
+            .exercise-content {
+                display: block !important;
+            }
+            .answer-content {
+                display: block !important;
+            }
+            .toggle-icon {
+                display: none;
+            }
+        }
+    
+        /* ============ Accessibility (a11y pass) ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        :focus-visible {
+            outline: 2px solid #00d4ff;
+            outline-offset: 2px;
+        }
+        [role="button"] { cursor: pointer; }
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            z-index: 10000;
+            background: #0f1320;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 0 0 8px 0;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <header>
+        <h1>&#128737;&#65039; SOC Training Exercises</h1>
+        <p class="subtitle">Hands-On Scenarios for SOC Analysts &#183; Now with Multidisciplinary Lenses</p>
+    </header>
+
+    <div class="container" id="main" role="main">
+        <div class="intro-section">
+        <div style="background: linear-gradient(90deg, rgba(46,213,115,0.2), rgba(46,213,115,0.05)); border-left: 4px solid #2ed573; padding: 12px 18px; margin-bottom: 20px; border-radius: 0 6px 6px 0;">
+            <strong style="color: #2ed573; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.85em;">Student Edition</strong>
+            <p style="margin: 4px 0 0 0; color: #a0a0a0; font-size: 0.9em;">This version contains the full exercises with rubrics. Answer keys are maintained separately by your instructor.</p>
+        </div>
+
+            <h2>&#128203; Training Overview</h2>
+            <p>These exercises provide hands-on experience with Security Operations Center (SOC) workflows using the four-screen simulation environment. They are organized into four sections: the three classic analyst tiers (Tier 1 Alert Triage &rarr; Tier 2 Incident Response &rarr; Tier 3 Threat Hunting), plus a Multidisciplinary section that applies the same SOC dashboards through the lenses of eight other fields &mdash; computer science, data science, business and risk management, criminal justice, psychology, healthcare, engineering, and social science.</p>
+
+            <div class="screen-reference">
+                <div class="screen-card">
+                    <h4>Screen 1: SIEM Dashboard</h4>
+                    <p>Alert queue, severity filtering, MITRE ATT&amp;CK heatmap, alert trends, SOC operational metrics (MTTD, MTTR, false-positive rate)</p>
+                </div>
+                <div class="screen-card">
+                    <h4>Screen 2: Network Monitor</h4>
+                    <p>Global threat map, traffic graphs, firewall logs, top talkers, port activity</p>
+                </div>
+                <div class="screen-card">
+                    <h4>Screen 3: Incident Response</h4>
+                    <p>Case management, IOC details, affected assets, response actions, playbooks, sector tagging (Healthcare/PHI, Finance/PCI, OT/Industrial)</p>
+                </div>
+                <div class="screen-card">
+                    <h4>Screen 4: Threat Intel &amp; Endpoints</h4>
+                    <p>Threat feeds, endpoint status (incl. medical devices and OT/SCADA assets), vulnerability management, compliance scores</p>
+                </div>
+            </div>
+
+            <button class="expand-all-btn" data-action="toggleAllExercises()">Expand/Collapse All Exercises</button>
+        </div>
+
+        <!-- TIER 1 EXERCISES -->
+        <div class="tier-section tier-1">
+            <div class="tier-header">
+                <h2>&#128994; Tier 1 Exercises: Alert Triage & Monitoring</h2>
+                <p>Focus: Initial alert assessment, basic classification, escalation procedures</p>
+            </div>
+
+            <!-- Exercise 1 -->
+            <div class="exercise" id="ex1">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex1')">
+                    <span class="exercise-number">1</span>
+                    <span class="exercise-title">Alert Severity Assessment & Prioritization</span>
+                    <span class="difficulty beginner">Beginner</span>
+                    <span class="time-estimate">&#9201;&#65039; 20 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Understand alert severity levels and their meanings</li>
+                        <li>Practice prioritizing alerts based on severity and context</li>
+                        <li>Learn to filter alerts effectively in a SIEM dashboard</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>You have just started your shift as a Tier 1 SOC analyst. The SIEM dashboard shows 47 unacknowledged alerts that accumulated overnight. You need to triage these alerts and determine the order in which they should be investigated.</p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Open Screen 1 (SIEM Dashboard) and observe the alert queue for 2 minutes</li>
+                        <li>Use the severity filters to view only Critical alerts. Document how many critical alerts exist.</li>
+                        <li>For the following alert types, identify the appropriate severity level and explain why:
+                            <div class="alert-data">
+                                <p><span class="label">Alert A:</span> <span class="value">Failed SSH login from internal IP 10.0.1.45</span></p>
+                                <p><span class="label">Alert B:</span> <span class="value">Ransomware signature detected on endpoint WKS-042</span></p>
+                                <p><span class="label">Alert C:</span> <span class="value">Unusual DNS query to newly registered domain</span></p>
+                                <p><span class="label">Alert D:</span> <span class="value">Data exfiltration detected - 500MB upload to external IP</span></p>
+                            </div>
+                        </li>
+                        <li>Create a prioritized list ranking these 4 alerts from highest to lowest priority</li>
+                        <li>Explain the factors that influenced your prioritization decisions</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct severity classifications (4 alerts)</span><span class="points">40 pts</span></div>
+                        <div class="rubric-item"><span>Correct priority ordering</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Clear justification of decisions</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Professional documentation</span><span class="points">10 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 2 -->
+            <div class="exercise" id="ex2">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex2')">
+                    <span class="exercise-number">2</span>
+                    <span class="exercise-title">False Positive Identification</span>
+                    <span class="difficulty beginner">Beginner</span>
+                    <span class="time-estimate">&#9201;&#65039; 25 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Distinguish between true positive and false positive alerts</li>
+                        <li>Understand common causes of false positives in SOC environments</li>
+                        <li>Learn when to tune detection rules vs. escalate alerts</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>Your SOC has been receiving numerous alerts that appear to be false positives, creating alert fatigue. Management has asked you to analyze a sample of alerts and recommend which ones might need detection rule tuning.</p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Review the following alerts and classify each as likely True Positive (TP) or False Positive (FP):
+                            <div class="alert-data">
+                                <p><span class="label">Alert 1:</span> <span class="value">Port scan detected from 10.0.5.100 (IT Security Scanner)</span></p>
+                                <p><span class="label">Alert 2:</span> <span class="value">Mimikatz signature detected in memory on DC-01</span></p>
+                                <p><span class="label">Alert 3:</span> <span class="value">Large file download from marketing@company.com (Google Drive sync)</span></p>
+                                <p><span class="label">Alert 4:</span> <span class="value">PowerShell encoded command execution on WKS-089</span></p>
+                                <p><span class="label">Alert 5:</span> <span class="value">Failed authentication from admin service account (nightly backup job)</span></p>
+                            </div>
+                        </li>
+                        <li>For each False Positive identified, suggest a tuning recommendation</li>
+                        <li>For each True Positive, describe the next investigation step</li>
+                        <li>Check Screen 4 Threat Intel feed - does any intelligence correlate with the true positives?</li>
+                    </ul>
+
+                    <div class="tips-box">
+                        <h4>&#128161; Tips for Identifying False Positives</h4>
+                        <ul>
+                            <li>Check if the source is a known authorized security tool</li>
+                            <li>Look for patterns that match legitimate business processes</li>
+                            <li>Verify if activity occurs during expected maintenance windows</li>
+                            <li>Cross-reference with asset inventory and user roles</li>
+                        </ul>
+                    </div>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct TP/FP classifications</span><span class="points">40 pts</span></div>
+                        <div class="rubric-item"><span>Appropriate tuning recommendations</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Correct investigation steps for TPs</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Threat intel correlation attempt</span><span class="points">10 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 3 -->
+            <div class="exercise" id="ex3">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex3')">
+                    <span class="exercise-number">3</span>
+                    <span class="exercise-title">Network Traffic Baseline Analysis</span>
+                    <span class="difficulty beginner">Beginner</span>
+                    <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Understand normal vs. anomalous network traffic patterns</li>
+                        <li>Read and interpret network monitoring dashboards</li>
+                        <li>Identify geographic traffic anomalies</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>You're tasked with monitoring network traffic to establish a baseline and identify any anomalies. The organization is a US-based company with offices in the UK and Germany, with no business operations in Eastern Europe or Asia.</p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Monitor Screen 2 (Network Monitor) for 3 minutes and document:
+                            <ul>
+                                <li>Average inbound traffic rate (Mbps)</li>
+                                <li>Average outbound traffic rate (Mbps)</li>
+                                <li>Number of blocked connections observed</li>
+                            </ul>
+                        </li>
+                        <li>Observe the Global Threat Map. List any countries showing attack activity that would be unexpected given the business context</li>
+                        <li>Review the Top Talkers panel. Identify any external IPs consuming unusual bandwidth</li>
+                        <li>Examine the Port Activity section. Which ports show the highest activity? Are any unexpected?</li>
+                        <li>Write a brief shift summary (3-4 sentences) describing the network status</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Accurate traffic documentation</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Geographic anomaly identification</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Top talker/port analysis</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Professional shift summary</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 4 -->
+            <div class="exercise" id="ex4">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex4')">
+                    <span class="exercise-number">4</span>
+                    <span class="exercise-title">Escalation Decision Making</span>
+                    <span class="difficulty beginner">Beginner</span>
+                    <span class="time-estimate">&#9201;&#65039; 20 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Apply escalation criteria correctly</li>
+                        <li>Understand the difference between Tier 1 and Tier 2 responsibilities</li>
+                        <li>Document alerts properly for escalation</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>As a Tier 1 analyst, you must decide which alerts to handle yourself and which to escalate to Tier 2. Your SOC's escalation policy states that Tier 1 handles: single failed logins, low-severity malware (PUPs), and informational alerts. Tier 2 handles: confirmed malware, multiple related alerts, and anything affecting critical assets.</p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>For each scenario below, decide: Handle (Tier 1), Escalate (Tier 2), or Escalate (Tier 3):
+                            <div class="alert-data">
+                                <p><span class="label">Scenario A:</span> <span class="value">PUP detected on intern's workstation - adware toolbar</span></p>
+                                <p><span class="label">Scenario B:</span> <span class="value">5 failed logins in 10 minutes from same user account</span></p>
+                                <p><span class="label">Scenario C:</span> <span class="value">Emotet trojan detected on Finance department laptop</span></p>
+                                <p><span class="label">Scenario D:</span> <span class="value">Suspicious process on Domain Controller with unknown binary</span></p>
+                                <p><span class="label">Scenario E:</span> <span class="value">Single informational alert - Windows update check</span></p>
+                            </div>
+                        </li>
+                        <li>For each escalation, write a brief escalation note (2-3 sentences) that Tier 2 would need</li>
+                        <li>Open Screen 3 (Incident Response) and familiarize yourself with the incident queue format</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct escalation decisions</span><span class="points">50 pts</span></div>
+                        <div class="rubric-item"><span>Quality of escalation notes</span><span class="points">40 pts</span></div>
+                        <div class="rubric-item"><span>Screen 3 familiarity demonstration</span><span class="points">10 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 5 -->
+            <div class="exercise" id="ex5">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex5')">
+                    <span class="exercise-number">5</span>
+                    <span class="exercise-title">Endpoint Health Monitoring</span>
+                    <span class="difficulty beginner">Beginner</span>
+                    <span class="time-estimate">&#9201;&#65039; 25 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Monitor endpoint health status across an organization</li>
+                        <li>Identify endpoints requiring attention</li>
+                        <li>Understand EDR alert categories</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 4: Threat Intel & Endpoints</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>Morning health check: You need to assess the overall endpoint security posture and identify any systems that need immediate attention before the business day begins.</p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Open Screen 4 and locate the Endpoint Status section</li>
+                        <li>Document the current status counts:
+                            <ul>
+                                <li>Total endpoints monitored</li>
+                                <li>Healthy endpoints (count and percentage)</li>
+                                <li>Warning status endpoints</li>
+                                <li>Critical status endpoints</li>
+                                <li>Offline endpoints</li>
+                            </ul>
+                        </li>
+                        <li>Use the search/filter to find all server endpoints. Are any in Critical or Warning status?</li>
+                        <li>Monitor the EDR Alert Stream for 2 minutes. Categorize the types of alerts you see</li>
+                        <li>If any Domain Controller (DC) endpoints show non-Healthy status, explain why this is a priority concern</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Accurate status documentation</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Server filter usage and analysis</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>EDR alert categorization</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>DC priority explanation</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2 EXERCISES -->
+        <div class="tier-section tier-2">
+            <div class="tier-header">
+                <h2>&#128993; Tier 2 Exercises: Incident Investigation & Response</h2>
+                <p>Focus: Deep investigation, IOC analysis, containment actions, playbook execution</p>
+            </div>
+
+            <!-- Exercise 6 -->
+            <div class="exercise" id="ex6">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex6')">
+                    <span class="exercise-number">6</span>
+                    <span class="exercise-title">Brute Force Attack Investigation</span>
+                    <span class="difficulty intermediate">Intermediate</span>
+                    <span class="time-estimate">&#9201;&#65039; 35 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Investigate authentication-based attacks</li>
+                        <li>Correlate alerts across multiple data sources</li>
+                        <li>Execute containment actions appropriately</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>A Tier 1 analyst has escalated the following alert cluster to you. Multiple failed authentication attempts have been detected targeting the VPN gateway, followed by a successful login.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Alert Time:</span> <span class="value">08:15:00 - 08:47:00 UTC</span></p>
+                            <p><span class="label">Target:</span> <span class="value">VPN Gateway (vpn.company.com)</span></p>
+                            <p><span class="label">Source IP:</span> <span class="value">185.220.101[.]45 (Tor Exit Node)</span></p>
+                            <p><span class="label">Targeted Accounts:</span> <span class="value">admin, administrator, jsmith, mwilliams, svc_backup</span></p>
+                            <p><span class="label">Failed Attempts:</span> <span class="value critical">347 attempts across 5 accounts</span></p>
+                            <p><span class="label">Successful Login:</span> <span class="value critical">08:47:23 - Account: svc_backup</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Analyze the attack pattern:
+                            <ul>
+                                <li>What type of brute force attack is this (credential stuffing, password spraying, dictionary)?</li>
+                                <li>Why is a Tor exit node significant?</li>
+                            </ul>
+                        </li>
+                        <li>Using Screen 2, check if the source IP (185.220.101[.]45) appears in the Top Talkers or Firewall Logs</li>
+                        <li>On Screen 3, create a mental incident workflow:
+                            <ul>
+                                <li>What containment action should happen FIRST?</li>
+                                <li>What IOCs should be documented?</li>
+                                <li>What systems might the compromised service account access?</li>
+                            </ul>
+                        </li>
+                        <li>Write an incident summary documenting: Timeline, Attack Vector, Impact, Containment Actions Taken</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1110.001 - Password Guessing</span>
+                    <span class="mitre-tag">T1078 - Valid Accounts</span>
+                    <span class="mitre-tag">T1133 - External Remote Services</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct attack type identification</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Tor exit node significance explained</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Proper containment action sequence</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Complete IOC documentation</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Professional incident summary</span><span class="points">20 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 7 -->
+            <div class="exercise" id="ex7">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex7')">
+                    <span class="exercise-number">7</span>
+                    <span class="exercise-title">Malware Outbreak Containment</span>
+                    <span class="difficulty intermediate">Intermediate</span>
+                    <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Respond to multi-system malware infections</li>
+                        <li>Make containment decisions under pressure</li>
+                        <li>Coordinate response across multiple screens</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>CRITICAL ALERT: Multiple endpoints are reporting malware detection within minutes of each other. This appears to be a spreading infection.</p>
+                        <div class="alert-data">
+                            <p><span class="label">09:15:33</span> <span class="value">WKS-042 - TrickBot detected</span></p>
+                            <p><span class="label">09:17:45</span> <span class="value">WKS-089 - TrickBot detected</span></p>
+                            <p><span class="label">09:18:02</span> <span class="value">WKS-042 - Lateral movement attempt to FILE-SVR-01</span></p>
+                            <p><span class="label">09:19:11</span> <span class="value">WKS-103 - TrickBot detected</span></p>
+                            <p><span class="label">09:20:30</span> <span class="value">FILE-SVR-01 - Suspicious SMB activity</span></p>
+                            <p><span class="label">09:21:45</span> <span class="value critical">DC-01 - Authentication anomaly detected</span></p>
+                        </div>
+                        <p style="margin-top: 10px;"><strong>Hash (SHA256):</strong> <code>e99a18c428cb38d5f260853678922e03abd833</code></p>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>On Screen 4, search the IOC Feed for TrickBot intelligence. What additional capabilities should you expect?</li>
+                        <li>Create an isolation priority list - which systems should be isolated first and why?</li>
+                        <li>Using Screen 3 as reference, determine which response actions are appropriate:
+                            <ul>
+                                <li>Should you isolate individual hosts or segment the network?</li>
+                                <li>Should DC-01 be isolated? What are the risks either way?</li>
+                            </ul>
+                        </li>
+                        <li>Document affected assets and their roles</li>
+                        <li>Write an executive summary (suitable for CISO briefing) explaining the situation</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1566 - Phishing</span>
+                    <span class="mitre-tag">T1055 - Process Injection</span>
+                    <span class="mitre-tag">T1021.002 - SMB/Windows Admin Shares</span>
+                    <span class="mitre-tag">T1003 - Credential Dumping</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>TrickBot capability research</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Correct isolation priority with justification</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>DC-01 decision with risk analysis</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Complete asset documentation</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Executive summary quality</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 8 -->
+            <div class="exercise" id="ex8">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex8')">
+                    <span class="exercise-number">8</span>
+                    <span class="exercise-title">Data Exfiltration Detection</span>
+                    <span class="difficulty intermediate">Intermediate</span>
+                    <span class="time-estimate">&#9201;&#65039; 35 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Identify indicators of data exfiltration</li>
+                        <li>Analyze network traffic for anomalies</li>
+                        <li>Determine scope of potential data breach</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>The DLP system has triggered an alert, and network analysis shows unusual outbound traffic patterns.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Alert:</span> <span class="value critical">Large data transfer detected</span></p>
+                            <p><span class="label">Source:</span> <span class="value">DB-SVR-02 (Customer Database)</span></p>
+                            <p><span class="label">Destination:</span> <span class="value">45.33.32[.]156 (DigitalOcean VPS)</span></p>
+                            <p><span class="label">Protocol:</span> <span class="value">HTTPS (Port 443)</span></p>
+                            <p><span class="label">Data Volume:</span> <span class="value critical">2.3 GB over 45 minutes</span></p>
+                            <p><span class="label">Time:</span> <span class="value">02:30 - 03:15 (outside business hours)</span></p>
+                            <p><span class="label">User Context:</span> <span class="value">No interactive sessions logged</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Analyze the indicators - why does this pattern suggest malicious exfiltration vs. legitimate backup?</li>
+                        <li>Using Screen 2, examine the network traffic patterns. Would this destination IP appear as a Top Talker?</li>
+                        <li>Check Screen 4's IOC feed and threat intelligence - is the destination IP associated with any known threats?</li>
+                        <li>Determine what data might have been accessed:
+                            <ul>
+                                <li>What type of data is likely on a "Customer Database" server?</li>
+                                <li>What compliance implications exist (GDPR, CCPA, PCI-DSS)?</li>
+                            </ul>
+                        </li>
+                        <li>Create an incident timeline and recommend immediate actions</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1048 - Exfiltration Over Alternative Protocol</span>
+                    <span class="mitre-tag">T1567 - Exfiltration Over Web Service</span>
+                    <span class="mitre-tag">T1041 - Exfiltration Over C2 Channel</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Suspicious indicator analysis</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Network traffic correlation</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Data scope assessment</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Compliance impact identification</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Incident timeline and actions</span><span class="points">20 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 9 -->
+            <div class="exercise" id="ex9">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex9')">
+                    <span class="exercise-number">9</span>
+                    <span class="exercise-title">Phishing Campaign Response</span>
+                    <span class="difficulty intermediate">Intermediate</span>
+                    <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Respond to organization-wide phishing campaigns</li>
+                        <li>Identify and document phishing IOCs</li>
+                        <li>Coordinate response with email security</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>Multiple users have reported suspicious emails, and the email gateway has quarantined several similar messages. One user admits to clicking the link before reporting.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Subject:</span> <span class="value">"Urgent: Your account will be suspended"</span></p>
+                            <p><span class="label">Sender:</span> <span class="value">security@micros0ft-verify[.]com</span></p>
+                            <p><span class="label">Link:</span> <span class="value critical">hxxps://micros0ft-verify[.]com/login.php</span></p>
+                            <p><span class="label">Recipients:</span> <span class="value">47 employees (Finance, HR, Executive)</span></p>
+                            <p><span class="label">Confirmed Clicks:</span> <span class="value critical">3 users clicked (1 entered credentials)</span></p>
+                            <p><span class="label">Attachment:</span> <span class="value">invoice_2024.pdf.exe (flagged)</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Identify all IOCs from this phishing campaign:
+                            <ul>
+                                <li>Domain(s)</li>
+                                <li>Email addresses</li>
+                                <li>File names and hashes (if available)</li>
+                                <li>Subject line patterns</li>
+                            </ul>
+                        </li>
+                        <li>For the user who entered credentials, outline the immediate response steps</li>
+                        <li>For users who clicked but didn't enter credentials, what actions are needed?</li>
+                        <li>Check Screen 4 threat intel - is this domain associated with known campaigns?</li>
+                        <li>Draft an all-hands security awareness message about this campaign</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1566.001 - Spearphishing Attachment</span>
+                    <span class="mitre-tag">T1566.002 - Spearphishing Link</span>
+                    <span class="mitre-tag">T1204 - User Execution</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Complete IOC documentation</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Credential compromise response plan</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Click-only user response</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Threat intel correlation</span><span class="points">10 pts</span></div>
+                        <div class="rubric-item"><span>Quality of awareness message</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 10 -->
+            <div class="exercise" id="ex10">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex10')">
+                    <span class="exercise-number">10</span>
+                    <span class="exercise-title">Playbook Execution - Ransomware Response</span>
+                    <span class="difficulty intermediate">Intermediate</span>
+                    <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Execute a formal incident response playbook</li>
+                        <li>Document actions and decisions during response</li>
+                        <li>Coordinate containment, eradication, and recovery</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>A confirmed ransomware infection has been detected. Follow the Ransomware Response Playbook to contain and remediate the threat.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Detection:</span> <span class="value critical">LockBit 3.0 ransomware confirmed</span></p>
+                            <p><span class="label">Initial Host:</span> <span class="value">WKS-156 (Marketing Department)</span></p>
+                            <p><span class="label">Encryption Status:</span> <span class="value critical">Local files encrypted, .lockbit3 extension</span></p>
+                            <p><span class="label">Network Shares:</span> <span class="value high">Attempting to access \\fileserver\marketing</span></p>
+                            <p><span class="label">Ransom Note:</span> <span class="value">README_LOCKBIT.txt found on desktop</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Ransomware Response Playbook Steps</p>
+                    <table class="ioc-table">
+                        <tr><th>Step</th><th>Action</th><th>Your Notes</th></tr>
+                        <tr><td>1</td><td>Isolate affected system(s)</td><td></td></tr>
+                        <tr><td>2</td><td>Disable network shares access</td><td></td></tr>
+                        <tr><td>3</td><td>Preserve evidence (memory, logs)</td><td></td></tr>
+                        <tr><td>4</td><td>Identify encryption scope</td><td></td></tr>
+                        <tr><td>5</td><td>Check for backup integrity</td><td></td></tr>
+                        <tr><td>6</td><td>Scan for lateral movement</td><td></td></tr>
+                        <tr><td>7</td><td>Notify stakeholders</td><td></td></tr>
+                        <tr><td>8</td><td>Document IOCs for threat intel</td><td></td></tr>
+                    </table>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Execute each playbook step, documenting your specific actions in the Notes column</li>
+                        <li>On Screen 3, review the Incident Response panel and track progress through each phase</li>
+                        <li>Using Screen 4, research LockBit 3.0 characteristics and expected TTPs</li>
+                        <li>Determine: Should the organization pay the ransom? Provide justification</li>
+                        <li>Create a post-incident recommendations list for preventing future infections</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1486 - Data Encrypted for Impact</span>
+                    <span class="mitre-tag">T1490 - Inhibit System Recovery</span>
+                    <span class="mitre-tag">T1489 - Service Stop</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Complete playbook execution with notes</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>LockBit research and TTP identification</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Ransom decision with justification</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Post-incident recommendations</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Professional documentation throughout</span><span class="points">10 pts</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 3 EXERCISES -->
+        <div class="tier-section tier-3">
+            <div class="tier-header">
+                <h2>&#128308; Tier 3 Exercises: Advanced Threat Hunting & Analysis</h2>
+                <p>Focus: Proactive threat hunting, advanced analysis, MITRE ATT&CK correlation, forensics</p>
+            </div>
+
+            <!-- Exercise 11 -->
+            <div class="exercise" id="ex11">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex11')">
+                    <span class="exercise-number">11</span>
+                    <span class="exercise-title">APT Campaign Detection & Attribution</span>
+                    <span class="difficulty advanced">Advanced</span>
+                    <span class="time-estimate">&#9201;&#65039; 50 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Identify indicators of Advanced Persistent Threat activity</li>
+                        <li>Correlate multiple weak signals into a detection hypothesis</li>
+                        <li>Map activity to threat actor TTPs</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>Your organization has been mentioned in a threat intelligence report as a potential target of APT41 (Double Dragon). You need to proactively hunt for indicators of compromise.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Threat Actor:</span> <span class="value critical">APT41 (Double Dragon)</span></p>
+                            <p><span class="label">Known TTPs:</span> <span class="value">Supply chain compromise, spearphishing, web shells</span></p>
+                            <p><span class="label">Target Industries:</span> <span class="value">Healthcare, Telecom, Technology, Gaming</span></p>
+                            <p><span class="label">Recent IOCs from Intel:</span></p>
+                            <p style="margin-left: 20px;"><span class="label">C2 Domains:</span> <span class="value">update-service[.]net, cdn-microsoft[.]com</span></p>
+                            <p style="margin-left: 20px;"><span class="label">IP Range:</span> <span class="value">103.224.182[.]0/24</span></p>
+                            <p style="margin-left: 20px;"><span class="label">Malware Hash:</span> <span class="value">a1b2c3d4e5f6...</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Create a threat hunting hypothesis based on APT41 known TTPs</li>
+                        <li>Using Screen 1 (SIEM), search for any alerts matching APT41 indicators:
+                            <ul>
+                                <li>Look for DNS queries to known-bad domains</li>
+                                <li>Check for connections to the C2 IP range</li>
+                                <li>Search for web shell indicators (aspx/php in unusual locations)</li>
+                            </ul>
+                        </li>
+                        <li>Using Screen 2 (Network), look for:
+                            <ul>
+                                <li>Beaconing patterns (regular interval callbacks)</li>
+                                <li>Unusual SSL certificates on internal hosts</li>
+                                <li>Traffic to the specified geographic regions</li>
+                            </ul>
+                        </li>
+                        <li>Using Screen 4 (Threat Intel), cross-reference any findings with known APT41 campaigns</li>
+                        <li>Document your hunt: hypothesis, data sources queried, findings, and conclusions</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK - APT41 Common Techniques</p>
+                    <span class="mitre-tag">T1195 - Supply Chain Compromise</span>
+                    <span class="mitre-tag">T1505.003 - Web Shell</span>
+                    <span class="mitre-tag">T1071 - Application Layer Protocol</span>
+                    <span class="mitre-tag">T1053 - Scheduled Task</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Quality of threat hunting hypothesis</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>SIEM search methodology</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Network analysis for beaconing</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Threat intel correlation</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Hunt documentation completeness</span><span class="points">20 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 12 -->
+            <div class="exercise" id="ex12">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex12')">
+                    <span class="exercise-number">12</span>
+                    <span class="exercise-title">MITRE ATT&CK Chain Reconstruction</span>
+                    <span class="difficulty advanced">Advanced</span>
+                    <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Reconstruct a complete attack chain from disparate alerts</li>
+                        <li>Map each stage to MITRE ATT&CK framework</li>
+                        <li>Identify gaps in detection coverage</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>A post-incident review has collected the following alerts from a confirmed breach. Reconstruct the attack chain and map each phase to MITRE ATT&CK.</p>
+                        <div class="alert-data">
+                            <p><span class="label">Day 1, 09:15:</span> <span class="value">Phishing email with macro-enabled doc opened by user jsmith</span></p>
+                            <p><span class="label">Day 1, 09:16:</span> <span class="value">PowerShell execution with encoded command on WKS-042</span></p>
+                            <p><span class="label">Day 1, 09:20:</span> <span class="value">New scheduled task created on WKS-042</span></p>
+                            <p><span class="label">Day 1, 14:30:</span> <span class="value">LSASS memory access detected on WKS-042</span></p>
+                            <p><span class="label">Day 2, 02:15:</span> <span class="value">RDP connection from WKS-042 to SRV-FILE-01</span></p>
+                            <p><span class="label">Day 2, 02:30:</span> <span class="value">New admin account "svc_update" created</span></p>
+                            <p><span class="label">Day 3, 03:00:</span> <span class="value">Large ZIP file created on SRV-FILE-01</span></p>
+                            <p><span class="label">Day 3, 03:45:</span> <span class="value">Outbound HTTPS transfer to cloud storage</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Map each alert to the appropriate MITRE ATT&CK tactic and technique</li>
+                        <li>Create a visual attack chain diagram showing the progression</li>
+                        <li>Identify which ATT&CK tactics are represented and which are missing (detection gaps)</li>
+                        <li>For each detection gap, recommend a detection mechanism</li>
+                        <li>Determine: At which point could this attack have been stopped most effectively?</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Correct ATT&CK mapping</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Attack chain visualization</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Detection gap identification</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Detection recommendations</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Intervention point analysis</span><span class="points">15 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 13 -->
+            <div class="exercise" id="ex13">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex13')">
+                    <span class="exercise-number">13</span>
+                    <span class="exercise-title">Insider Threat Investigation</span>
+                    <span class="difficulty advanced">Advanced</span>
+                    <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Investigate potential insider threat indicators</li>
+                        <li>Balance security investigation with privacy considerations</li>
+                        <li>Document findings for potential HR/Legal action</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>HR has reported that a senior engineer (User: mthompson) submitted their resignation yesterday and will be leaving for a competitor in two weeks. They have requested SOC assistance to monitor for potential data theft.</p>
+                        <div class="alert-data">
+                            <p><span class="label">User:</span> <span class="value">mthompson (Senior Software Engineer)</span></p>
+                            <p><span class="label">Department:</span> <span class="value">R&D - Product Development</span></p>
+                            <p><span class="label">Access Level:</span> <span class="value high">High - Source code repos, design docs, customer data</span></p>
+                            <p><span class="label">Resignation Date:</span> <span class="value">Yesterday</span></p>
+                            <p><span class="label">Last Day:</span> <span class="value">In 2 weeks</span></p>
+                            <p><span class="label">New Employer:</span> <span class="value critical">Direct competitor</span></p>
+                        </div>
+                        <p style="margin-top: 15px;"><strong>Recent Activity Flags from DLP:</strong></p>
+                        <div class="alert-data">
+                            <p><span class="value">&#8226; 3 days ago: Downloaded 450MB from source code repository</span></p>
+                            <p><span class="value">&#8226; 2 days ago: Accessed customer list (unusual for role)</span></p>
+                            <p><span class="value">&#8226; Yesterday: USB device connected (after resignation submitted)</span></p>
+                            <p><span class="value">&#8226; Today: Personal email attachment sent (15MB)</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Evaluate each activity indicator: Is it suspicious given the context, or could it be normal?</li>
+                        <li>What additional data would you need to determine if data theft occurred?</li>
+                        <li>Using Screen 2, what network indicators would show data being sent to personal accounts?</li>
+                        <li>Draft a findings memo for HR/Legal that:
+                            <ul>
+                                <li>States only facts, not assumptions</li>
+                                <li>Distinguishes between suspicious and confirmed activities</li>
+                                <li>Recommends appropriate next steps</li>
+                            </ul>
+                        </li>
+                        <li>What immediate technical controls should be implemented?</li>
+                    </ul>
+
+                    <p class="section-label">MITRE ATT&CK Mapping</p>
+                    <span class="mitre-tag">T1052 - Exfiltration Over Physical Medium</span>
+                    <span class="mitre-tag">T1567 - Exfiltration Over Web Service</span>
+                    <span class="mitre-tag">T1074 - Data Staged</span>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Activity indicator analysis</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Additional data requirements</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>HR/Legal memo quality (factual, professional)</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Technical control recommendations</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 14 -->
+            <div class="exercise" id="ex14">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex14')">
+                    <span class="exercise-number">14</span>
+                    <span class="exercise-title">Zero-Day Vulnerability Response</span>
+                    <span class="difficulty advanced">Advanced</span>
+                    <span class="time-estimate">&#9201;&#65039; 50 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Respond to newly disclosed zero-day vulnerabilities</li>
+                        <li>Assess organizational exposure quickly</li>
+                        <li>Implement compensating controls before patches are available</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 4: Threat Intel & Endpoints</span>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 2: Network Monitor</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>A critical zero-day vulnerability has been publicly disclosed and is being actively exploited in the wild. No patch is currently available.</p>
+                        <div class="alert-data">
+                            <p><span class="label">CVE:</span> <span class="value critical">CVE-2024-XXXX</span></p>
+                            <p><span class="label">Affected:</span> <span class="value">Apache Web Server 2.4.x (all versions)</span></p>
+                            <p><span class="label">CVSS:</span> <span class="value critical">9.8 (Critical)</span></p>
+                            <p><span class="label">Type:</span> <span class="value">Remote Code Execution</span></p>
+                            <p><span class="label">Exploitation:</span> <span class="value critical">Active exploitation confirmed</span></p>
+                            <p><span class="label">Attack Vector:</span> <span class="value">Malformed HTTP headers</span></p>
+                            <p><span class="label">Patch Status:</span> <span class="value high">No patch available - ETA 48-72 hours</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Using Screen 4 Endpoint Status, identify how many Apache servers exist in your environment</li>
+                        <li>Check Screen 4 Vulnerability Management panel - would this CVE appear there?</li>
+                        <li>Develop a risk assessment:
+                            <ul>
+                                <li>Which systems are internet-facing vs. internal only?</li>
+                                <li>What is the business impact if these servers are compromised?</li>
+                            </ul>
+                        </li>
+                        <li>Create compensating controls (without a patch):
+                            <ul>
+                                <li>Network-level mitigations</li>
+                                <li>WAF rules that could help</li>
+                                <li>Monitoring/detection signatures</li>
+                            </ul>
+                        </li>
+                        <li>Write a CISO briefing on exposure and mitigation status</li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Inventory identification approach</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Risk assessment quality</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Compensating controls (comprehensive)</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>CISO briefing professionalism</span><span class="points">25 pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 15 -->
+            <div class="exercise" id="ex15">
+                <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex15')">
+                    <span class="exercise-number">15</span>
+                    <span class="exercise-title">SOC Metrics & Improvement Planning</span>
+                    <span class="difficulty advanced">Advanced</span>
+                    <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                    <span class="toggle-icon">&#9660;</span>
+                </div>
+                <div class="exercise-content">
+                    <p class="section-label">Learning Objectives</p>
+                    <ul class="objective-list">
+                        <li>Analyze SOC performance metrics</li>
+                        <li>Identify operational improvement opportunities</li>
+                        <li>Develop recommendations for SOC maturity advancement</li>
+                    </ul>
+
+                    <p class="section-label">Screens Used</p>
+                    <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                    <span class="screen-used">Screen 3: Incident Response</span>
+                    <span class="screen-used">Screen 4: Threat Intel</span>
+
+                    <p class="section-label">Scenario</p>
+                    <div class="scenario-box">
+                        <p>You've been asked to assess SOC performance and recommend improvements. Review the following metrics from the past quarter:</p>
+                        <div class="alert-data">
+                            <p><span class="label">Total Alerts:</span> <span class="value">127,450</span></p>
+                            <p><span class="label">Alerts Investigated:</span> <span class="value">89,215 (70%)</span></p>
+                            <p><span class="label">True Positives:</span> <span class="value">4,460 (5% of investigated)</span></p>
+                            <p><span class="label">Mean Time to Detect (MTTD):</span> <span class="value">4.2 hours</span></p>
+                            <p><span class="label">Mean Time to Respond (MTTR):</span> <span class="value">18.5 hours</span></p>
+                            <p><span class="label">Incidents Escalated to Tier 2:</span> <span class="value">3,120</span></p>
+                            <p><span class="label">Incidents Escalated to Tier 3:</span> <span class="value">156</span></p>
+                            <p><span class="label">Analyst Turnover:</span> <span class="value high">35% annually</span></p>
+                            <p><span class="label">Compliance Score (avg):</span> <span class="value">78%</span></p>
+                        </div>
+                    </div>
+
+                    <p class="section-label">Tasks</p>
+                    <ul class="task-list">
+                        <li>Analyze the metrics and identify the top 3 areas of concern</li>
+                        <li>Calculate additional metrics from the provided data:
+                            <ul>
+                                <li>False positive rate</li>
+                                <li>Alert fatigue indicator (alerts per analyst if SOC has 10 analysts)</li>
+                                <li>Escalation rate Tier 1 &#8594; Tier 2</li>
+                            </ul>
+                        </li>
+                        <li>Using Screen 1, observe the current alert volume and severity distribution. Does this align with the quarterly data?</li>
+                        <li>Review Screen 4 Compliance scores. What gaps might contribute to the 78% average?</li>
+                        <li>Create a SOC Improvement Plan addressing:
+                            <ul>
+                                <li>Alert tuning recommendations</li>
+                                <li>Process improvements</li>
+                                <li>Technology recommendations</li>
+                                <li>Staffing/training needs</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <div class="rubric">
+                        <h4>Grading Rubric</h4>
+                        <div class="rubric-item"><span>Metric analysis and concern identification</span><span class="points">25 pts</span></div>
+                        <div class="rubric-item"><span>Calculated metrics accuracy</span><span class="points">20 pts</span></div>
+                        <div class="rubric-item"><span>Screen observation correlation</span><span class="points">15 pts</span></div>
+                        <div class="rubric-item"><span>Improvement plan comprehensiveness</span><span class="points">30 pts</span></div>
+                        <div class="rubric-item"><span>Feasibility of recommendations</span><span class="points">10 pts</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MULTIDISCIPLINARY EXERCISES -->
+        <div class="tier-section tier-multi">
+            <div class="tier-header">
+                <h2>&#127891; Multidisciplinary Exercises: Cross-Program Integration</h2>
+                <p>Focus: Applying the SOC through different professional lenses &#8212; computer science, data science, business &amp; risk, criminal justice, psychology, healthcare, engineering, and social science. Each exercise is written for the primary discipline but benefits from mixed-major discussion.</p>
+            </div>
+
+            <!-- ============= COMPUTER SCIENCE ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#128187;</span>
+                    <div>
+                        <h3>Computer Science</h3>
+                        <p>Systems, algorithms, and detection engineering</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex16">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex16')">
+                        <span class="exercise-number">16</span>
+                        <span class="exercise-title">Detection Rule Authoring &amp; Tuning</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Computer Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 35 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Translate an informal security requirement into formal detection logic</li>
+                            <li>Identify false-positive amplifiers in rule design</li>
+                            <li>Apply precision/recall tradeoffs to rule tuning decisions</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Leadership wants a detection for "suspicious PowerShell execution." The first attempt was the rule <code>EventID=4104 AND ScriptBlockText CONTAINS "Invoke"</code>, which generated 10,400 alerts/day with a 97% false positive rate. It was rolled back after 18 hours. You've been asked to propose a better rule.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Available signals:</span> <span class="value">PowerShell ScriptBlock logging (4104), Process creation (4688), Parent process</span></p>
+                                <p><span class="label">Known legitimate uses:</span> <span class="value">Admin scripts using Invoke-WebRequest, software deployment tools, SCCM client</span></p>
+                                <p><span class="label">Known malicious indicators:</span> <span class="value">Base64-encoded commands, hidden windows, downloaded payload execution, uncommon parent processes</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Write a revised detection rule in pseudocode that lowers false positive rate to under 20%</li>
+                            <li>Identify at least three conditions that are common in malicious PowerShell but rare in admin PowerShell</li>
+                            <li>Describe a staged rollout plan (shadow mode, percentage rollout, monitored window)</li>
+                            <li>Explain the precision/recall tradeoff of your rule: what do you gain, what do you give up?</li>
+                            <li>Propose a metric and threshold for automatically rolling back your rule if it misbehaves</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Rule logic correctness</span><span class="points">30 pts</span></div>
+                            <div class="rubric-item"><span>Indicator selection quality</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Rollout plan realism</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Tradeoff articulation</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Auto-rollback design</span><span class="points">10 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex17">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex17')">
+                        <span class="exercise-number">17</span>
+                        <span class="exercise-title">Log Parsing &amp; Alert Deduplication</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Computer Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Design a deduplication algorithm for near-identical alerts</li>
+                            <li>Parse semi-structured log data into queryable fields</li>
+                            <li>Reason about time-based windowing</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 1's alert queue is receiving 40&#8211;60 copies of the same alert per minute from a failing backup job. Analysts are drowning. You need to write a deduplication algorithm so 1,000 identical alerts collapse into one with a count field.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Define the "identity" of an alert (which fields must match to count as a duplicate?)</li>
+                            <li>Design a windowing strategy (tumbling, sliding, session &#8212; pick one and justify)</li>
+                            <li>Write pseudocode for the dedup logic, including the counter update</li>
+                            <li>Handle the edge case where an alert stops repeating &#8212; when should the dedup group close?</li>
+                            <li>What happens if two analysts view the dedup group at the same time? (concurrency)</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Identity definition</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Window strategy justification</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Pseudocode correctness</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Edge case handling</span><span class="points">25 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= DATA SCIENCE ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#128202;</span>
+                    <div>
+                        <h3>Data Science</h3>
+                        <p>Metrics, baselines, anomalies, and the statistical story</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex18">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex18')">
+                        <span class="exercise-number">18</span>
+                        <span class="exercise-title">SOC Metric Interpretation &amp; Trend Analysis</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Data Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Interpret operational SOC metrics (MTTD, MTTR, FPR, dwell time, SLA)</li>
+                            <li>Distinguish noise-driven and signal-driven metric changes</li>
+                            <li>Propose targeted interventions based on metric patterns</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard (SOC Metrics panel)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>You are the SOC data analyst. You've pulled 4 weeks of operational metrics from Screen 1's SOC Metrics panel.</p>
+                            <div class="alert-data">
+                                <p><span class="label">Week 1:</span> <span class="value">MTTD 7m, MTTR 38m, FPR 28%, Alerts/Analyst 108, Dwell 5.1d, SLA 96%</span></p>
+                                <p><span class="label">Week 2:</span> <span class="value">MTTD 8m, MTTR 41m, FPR 31%, Alerts/Analyst 127, Dwell 4.8d, SLA 95%</span></p>
+                                <p><span class="label">Week 3:</span> <span class="value">MTTD 9m, MTTR 47m, FPR 33%, Alerts/Analyst 148, Dwell 4.2d, SLA 93%</span></p>
+                                <p><span class="label">Week 4:</span> <span class="value">MTTD 11m, MTTR 52m, FPR 35%, Alerts/Analyst 163, Dwell 4.4d, SLA 91%</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Describe the trend in each metric across the four weeks (up / down / flat, rate of change)</li>
+                            <li>Propose a hypothesis that explains all six metric movements consistently</li>
+                            <li>Identify which metric is the strongest leading indicator for the SLA breach</li>
+                            <li>Recommend two interventions &#8212; one staffing, one technical &#8212; with expected impact per metric</li>
+                            <li>Design a single composite KPI that would have caught this trend at Week 2 instead of Week 4</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Trend description accuracy</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Hypothesis quality</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Leading indicator identification</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Intervention quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Composite KPI design</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex19">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex19')">
+                        <span class="exercise-number">19</span>
+                        <span class="exercise-title">Precision/Recall &amp; Alert Prioritization Scoring</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Data Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Compute precision, recall, and F1 from a confusion matrix</li>
+                            <li>Build a risk-scoring function from multiple signals</li>
+                            <li>Justify weighting choices from observed data</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM Dashboard</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Over the past 30 days, your "Suspicious Authentication" detection fired 3,200 times. After triage: 380 were confirmed true positives, 2,820 were false positives. Known real incidents missed by this detection: 42.</p>
+                            <p>You're asked to design a prioritization score (0&#8211;100) that ranks alerts by likely risk, using these features: severity, asset criticality, user department, time-of-day anomaly, source geolocation anomaly, and historical FPR per source.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Compute precision, recall, and F1 for the existing detection</li>
+                            <li>Propose a weighting scheme for the six features; total weights sum to 1.0</li>
+                            <li>Justify each weight from an operational reasoning standpoint</li>
+                            <li>Define the thresholds that split scores into Critical / High / Medium / Low buckets, and explain how you picked them</li>
+                            <li>Describe how you'd validate the score against the next 30 days of triage outcomes</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Metric computation accuracy</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Weighting scheme reasonableness</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Weight justifications</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Threshold methodology</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Validation plan</span><span class="points">15 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= BUSINESS & RISK MANAGEMENT ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#128188;</span>
+                    <div>
+                        <h3>Business &amp; Risk Management</h3>
+                        <p>Quantified risk, compliance, executive communication, and business continuity</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex20">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex20')">
+                        <span class="exercise-number">20</span>
+                        <span class="exercise-title">Risk Quantification &amp; Executive Briefing</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Business &amp; Risk</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Apply Annualized Loss Expectancy (ALE) to quantify cyber risk</li>
+                            <li>Translate technical incident data into business language</li>
+                            <li>Draft a board-ready risk summary</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <span class="screen-used">Screen 4: Threat Intel (Compliance)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 3 currently shows 4 ransomware incidents in the past 12 months, each averaging $180K in direct cost (response, recovery, downtime). Screen 4's compliance panel shows your PCI DSS score at 72%, below the 85% target. The CEO is asking for a 1-page "cyber risk summary" for the board's quarterly meeting.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Compute the ARO, SLE, and ALE for ransomware at the organization (ARO = Annualized Rate of Occurrence; SLE = Single Loss Expectancy; ALE = ARO &times; SLE)</li>
+                            <li>Estimate the risk contribution of the PCI compliance gap (probability of fine &times; estimated fine size + remediation cost)</li>
+                            <li>Draft a 1-page board summary with three sections: Current Risk Posture, Top Three Risks Quantified, Recommended Actions with Cost/Benefit</li>
+                            <li>Avoid all jargon &#8212; no T-codes, no acronyms except ones a board member would know</li>
+                            <li>Close with one specific budget ask tied to one specific risk reduction</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>ALE computation accuracy</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Compliance risk modeling</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Board summary clarity</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Jargon discipline</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Budget ask / ROI framing</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex21">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex21')">
+                        <span class="exercise-number">21</span>
+                        <span class="exercise-title">Breach Notification Decision &amp; Regulatory Mapping</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Business &amp; Risk</span>
+                        <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Map an incident to applicable notification frameworks (HIPAA, GDPR, state laws, PCI DSS)</li>
+                            <li>Build a parallel-track notification timeline</li>
+                            <li>Draft stakeholder communications for an active incident</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response (Sector tag)</span>
+                        <span class="screen-used">Screen 4: Compliance Status</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>INC-2024142 on Screen 3: confirmed exfiltration of a database containing 12,400 patient records. Sector tag: Healthcare/PHI. Of the affected records: ~11,000 are US residents across 4 states (California, Texas, New York, Florida); ~1,400 are EU residents.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>List every notification framework the incident triggers and the associated deadline</li>
+                            <li>Build a parallel-track timeline (T+0, T+24h, T+48h, T+72h, T+7d, T+30d, T+60d) showing who gets notified and by whom</li>
+                            <li>Identify which deadline is the binding constraint (the one that closes first)</li>
+                            <li>Draft a 3-sentence internal all-hands notification and a 3-sentence external holding statement</li>
+                            <li>Describe one scenario where notification timing conflicts with ongoing forensic investigation, and how to resolve it</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Framework identification completeness</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Timeline construction</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Binding constraint analysis</span><span class="points">10 pts</span></div>
+                            <div class="rubric-item"><span>Communication drafts</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Conflict resolution reasoning</span><span class="points">15 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= CRIMINAL JUSTICE ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#9878;&#65039;</span>
+                    <div>
+                        <h3>Criminal Justice</h3>
+                        <p>Digital forensics, chain of custody, jurisdictional analysis, and prosecution-readiness</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex22">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex22')">
+                        <span class="exercise-number">22</span>
+                        <span class="exercise-title">Evidence Preservation &amp; Chain of Custody</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Criminal Justice</span>
+                        <span class="time-estimate">&#9201;&#65039; 35 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Design an evidence preservation plan for a live incident</li>
+                            <li>Document chain of custody for admissibility</li>
+                            <li>Identify actions that destroy evidence vs. preserve it</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>A senior employee is suspected of IP theft based on Screen 3 case INC-2024137. The organization may pursue both civil and criminal action. As the SOC lead, you must preserve evidence for possible prosecution.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>List every data source that should be preserved (endpoint, network, email, authentication logs, SaaS, physical access) with a brief justification for each</li>
+                            <li>Specify the preservation method for each source (memory image, disk image, log export with cryptographic hash, etc.)</li>
+                            <li>Write a sample chain-of-custody entry for one piece of evidence, including who, when, what, and hash verification</li>
+                            <li>Identify three common IR actions that would harm admissibility if done casually, and their safe alternatives</li>
+                            <li>Name the primary legal standard evidence will be measured against (e.g., Federal Rules of Evidence 901 and 902)</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Source identification</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Preservation method specificity</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Chain-of-custody detail</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Admissibility-risk analysis</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Legal standard citation</span><span class="points">10 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex23">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex23')">
+                        <span class="exercise-number">23</span>
+                        <span class="exercise-title">Cross-Border Investigation &amp; Jurisdiction</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Criminal Justice</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Identify which authorities have jurisdiction over a cross-border cyber incident</li>
+                            <li>Navigate MLAT (Mutual Legal Assistance Treaty) mechanics</li>
+                            <li>Identify practical enforcement limits when attribution crosses uncooperative jurisdictions</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 2: Network Monitor (Global Threat Map)</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 3 shows INC-2024151: an attacker exfiltrated $4.2M worth of proprietary designs. Screen 2's threat map traces the source to IPs rotating across Russia, Belarus, and a Tor exit in the Netherlands. The stolen data appears to have been offered for sale on a dark-web forum hosted via a Panama-based proxy. The victim servers are in Frankfurt, Germany. The company is a US corporation headquartered in Delaware. Some of the stolen IP is classified "EAR-controlled" under US export regulations.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>List every authority that has a legitimate interest in the case and what they'd each want</li>
+                            <li>Identify which authorities cooperate with each other (MLAT, Budapest Convention, EU JITs) and which likely don't</li>
+                            <li>Describe the realistic enforcement ceiling &#8212; what's actually achievable against the likely threat actor?</li>
+                            <li>Identify what non-criminal remedies are available (sanctions designation, indictment-in-absentia, cyber insurance claim, private civil action)</li>
+                            <li>Recommend the sequence: which authority gets engaged first, second, third, and why</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Authority identification</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Cooperation map accuracy</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Enforcement ceiling realism</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Non-criminal remedies</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Sequencing rationale</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= PSYCHOLOGY ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#129504;</span>
+                    <div>
+                        <h3>Psychology</h3>
+                        <p>Human behavior, social engineering, insider threat psychology, and analyst cognition</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex24">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex24')">
+                        <span class="exercise-number">24</span>
+                        <span class="exercise-title">Insider Threat Behavioral Analysis</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Psychology</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Identify behavioral escalation patterns in DLP and access logs</li>
+                            <li>Differentiate malicious, negligent, and coerced insider behavior</li>
+                            <li>Apply the Critical Pathway to Insider Threat framework</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <span class="screen-used">Screen 1: SIEM (alert context)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Three separate employees appear in Screen 3 incidents in the past month. Each shows different behavioral patterns:</p>
+                            <div class="alert-data">
+                                <p><span class="label">Employee A:</span> <span class="value">3 weeks of escalating DLP flags, final event was bulk download Friday evening; resignation notice during week 3</span></p>
+                                <p><span class="label">Employee B:</span> <span class="value">Fell for the same phishing email pattern 4 times in 6 months; opened an executable attachment despite training</span></p>
+                                <p><span class="label">Employee C:</span> <span class="value">Uncharacteristically accessed financial systems late at night, transferred a small but unusual file; behavior started after their spouse's job loss was mentioned in an internal coffee chat</span></p>
+                            </div>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>For each employee, categorize the most likely insider type: malicious, negligent, or coerced/pressured</li>
+                            <li>For employee A, describe the behavioral escalation signature and how each step informed the next</li>
+                            <li>For employee B, describe the cognitive and organizational factors that likely contribute</li>
+                            <li>For employee C, apply the Critical Pathway framework (predisposition + stressors + concerning behaviors + technical activity)</li>
+                            <li>Propose one humane, effective intervention for each case that balances security with employee wellbeing</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Categorization accuracy</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Escalation analysis (A)</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Cognitive factors (B)</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Critical Pathway application (C)</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Intervention humanity + effectiveness</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex25">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex25')">
+                        <span class="exercise-number">25</span>
+                        <span class="exercise-title">Analyst Fatigue &amp; Decision Quality</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Psychology</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Recognize cognitive fatigue signatures in SOC operational metrics</li>
+                            <li>Apply signal detection theory to analyst decision-making</li>
+                            <li>Design interventions grounded in cognitive science</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM (Metrics panel)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 1's Metrics panel shows the false positive rate climbing from 28% to 35% over four weeks while alert volume per analyst climbed from 108 to 163. Leadership is blaming the detection rules. You suspect analyst fatigue and alert normalization.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Describe the cognitive mechanism by which a higher FPR can be a consequence of analyst fatigue rather than a cause of it</li>
+                            <li>Apply signal detection theory: how do high workload and fatigue shift an analyst's decision criterion?</li>
+                            <li>Propose three interventions grounded in cognitive science (not just "hire more people")</li>
+                            <li>Design a measurement that would distinguish "rules got worse" from "analysts got tired" as the root cause</li>
+                            <li>Describe how you would communicate this analysis to a skeptical leadership team without blaming analysts</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Cognitive mechanism explanation</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Signal detection theory application</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Intervention quality</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Root cause measurement design</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Leadership communication</span><span class="points">15 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= HEALTHCARE ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#129302;</span>
+                    <div>
+                        <h3>Healthcare</h3>
+                        <p>HIPAA, patient safety, medical device security, and clinical continuity</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex26">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex26')">
+                        <span class="exercise-number">26</span>
+                        <span class="exercise-title">Medical Device Incident Response</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Healthcare</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Balance security response with patient safety obligations</li>
+                            <li>Work within FDA-regulated device constraints</li>
+                            <li>Coordinate SOC, biomedical engineering, and clinical staff</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 4: Endpoint Status</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 4 shows MRI-RAD-03 flagged with malware. Clinical schedule shows 6 MRI scans today, next in 40 minutes. The MRI is a 12-year-old Windows-embedded system with no available patch. It connects to PACS-01 for image routing and the hospital network for scheduling.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Write the decision tree for the first 15 minutes: what conditions make you stop current care, what conditions let you continue?</li>
+                            <li>List who must be engaged in parallel (not sequentially) and why</li>
+                            <li>Describe the preferred isolation method for a medical device and why power-cycling is dangerous</li>
+                            <li>Explain the FDA regulatory constraint: why can't IT just "update" or "reimage" the device?</li>
+                            <li>Draft a 3-sentence briefing for the radiology department head that doesn't use security jargon</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Decision tree quality</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Stakeholder engagement</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Isolation method understanding</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>FDA/regulatory framing</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Clinical briefing clarity</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex27">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex27')">
+                        <span class="exercise-number">27</span>
+                        <span class="exercise-title">HIPAA Privacy Audit Investigation</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Healthcare</span>
+                        <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Distinguish technical access control from HIPAA "minimum necessary" compliance</li>
+                            <li>Investigate EHR "snooping" events</li>
+                            <li>Determine when an access violation becomes a reportable breach</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>EHR audit system generated an incident on Screen 3: Nurse R. Thompson accessed the record of patient M. Thompson 14 times across 3 days. The nurse has system-level access to all patient records on their floor. Patient M. Thompson is not assigned to the nurse's floor. No data was printed, exported, or shared externally.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Explain the gap between "system-authorized access" and "HIPAA-permitted access"</li>
+                            <li>List the questions the Privacy Officer will want answered before deciding whether this is a violation</li>
+                            <li>Identify the threshold at which this becomes a reportable breach vs. a privacy violation handled internally</li>
+                            <li>Describe three technical controls that could reduce this type of event</li>
+                            <li>Discuss the workforce implications: what's the appropriate response spectrum from "no action" to "termination and OCR notification"?</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Access vs. permission distinction</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Investigation questions</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Breach threshold analysis</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Technical controls</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Response spectrum calibration</span><span class="points">15 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= ENGINEERING ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#9881;&#65039;</span>
+                    <div>
+                        <h3>Engineering</h3>
+                        <p>OT/ICS, safety-critical systems, smart infrastructure, and industrial protocols</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex28">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex28')">
+                        <span class="exercise-number">28</span>
+                        <span class="exercise-title">OT Incident Response &amp; Safety-Critical Containment</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Engineering</span>
+                        <span class="time-estimate">&#9201;&#65039; 45 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Apply the Purdue Model to plan OT containment</li>
+                            <li>Sequence security response around safety-critical processes</li>
+                            <li>Coordinate SOC, OT engineers, and plant operations</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 2: Network Monitor</span>
+                        <span class="screen-used">Screen 4: Endpoint Status (SCADA/PLC/HMI)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 4 shows SCADA-PLANT-07 and 3 PLCs on the plant floor with new unusual outbound traffic to an unknown domain. Screen 2 confirms the traffic is TLS-encrypted, low-volume, periodic. The plant is running a batch process with 14 hours remaining. Aborting the batch will cost $180K in material loss plus a 36-hour safety cooldown on the reactor.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Map the affected devices onto the Purdue Model (Level 0&#8211;5) and identify which level the response must target</li>
+                            <li>List the operational questions you need answered before taking any action (e.g., is this vendor telemetry? what's the reactor safety state?)</li>
+                            <li>Describe the staged containment plan that respects the batch cycle and reactor cooldown</li>
+                            <li>Identify what would make you override the cost calculation and stop the batch anyway</li>
+                            <li>Propose an OT/IT coordination protocol that would speed up the next incident</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Purdue Model application</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Operational questions quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Staged containment plan</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Override decision reasoning</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Coordination protocol design</span><span class="points">15 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex29">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex29')">
+                        <span class="exercise-number">29</span>
+                        <span class="exercise-title">Smart Building / BMS Security Assessment</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                        <span class="discipline-lens">Engineering</span>
+                        <span class="time-estimate">&#9201;&#65039; 30 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Identify security exposures unique to building management and IoT systems</li>
+                            <li>Propose mitigations that respect facilities operations</li>
+                            <li>Evaluate supply-chain risk in connected infrastructure</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 4: Endpoint Status (HVAC, BMS, IoT)</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 4 shows 12 HVAC controllers, a BMS, and 40+ IoT sensors (occupancy, environmental, door access) on the corporate network. The BMS is accessible from the facilities vendor's cloud portal. HVAC firmware was last updated 4 years ago. The BMS credentials appear to be vendor defaults.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Identify the top 5 security exposures in this setup, ranked by likely impact</li>
+                            <li>Propose mitigations that facilities can actually implement (no "replace the BMS" answers)</li>
+                            <li>Describe the supply-chain risk introduced by the vendor's cloud portal</li>
+                            <li>Propose a network architecture change that reduces blast radius if the BMS is compromised</li>
+                            <li>Write a 1-paragraph case for why facilities should care about this, framed for a facilities director</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Exposure ranking</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Mitigation practicality</span><span class="points">25 pts</span></div>
+                            <div class="rubric-item"><span>Supply-chain analysis</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Architecture proposal</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Facilities director framing</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= SOCIAL SCIENCE ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header">
+                    <span class="discipline-icon">&#128101;</span>
+                    <div>
+                        <h3>Social Science</h3>
+                        <p>Security culture, policy ethics, workforce dynamics, and surveillance tradeoffs</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex30">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex30')">
+                        <span class="exercise-number">30</span>
+                        <span class="exercise-title">Whistleblower Protection vs. Insider Threat Response</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="discipline-lens">Social Science</span>
+                        <span class="time-estimate">&#9201;&#65039; 40 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Identify the institutional signals that distinguish whistleblowing from data theft</li>
+                            <li>Navigate competing legal/ethical obligations</li>
+                            <li>Design a policy that protects both legitimate security and legitimate dissent</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>Screen 3 case INC-2024167: An employee in the compliance department has been encrypting and sending internal audit documents to an outside law firm. The documents relate to a financial reporting irregularity. HR records show the employee reported the irregularity via the internal ethics hotline 2 months ago and was told it was "handled." Nothing appears to have been done.</p>
+                        </div>
+                        <p class="section-label">Tasks</p>
+                        <ul class="task-list">
+                            <li>Identify the legal protections that likely apply (name specific statutes)</li>
+                            <li>Describe why treating this as a standard insider-threat incident could legally backfire</li>
+                            <li>Propose the correct intake and escalation path within the organization</li>
+                            <li>Draft a policy addition that defines how the SOC should handle potential whistleblower activity</li>
+                            <li>Reflect on the ethics: when does employee monitoring itself become a harm?</li>
+                        </ul>
+                    <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Legal framework identification</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Legal risk analysis</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Escalation path design</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Policy language quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Ethical reasoning depth</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= CROSS-DISCIPLINARY CAPSTONES ============= -->
+            <div class="discipline-group">
+                <div class="discipline-header" style="border-left-color:#fb7185; background: linear-gradient(90deg, rgba(251,113,133,0.1), transparent);">
+                    <span class="discipline-icon">&#127919;</span>
+                    <div>
+                        <h3 style="color:#fb7185;">Cross-Disciplinary Capstones</h3>
+                        <p>One incident. Many disciplines. Designed for mixed-major team sessions.</p>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex31">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex31')">
+                        <span class="exercise-number">31</span>
+                        <span class="exercise-title">Hospital Ransomware: Multi-Lens Response</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="capstone-marker">Capstone</span>
+                        <span class="time-estimate">&#9201;&#65039; 75 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Coordinate a multi-disciplinary response to a single complex incident</li>
+                            <li>Apply each discipline's lens to the same underlying data</li>
+                            <li>Practice handoffs across roles with different priorities</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">Screen 1: SIEM</span>
+                        <span class="screen-used">Screen 2: Network</span>
+                        <span class="screen-used">Screen 3: Incident Response</span>
+                        <span class="screen-used">Screen 4: Threat Intel</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>At 03:14 UTC, ransomware detonated across a 340-bed regional hospital's network. The EHR is offline; imaging systems are unresponsive; two IV infusion pumps are stuck at last-known settings. Initial access appears to have been a phishing email opened by a clinical staff member 11 days ago. Estimated 48,000 patient records are at risk. Ransom demand: $4.5M in Monero.</p>
+                            <p><strong>Team roles (assign one per student):</strong> Cybersecurity Analyst, Clinical Operations Lead, Legal/Privacy Officer, Business Continuity Lead, Communications Lead, Criminal Justice Liaison, Psychology (human-factors analyst), Data Analyst.</p>
+                        </div>
+                        <p class="section-label">Tasks (per role)</p>
+                        <ul class="task-list">
+                            <li><strong>Cybersecurity:</strong> containment plan, evidence preservation, hunt for other infected hosts, EDR action plan</li>
+                            <li><strong>Clinical:</strong> patient-safety triage, device-by-device impact, downtime procedures, transfer plan for critical patients</li>
+                            <li><strong>Legal/Privacy:</strong> HIPAA/GDPR/state notification clocks, ransom payment legality (OFAC check), evidence preservation for any legal action</li>
+                            <li><strong>Business Continuity:</strong> cost estimate, insurance notification, alternative care site plan, supply chain for paper records</li>
+                            <li><strong>Communications:</strong> internal all-hands, patient families, media holding statement, regulator notification drafts</li>
+                            <li><strong>Criminal Justice:</strong> FBI engagement, chain-of-custody plan, jurisdictional questions, law enforcement coordination</li>
+                            <li><strong>Psychology:</strong> analyze the 11-day dwell time &#8212; what happened between initial access and detonation, and what cognitive/operational factors let it persist? Propose future prevention</li>
+                            <li><strong>Data:</strong> reconstruct the attack timeline from Screen 1&#8211;4 data, calculate metrics for post-incident review, identify the detection that should have caught this sooner</li>
+                        </ul>
+                        <p class="section-label">Team Deliverable</p>
+                        <div class="scenario-box">
+                            <p>At the end of the session, the team produces a <strong>unified incident briefing</strong> that could be delivered to the hospital's Board of Directors. It must integrate all eight perspectives into a single coherent narrative: what happened, who was affected, what we did, what obligations we now have, and what must change.</p>
+                            <p>The grading is on integration quality, not on any single role's output. The best briefings show where the roles handed off to each other, disagreed productively, and resolved tradeoffs explicitly.</p>
+                        </div>
+                        <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Per-role analysis quality (avg across roles)</span><span class="points">40 pts</span></div>
+                            <div class="rubric-item"><span>Handoff and coordination quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Tradeoff identification and resolution</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Unified briefing coherence</span><span class="points">20 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise" id="ex32">
+                    <div class="exercise-header" role="button" tabindex="0" aria-expanded="false" data-action="toggleExercise('ex32')">
+                        <span class="exercise-number">32</span>
+                        <span class="exercise-title">Manufacturing APT: OT Compromise Under the Microscope</span>
+                        <span class="difficulty advanced">Advanced</span>
+                        <span class="capstone-marker">Capstone</span>
+                        <span class="time-estimate">&#9201;&#65039; 75 min</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="exercise-content">
+                        <p class="section-label">Learning Objectives</p>
+                        <ul class="objective-list">
+                            <li>Apply multiple disciplinary lenses to a safety-critical cyber incident</li>
+                            <li>Balance investigation, production continuity, and public safety</li>
+                            <li>Coordinate with external authorities, regulators, and media</li>
+                        </ul>
+                        <p class="section-label">Screens Used</p>
+                        <span class="screen-used">All four screens</span>
+                        <p class="section-label">Scenario</p>
+                        <div class="scenario-box">
+                            <p>A chemical manufacturing plant's SCADA system (SCADA-PLANT-07) was compromised by a suspected nation-state actor. Threat intel (Screen 4) connects the TTPs to a group known to target industrial targets in allied nations. The attackers appear to have spent 6 weeks understanding the plant's process control logic before any visible action. A production line anomaly yesterday caused a minor chemical release with no injuries &#8212; but could have been catastrophic. Local news is starting to ask questions. The plant is a major regional employer.</p>
+                            <p><strong>Team roles:</strong> Cybersecurity Analyst, OT/Engineering Lead, Legal Counsel, Business/Executive Lead, Communications Lead, Criminal Justice Liaison, Psychology (analyst-attacker profiling), Data Analyst, Social Science (community/workforce impact).</p>
+                        </div>
+                        <p class="section-label">Tasks (per role)</p>
+                        <ul class="task-list">
+                            <li><strong>Cybersecurity:</strong> map the intrusion timeline, identify persistence, remediation plan, infrastructure for detecting repeat attack</li>
+                            <li><strong>OT/Engineering:</strong> assess process safety, validate integrity of PLC logic, plan safe restart, propose Purdue Model hardening</li>
+                            <li><strong>Legal:</strong> environmental/OSHA notification obligations, insurance implications, regulatory engagement (EPA, state), vendor liability analysis</li>
+                            <li><strong>Business/Executive:</strong> production loss estimate, customer commitments, board briefing, business continuity plan</li>
+                            <li><strong>Communications:</strong> community statement (chemical release was public), workforce communication, media strategy, regulator disclosure wording</li>
+                            <li><strong>Criminal Justice:</strong> nation-state attribution cooperation (FBI, CISA, NSA liaison), sanctions implications, classified intel handling</li>
+                            <li><strong>Psychology:</strong> 6-week dwell time analysis &#8212; what did the attackers learn and why wasn't their reconnaissance detected? Attacker profiling; analyst over/under-reaction risk given nation-state framing</li>
+                            <li><strong>Data:</strong> precise reconstruction of attacker dwell + detection gap; propose detections that would have caught the 6-week reconnaissance phase</li>
+                            <li><strong>Social Science:</strong> community trust impact analysis, workforce psychological effect, employer-to-community obligations beyond the legal minimum</li>
+                        </ul>
+                        <p class="section-label">Team Deliverable</p>
+                        <div class="scenario-box">
+                            <p>Two outputs: (1) a confidential executive briefing and (2) a public statement. The team must demonstrate awareness of the tension between those documents: executives need honest risk, the public needs honest reassurance without revealing operational details. The best teams will articulate explicitly where they chose to simplify, where they chose to be vague, and why.</p>
+                        </div>
+                        <div class="rubric">
+                            <h4>Grading Rubric</h4>
+                            <div class="rubric-item"><span>Per-role analysis quality (avg across roles)</span><span class="points">35 pts</span></div>
+                            <div class="rubric-item"><span>Executive briefing quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Public statement quality</span><span class="points">20 pts</span></div>
+                            <div class="rubric-item"><span>Tradeoff articulation between documents</span><span class="points">15 pts</span></div>
+                            <div class="rubric-item"><span>Coordination and handoff quality</span><span class="points">10 pts</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MULTIDISCIPLINARY EXERCISES -->
+
+        <footer>
+            <p>SOC Training Exercises v2.0 &mdash; Student Edition | Designed for use with the 4-Screen SOC Simulation</p>
+            <p>Exercises cover Tier 1 (Alert Triage), Tier 2 (Incident Response), Tier 3 (Threat Hunting), and Multidisciplinary Integration across 8 programs</p>
+        </footer>
+    </div>
+
+    <script>
+        
+    /* ============ Progress persistence (punch list item 5) ============ */
+    const EX_KEY = 'soc-ex-student-v1';
+    function saveExState(state) {
+        try { localStorage.setItem(EX_KEY, JSON.stringify(state)); } catch (e) { /* private mode etc. */ }
+    }
+    function loadExState() {
+        try { return JSON.parse(localStorage.getItem(EX_KEY)) || null; } catch (e) { return null; }
+    }
+
+    function snapshotExState() {
+        saveExState({
+            expanded: Array.from(document.querySelectorAll('.exercise.expanded')).map(function (e) { return e.id; }),
+            revealed: Array.from(document.querySelectorAll('.answer-content.revealed')).map(function (e) { return e.id; })
+        });
+    }
+
+    function toggleExercise(id) {
+            const exercise = document.getElementById(id);
+            exercise.classList.toggle('expanded');
+            const hdr = exercise.querySelector('.exercise-header[data-action]');
+            if (hdr) hdr.setAttribute('aria-expanded', exercise.classList.contains('expanded'));
+                    snapshotExState();
+        }
+
+        function toggleAnswer(id) {
+            const answer = document.getElementById(id);
+            answer.classList.toggle('revealed');
+            const trig = document.querySelector('[aria-controls="' + id + '"]');
+            if (trig) trig.setAttribute('aria-expanded', answer.classList.contains('revealed'));
+                    snapshotExState();
+        }
+
+        function toggleAllExercises() {
+            const exercises = document.querySelectorAll('.exercise');
+            const anyExpanded = Array.from(exercises).some(ex => ex.classList.contains('expanded'));
+            
+            exercises.forEach(exercise => {
+                if (anyExpanded) {
+                    exercise.classList.remove('expanded');
+                    const h1 = exercise.querySelector('.exercise-header[data-action]');
+                    if (h1) h1.setAttribute('aria-expanded', 'false');
+                } else {
+                    exercise.classList.add('expanded');
+                    const h2 = exercise.querySelector('.exercise-header[data-action]');
+                    if (h2) h2.setAttribute('aria-expanded', 'true');
+                }
+            });
+                    snapshotExState();
+        }
+
+        // Auto-expand first exercise on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('ex1').classList.add('expanded');
+        });
+    
+        /* ---- Keep scenario incident IDs current (item 6) ---- */
+        (function refreshIncidentYears() {
+            const y = new Date().getFullYear();
+            if (y === 2024) return;
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                if (node.nodeValue.indexOf('INC-2024') !== -1) {
+                    node.nodeValue = node.nodeValue.replace(/INC-2024(\d+)/g, 'INC-' + y + '$1');
+                }
+            }
+        })();
+
+        /* ---- Restore expand/reveal state (item 5) ---- */
+        (function restoreExercises() {
+            const saved = loadExState();
+            if (!saved) return;
+            (saved.expanded || []).forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('expanded')) toggleExercise(id);
+            });
+            (saved.revealed || []).forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('revealed')) toggleAnswer(id);
+            });
+        })();
+</script>
+
+<script>
+/* CSP-safe delegated event dispatcher + accessibility helpers (a11y pass). */
+(function () {
+    'use strict';
+    function parseArg(tok, el, ev) {
+        tok = tok.trim();
+        if (tok === 'this') return el;
+        if (tok === 'event') return ev;
+        if (tok === 'true') return true;
+        if (tok === 'false') return false;
+        var qs = tok.match(/^this\.querySelector\('([^']+)'\)$/);
+        if (qs) return el.querySelector(qs[1]);
+        var str = tok.match(/^'([^']*)'$/);
+        if (str) return str[1];
+        if (/^-?\d+(\.\d+)?$/.test(tok)) return Number(tok);
+        return undefined;
+    }
+    function splitArgs(s) {
+        var out = [], depth = 0, q = false, cur = '';
+        for (var i = 0; i < s.length; i++) {
+            var c = s[i];
+            if (c === "'" ) { q = !q; cur += c; }
+            else if (!q && c === '(') { depth++; cur += c; }
+            else if (!q && c === ')') { depth--; cur += c; }
+            else if (!q && depth === 0 && c === ',') { out.push(cur); cur = ''; }
+            else cur += c;
+        }
+        if (cur.trim()) out.push(cur);
+        return out;
+    }
+    function runAction(expr, el, ev) {
+        var m = expr.match(/^\s*([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/);
+        if (!m) return;
+        var fn = window[m[1]];
+        if (typeof fn !== 'function') return;
+        var args = m[2].trim() ? splitArgs(m[2]).map(function (t) { return parseArg(t, el, ev); }) : [];
+        fn.apply(null, args);
+    }
+    document.addEventListener('click', function (ev) {
+        var dis = ev.target.closest('[data-dismiss]');
+        if (dis && ev.target === dis) {
+            var f = window[dis.getAttribute('data-dismiss')];
+            if (typeof f === 'function') f();
+            return;
+        }
+        var t = ev.target.closest('[data-action]');
+        if (t) runAction(t.getAttribute('data-action'), t, ev);
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+            var t = ev.target.closest('[role="button"][data-action]');
+            if (t) { ev.preventDefault(); runAction(t.getAttribute('data-action'), t, ev); }
+        }
+        if (ev.key === 'Tab') { /* basic focus trap for the display-info dialog */
+            var ov = document.getElementById('diOverlay');
+            if (!ov || !ov.classList.contains('visible')) return;
+            var f = ov.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]');
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+            else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+        }
+    });
+})();
+</script>
+</body>
+</html>
