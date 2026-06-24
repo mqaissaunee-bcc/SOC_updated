@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () { document.documentElement.setAttribute('data-theme', 'dark'); })();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Instructor inject console for the Simulated SOC - launch live scenarios across all four dashboards.">
+<meta name="robots" content="noindex">
+<title>SOC Instructor Inject Console</title>
+<style>
+    :root {
+        --bg-1: #1a1a2e; --bg-2: #16213e;
+        --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.12);
+        --accent: #a855f7; --cyan: #00d4ff; --green: #2ed573;
+        --amber: #ffa502; --red: #ff4757;
+        --text: #e0e0e0; --muted: #9aa6b2;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+        min-height: 100vh; color: var(--text); padding: 28px 20px 60px;
+    }
+    .wrap { max-width: 1060px; margin: 0 auto; }
+    header {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+        border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 22px;
+    }
+    h1 { color: var(--accent); font-size: 1.5rem; }
+    .transport {
+        margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+        font-size: 0.82rem; color: var(--muted);
+        border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px;
+    }
+    .transport .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); }
+    .transport.ok .dot { background: var(--green); }
+    .note {
+        background: rgba(0,212,255,0.06); border-left: 3px solid var(--cyan);
+        padding: 12px 16px; border-radius: 0; font-size: 0.85rem; color: var(--muted);
+        margin-bottom: 24px; line-height: 1.55;
+    }
+    .note strong { color: var(--cyan); }
+    h2 { color: var(--cyan); font-size: 1.02rem; margin: 22px 0 12px; letter-spacing: 0.4px; }
+    .params { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 6px; }
+    .param { display: flex; flex-direction: column; gap: 6px; }
+    .param label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+    select, input[type="text"] {
+        background: rgba(0,0,0,0.35); border: 1px solid var(--border); color: var(--text);
+        border-radius: 8px; padding: 10px 12px; font-size: 0.92rem; min-height: 44px; min-width: 180px;
+        font-family: inherit;
+    }
+    select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .scenarios { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+    .scenario {
+        text-align: left; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 16px 18px; color: var(--text); cursor: pointer;
+        font-family: inherit; min-height: 44px; transition: border-color 0.15s, background 0.15s;
+    }
+    .scenario:hover { border-color: var(--accent); background: rgba(168,85,247,0.08); }
+    .scenario h3 { font-size: 0.98rem; margin-bottom: 6px; color: #fff; }
+    .scenario p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .scenario .steps { display: inline-block; margin-top: 8px; font-size: 0.72rem; color: var(--accent);
+        border: 1px solid rgba(168,85,247,0.4); border-radius: 12px; padding: 2px 10px; }
+    .utility { display: flex; flex-wrap: wrap; gap: 10px; }
+    .util-btn {
+        background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text);
+        border-radius: 8px; padding: 10px 18px; font-size: 0.88rem; cursor: pointer;
+        font-family: inherit; min-height: 44px;
+    }
+    .util-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .util-btn.danger:hover { border-color: var(--red); color: var(--red); }
+    #log {
+        background: rgba(0,0,0,0.35); border: 1px solid var(--border); border-radius: 10px;
+        padding: 14px 16px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.8rem;
+        max-height: 260px; overflow-y: auto; line-height: 1.7;
+    }
+    #log .t { color: var(--muted); margin-right: 8px; }
+    #log .k-launch { color: var(--green); }
+    #log .k-step { color: var(--cyan); }
+    #log .k-ctl { color: var(--amber); }
+    #log .k-abort { color: var(--red); }
+    #log p { margin: 0; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+        /* ============ Light theme (structural remap only) ============
+           Dark is the default. Light mode flips page/panel/text/border
+           colors for readability; severity and accent colors are kept so
+           alerts still read as red/amber/green in both themes. */
+        html[data-theme="light"] body {
+            background: linear-gradient(135deg, #eef2f7 0%, #dde6f0 100%) !important;
+            color: #1c2733 !important;
+        }
+        html[data-theme="light"] {
+            --bg-primary: #eef2f7; --bg-secondary: #e2e9f1; --bg-surface: #ffffff;
+            --bg-card: #ffffff; --bg-dark: #e8eef5; --bg-darker: #dde6f0;
+            --text-primary: #1c2733; --text-secondary: #475467; --text-dim: #667085;
+            --text: #1c2733; --muted: #51606f;
+            --border: rgba(0,0,0,0.14); --border-dim: rgba(0,0,0,0.10);
+            --bg-1: #eef2f7; --bg-2: #dde6f0; --surface: #ffffff;
+        }
+        /* Generic structural surfaces: many panels use these dark hexes inline. */
+        html[data-theme="light"] .card,
+        html[data-theme="light"] .panel,
+        html[data-theme="light"] .exercise,
+        html[data-theme="light"] .scenario-box,
+        html[data-theme="light"] .nav-card,
+        html[data-theme="light"] .action-link,
+        html[data-theme="light"] .stat-card,
+        html[data-theme="light"] .section,
+        html[data-theme="light"] .quiz-question,
+        html[data-theme="light"] .expand-panel,
+        html[data-theme="light"] .glossary-item,
+        html[data-theme="light"] .whats-new-panel,
+        html[data-theme="light"] .tier-section,
+        html[data-theme="light"] .lesson-nav,
+        html[data-theme="light"] .di-panel {
+            background: #ffffff !important;
+            color: #1c2733 !important;
+            border-color: rgba(0,0,0,0.14) !important;
+        }
+        /* Code / terminal-style blocks read better as a soft slate in light. */
+        html[data-theme="light"] .alert-data,
+        html[data-theme="light"] pre,
+        html[data-theme="light"] code,
+        html[data-theme="light"] .log-list,
+        html[data-theme="light"] .terminal,
+        html[data-theme="light"] .console-output {
+            background: #1e2733 !important;
+            color: #e6edf3 !important;
+        }
+        /* Body copy that was set to light grays needs darkening. */
+        html[data-theme="light"] p,
+        html[data-theme="light"] li,
+        html[data-theme="light"] td,
+        html[data-theme="light"] .description,
+        html[data-theme="light"] .subtitle,
+        html[data-theme="light"] label {
+            color: #2b3947 !important;
+        }
+        /* Keep severity/intel values legible on the dark code blocks. */
+        html[data-theme="light"] .alert-data .value,
+        html[data-theme="light"] .alert-data .label { color: inherit; }
+
+        /* Floating theme toggle */
+        .theme-toggle {
+            position: fixed; bottom: 18px; right: 18px; z-index: 9998;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(20,28,46,0.85); color: #ffe27a;
+            font-size: 1.2rem; cursor: pointer; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+            font-family: inherit;
+        }
+        .theme-toggle:hover { filter: brightness(1.15); }
+        .theme-toggle:focus-visible { outline: 2px solid #00d4ff; outline-offset: 2px; }
+        html[data-theme="light"] .theme-toggle {
+            background: #ffffff; color: #b8860b; border-color: rgba(0,0,0,0.18);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+        @media print { .theme-toggle { display: none !important; } }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>&#127919; Instructor Inject Console</h1>
+        <div class="transport" id="transport" role="status">
+            <span class="dot" aria-hidden="true"></span><span id="transportText">checking transport&hellip;</span>
+        </div>
+    </header>
+
+    <div class="note">
+        <strong>How this works:</strong> scenario injections are broadcast to every open SOC dashboard in this browser
+        (separate tabs or the multi-screen viewer). Screen 3 opens the incident; Screens 1, 2, and 4 develop correlated
+        alerts, traffic, and intel over the following minute. <strong>Requires hosting</strong> (GitHub Pages, localhost,
+        or any web server) &mdash; opened as a bare file://, browsers isolate pages and the broadcast cannot reach other tabs.
+        Multi-step scenarios keep injecting on a timed script; use Abort to cancel pending steps.
+    </div>
+
+    <h2>Parameters</h2>
+    <div class="params">
+        <div class="param">
+            <label for="host">Target host</label>
+            <select id="host">
+                <option>FS-HR-03</option><option>SRV-DB-01</option><option>WKS-FIN-07</option>
+                <option>DC-PRIMARY</option><option>SRV-WEB-02</option><option>WKS-EXEC-01</option>
+                <option>SRV-MAIL-01</option><option>WKS-DEV-05</option>
+            </select>
+        </div>
+        <div class="param">
+            <label for="country">Source country</label>
+            <select id="country">
+                <option value="RU">Russia</option><option value="CN">China</option>
+                <option value="KP">North Korea</option><option value="IR">Iran</option>
+                <option value="BR">Brazil</option><option value="NL">Netherlands (Tor exit)</option>
+                <option value="US-E">United States (East)</option>
+            </select>
+        </div>
+        <div class="param">
+            <label for="severity">Severity</label>
+            <select id="severity">
+                <option>critical</option><option selected>high</option><option>medium</option>
+            </select>
+        </div>
+    </div>
+
+    <h2>Scenarios</h2>
+    <div class="scenarios" id="scenarioGrid"></div>
+
+    <h2>Controls</h2>
+    <div class="utility">
+        <button class="util-btn" id="btnPause">&#9208;&#65039; Pause all screens</button>
+        <button class="util-btn" id="btnResume">&#9654;&#65039; Resume all screens</button>
+        <button class="util-btn danger" id="btnAbort">&#10060; Abort pending steps</button>
+        <button class="util-btn danger" id="btnReset">&#9851;&#65039; Reset to ambient</button>
+        <label class="util-btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="stepMode" style="min-width:auto;min-height:auto;width:16px;height:16px;"> Step mode (fire one step per click)
+        </label>
+    </div>
+
+    <h2>Activity log</h2>
+    <div id="log" aria-live="polite"><p><span class="t">--:--:--</span>Console ready. Open the dashboards or multi-screen viewer, then launch a scenario.</p></div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ---- SocBus publisher (console side) ---- */
+    var seen = {};
+    var bc = null;
+    try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
+    function publish(evt) {
+        evt.type = evt.type || 'scenario-event';
+        evt.id = 'evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36);
+        evt.ts = Date.now();
+        seen[evt.id] = true;
+        if (bc) { try { bc.postMessage(evt); } catch (e) {} }
+    }
+
+    var transport = document.getElementById('transport');
+    var transportText = document.getElementById('transportText');
+    var hosted = location.protocol === 'http:' || location.protocol === 'https:';
+    if (bc && hosted) {
+        transport.classList.add('ok');
+        transportText.textContent = 'BroadcastChannel active';
+    } else if (bc) {
+        transportText.textContent = 'file:// detected - other tabs unreachable';
+    } else {
+        transportText.textContent = 'BroadcastChannel unavailable in this browser';
+    }
+
+    /* ---- logging ---- */
+    var logEl = document.getElementById('log');
+    function log(kind, msg) {
+        var p = document.createElement('p');
+        var t = document.createElement('span');
+        t.className = 't';
+        t.textContent = new Date().toLocaleTimeString();
+        var m = document.createElement('span');
+        m.className = 'k-' + kind;
+        m.textContent = msg;
+        p.appendChild(t); p.appendChild(m);
+        logEl.appendChild(p);
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    /* ---- shared helpers ---- */
+    function randomExternalIp() {
+        return (Math.floor(Math.random() * 100) + 100) + '.' + Math.floor(Math.random() * 255) + '.' +
+               Math.floor(Math.random() * 255) + '.' + (Math.floor(Math.random() * 254) + 1);
+    }
+    function newIncidentId() {
+        return 'INC-' + new Date().getFullYear() + String(Math.floor(Math.random() * 900) + 100);
+    }
+    function params() {
+        return {
+            host: document.getElementById('host').value,
+            country: document.getElementById('country').value,
+            severity: document.getElementById('severity').value
+        };
+    }
+
+    /* ---- scenario scripts: arrays of {delay (ms), build (p, ctx) => evt} ---- */
+    var SCENARIOS = [
+        {
+            name: 'Ransomware outbreak',
+            desc: 'Mass encryption begins on the target host, then lateral spread to a second server.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Malware', title: 'Ransomware Attack', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 75000, build: function (p, ctx) { return { origin: 'console', kind: 'Malware', title: 'Ransomware Lateral Spread', severity: 'critical', host: 'SRV-BACKUP-01', sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'AiTM phishing wave',
+            desc: 'Credential-harvesting phish, then token replay sign-in, then a malicious inbox rule.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Email', title: 'AiTM Phishing Session Detected', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 60000, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'Session Token Replay', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 130000, build: function (p, ctx) { return { origin: 'console', kind: 'Email', title: 'Malicious Inbox Rule Created', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Insider exfiltration',
+            desc: 'After-hours bulk data staging from the target host to an external VPS.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Insider', title: 'Bulk Data Staging Detected', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 90000, build: function (p, ctx) { return { origin: 'console', kind: 'Data Breach', title: 'Large Outbound Transfer', severity: 'critical', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Brute force campaign',
+            desc: 'Password spraying against the VPN, escalating to a successful login.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'Password Spraying', severity: 'medium', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 80000, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'Successful Login After Spray', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Cloud IAM abuse',
+            desc: 'Compromised pipeline key spins up crypto-mining instances in an unused region.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Cloud', title: 'CI/CD Pipeline Token Abuse', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 70000, build: function (p, ctx) { return { origin: 'console', kind: 'Cloud', title: 'GuardDuty Crypto Mining Finding', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Deepfake vishing',
+            desc: 'AI voice-fraud attempt against finance, followed by a matching AI spearphish.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Email', title: 'Deepfake Vishing Reported', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 60000, build: function (p, ctx) { return { origin: 'console', kind: 'Email', title: 'AI-Generated Phishing Detected', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        }
+        ,
+        {
+            name: 'Supply-chain / CI-CD compromise',
+            desc: 'A poisoned container image is pushed, then deployed to production on the next release.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Cloud', title: 'Malicious Image Pushed to Registry', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 65000, build: function (p, ctx) { return { origin: 'console', kind: 'Execution', title: 'Untrusted Image Deployed to Production', severity: 'critical', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Kubernetes container escape',
+            desc: 'A shell spawns in a pod, the service-account token is read, then the pod beacons to a mining pool.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Execution', title: 'Terminal Shell in Container', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 55000, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'Service Account Token Read', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 120000, build: function (p, ctx) { return { origin: 'console', kind: 'Cloud', title: 'Pod Beaconing to Mining Pool', severity: 'critical', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Cloud data exposure (S3)',
+            desc: 'A storage bucket is made public, then anonymous external reads spike.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Cloud', title: 'S3 Bucket Made Public', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 60000, build: function (p, ctx) { return { origin: 'console', kind: 'Data Breach', title: 'Anonymous Bucket Access Spike', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Lateral movement (LOTL)',
+            desc: 'Living-off-the-land: a foothold spreads host-to-host via PsExec / WMI / RDP.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Execution', title: 'Suspicious PsExec Execution', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 50000, build: function (p, ctx) { return { origin: 'console', kind: 'Persistence', title: 'Remote WMI Process Creation', severity: 'high', host: 'WKS-FIN-07', sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 110000, build: function (p, ctx) { return { origin: 'console', kind: 'Privilege', title: 'RDP Lateral Movement to DC', severity: 'critical', host: 'DC-PRIMARY', sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'DDoS / volumetric attack',
+            desc: 'A sudden traffic flood from many sources saturates the network edge.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Network', title: 'Volumetric Traffic Surge', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 20000, build: function (p, ctx) { return { origin: 'console', kind: 'Network', title: 'Edge Bandwidth Saturation', severity: 'high', host: p.host, sourceIp: randomExternalIp(), country: p.country, incidentId: ctx.inc }; } },
+                { delay: 40000, build: function (p, ctx) { return { origin: 'console', kind: 'Network', title: 'Service Degradation Detected', severity: 'critical', host: p.host, sourceIp: randomExternalIp(), country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'MFA fatigue / push bombing',
+            desc: 'Repeated MFA push prompts pressure a user into approving, then a sign-in succeeds.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'MFA Push Bombing Detected', severity: p.severity, host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 70000, build: function (p, ctx) { return { origin: 'console', kind: 'Credential', title: 'Sign-In After MFA Approval', severity: 'high', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        },
+        {
+            name: 'Benign noise burst (anti-fatigue)',
+            desc: 'A burst of low-severity, ultimately benign alerts - trains against alarm fatigue and tunnel vision.',
+            steps: [
+                { delay: 0, build: function (p, ctx) { return { origin: 'console', kind: 'Network', title: 'Scheduled Vulnerability Scan', severity: 'low', host: p.host, sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 8000, build: function (p, ctx) { return { origin: 'console', kind: 'Authentication', title: 'Expired Certificate Warning', severity: 'low', host: 'SRV-WEB-02', sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } },
+                { delay: 16000, build: function (p, ctx) { return { origin: 'console', kind: 'Network', title: 'Backup Job Network Spike', severity: 'medium', host: 'BAK-OPS-01', sourceIp: ctx.ip, country: p.country, incidentId: ctx.inc }; } }
+            ]
+        }
+    ];
+
+
+    var pending = [];
+    function abortPending() {
+        if (!pending.length) { log('abort', 'Nothing pending.'); return; }
+        pending.forEach(function (id) { clearTimeout(id); });
+        log('abort', 'Aborted ' + pending.length + ' pending step(s).');
+        pending = [];
+    }
+
+    var stepProgress = {};   // scenario name -> next step index, for step mode
+    function launch(scn) {
+        var p = params();
+        var stepMode = document.getElementById('stepMode').checked;
+        if (stepMode) {
+            var key = scn.name;
+            var i = stepProgress[key] || 0;
+            if (i === 0) { stepProgress[key + '__ctx'] = { ip: randomExternalIp(), inc: newIncidentId() }; }
+            var ctxS = stepProgress[key + '__ctx'];
+            var evt = scn.steps[i].build(p, ctxS);
+            publish(evt);
+            log('step', 'STEP ' + (i + 1) + '/' + scn.steps.length + ' [' + scn.name + '] -> ' + ctxS.inc + ': ' + evt.title);
+            i++;
+            if (i >= scn.steps.length) { stepProgress[key] = 0; log('launch', '  "' + scn.name + '" complete - next click restarts it.'); }
+            else { stepProgress[key] = i; }
+            return;
+        }
+        var ctx = { ip: randomExternalIp(), inc: newIncidentId() };
+        log('launch', 'LAUNCH "' + scn.name + '" -> ' + ctx.inc + ' on ' + p.host + ' from ' + ctx.ip + ' (' + p.country + ')');
+        scn.steps.forEach(function (step, i) {
+            if (step.delay === 0) {
+                publish(step.build(p, ctx));
+                log('step', '  step 1/' + scn.steps.length + ' injected: ' + step.build(p, ctx).title);
+            } else {
+                var id = setTimeout(function () {
+                    var evt = step.build(p, ctx);
+                    publish(evt);
+                    log('step', '  step ' + (i + 1) + '/' + scn.steps.length + ' injected: ' + evt.title);
+                    pending = pending.filter(function (x) { return x !== id; });
+                }, step.delay);
+                pending.push(id);
+            }
+        });
+    }
+
+    /* ---- build scenario cards ---- */
+    var grid = document.getElementById('scenarioGrid');
+    SCENARIOS.forEach(function (scn) {
+        var btn = document.createElement('button');
+        btn.className = 'scenario';
+        var h3 = document.createElement('h3');
+        h3.textContent = scn.name;
+        var pEl = document.createElement('p');
+        pEl.textContent = scn.desc;
+        var steps = document.createElement('span');
+        steps.className = 'steps';
+        steps.textContent = scn.steps.length + '-step script';
+        btn.appendChild(h3); btn.appendChild(pEl); btn.appendChild(steps);
+        btn.addEventListener('click', function () { launch(scn); });
+        grid.appendChild(btn);
+    });
+
+    /* ---- utility controls ---- */
+    document.getElementById('btnPause').addEventListener('click', function () {
+        publish({ type: 'control-event', cmd: 'pause' });
+        log('ctl', 'CONTROL: pause broadcast to all screens');
+    });
+    document.getElementById('btnResume').addEventListener('click', function () {
+        publish({ type: 'control-event', cmd: 'resume' });
+        log('ctl', 'CONTROL: resume broadcast to all screens');
+    });
+    document.getElementById('btnAbort').addEventListener('click', abortPending);
+    document.getElementById('btnReset').addEventListener('click', function () {
+        abortPending();
+        stepProgress = {};
+        publish({ type: 'control-event', cmd: 'clear' });
+        publish({ type: 'control-event', cmd: 'resume' });
+        log('ctl', 'CONTROL: reset - cleared injected events, screens back to ambient');
+    });
+})();
+</script>
+</body>
+</html>

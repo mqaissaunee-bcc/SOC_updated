@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+(function () {
+    try {
+        var saved = localStorage.getItem('soc-theme');
+        var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+})();
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOC Training Exercises - 15 Hands-On Scenarios</title>
@@ -529,6 +541,89 @@
         .skip-link:focus {
             left: 0;
         }
+    
+        /* ============ Light theme (structural remap only) ============
+           Dark is the default. Light mode flips page/panel/text/border
+           colors for readability; severity and accent colors are kept so
+           alerts still read as red/amber/green in both themes. */
+        html[data-theme="light"] body {
+            background: linear-gradient(135deg, #eef2f7 0%, #dde6f0 100%) !important;
+            color: #1c2733 !important;
+        }
+        html[data-theme="light"] {
+            --bg-primary: #eef2f7; --bg-secondary: #e2e9f1; --bg-surface: #ffffff;
+            --bg-card: #ffffff; --bg-dark: #e8eef5; --bg-darker: #dde6f0;
+            --text-primary: #1c2733; --text-secondary: #475467; --text-dim: #667085;
+            --text: #1c2733; --muted: #51606f;
+            --border: rgba(0,0,0,0.14); --border-dim: rgba(0,0,0,0.10);
+            --bg-1: #eef2f7; --bg-2: #dde6f0; --surface: #ffffff;
+        }
+        /* Generic structural surfaces: many panels use these dark hexes inline. */
+        html[data-theme="light"] .card,
+        html[data-theme="light"] .panel,
+        html[data-theme="light"] .exercise,
+        html[data-theme="light"] .scenario-box,
+        html[data-theme="light"] .nav-card,
+        html[data-theme="light"] .action-link,
+        html[data-theme="light"] .stat-card,
+        html[data-theme="light"] .section,
+        html[data-theme="light"] .quiz-question,
+        html[data-theme="light"] .expand-panel,
+        html[data-theme="light"] .glossary-item,
+        html[data-theme="light"] .whats-new-panel,
+        html[data-theme="light"] .tier-section,
+        html[data-theme="light"] .lesson-nav,
+        html[data-theme="light"] .di-panel {
+            background: #ffffff !important;
+            color: #1c2733 !important;
+            border-color: rgba(0,0,0,0.14) !important;
+        }
+        /* Code / terminal-style blocks read better as a soft slate in light. */
+        html[data-theme="light"] .alert-data,
+        html[data-theme="light"] pre,
+        html[data-theme="light"] code,
+        html[data-theme="light"] .log-list,
+        html[data-theme="light"] .terminal,
+        html[data-theme="light"] .console-output {
+            background: #1e2733 !important;
+            color: #e6edf3 !important;
+        }
+        /* Body copy that was set to light grays needs darkening. */
+        html[data-theme="light"] p,
+        html[data-theme="light"] li,
+        html[data-theme="light"] td,
+        html[data-theme="light"] .description,
+        html[data-theme="light"] .subtitle,
+        html[data-theme="light"] label {
+            color: #2b3947 !important;
+        }
+        /* Keep severity/intel values legible on the dark code blocks. */
+        /* Code blocks stay dark in light mode, so their text must stay light. */
+        html[data-theme="light"] .alert-data,
+        html[data-theme="light"] .alert-data p,
+        html[data-theme="light"] .alert-data .label { color: #e6edf3 !important; }
+        html[data-theme="light"] .alert-data .value { color: #7ee787 !important; }
+        html[data-theme="light"] .alert-data .value.critical { color: #ff7b72 !important; }
+        html[data-theme="light"] .alert-data .drill-caption { color: #b8a6ff !important; }
+
+        /* Floating theme toggle */
+        .theme-toggle {
+            position: fixed; bottom: 18px; right: 18px; z-index: 9998;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(20,28,46,0.85); color: #ffe27a;
+            font-size: 1.2rem; cursor: pointer; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+            font-family: inherit;
+        }
+        .theme-toggle:hover { filter: brightness(1.15); }
+        .theme-toggle:focus-visible { outline: 2px solid #00d4ff; outline-offset: 2px; }
+        html[data-theme="light"] .theme-toggle {
+            background: #ffffff; color: #b8860b; border-color: rgba(0,0,0,0.18);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+        @media print { .theme-toggle { display: none !important; } }
     </style>
 </head>
 <body>
@@ -2853,7 +2948,59 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ex1').classList.add('expanded');
         });
-    
+
+        /* ===== Task-type classifier (item: exercise task clarity) =====
+           Tags each task item from its own wording so the distinction between
+           "do this on a live screen" and "classify this on paper" is explicit
+           and stays correct if exercises are edited. */
+        (function classifyTasks() {
+            var LIVE = /\b(open|use|using|review|observe|filter|navigate|check|examine|locate|look at|inspect)\b[^.]*\b(screen\s*[1-4]|siem dashboard|network monitor|incident response|threat intel|global threat map|top talkers|port activity|endpoint status|ioc feed|firewall log|alert queue|severity filter|alert queue|search\/filter|the map)/i;
+            var lists = document.querySelectorAll('.task-list');
+            lists.forEach(function (list) {
+                var hasLive = false, hasPaper = false, hasDesk = false;
+                Array.prototype.forEach.call(list.children, function (li) {
+                    if (li.tagName !== 'LI') return;
+                    var drill = li.querySelector('.alert-data');
+                    var firstText = (li.childNodes[0] && li.childNodes[0].nodeValue ? li.childNodes[0].nodeValue : li.textContent) || '';
+                    var tag = document.createElement('span');
+                    if (drill) {
+                        // an embedded data block inside a task = on-paper classification drill
+                        tag.className = 'task-tag paper';
+                        tag.textContent = 'On paper ';
+                        drill.classList.add('is-drill');
+                        if (!drill.querySelector('.drill-caption')) {
+                            var cap = document.createElement('span');
+                            cap.className = 'drill-caption';
+                            cap.textContent = 'Classification drill - these are examples to analyze, not live screen data';
+                            drill.insertBefore(cap, drill.firstChild);
+                        }
+                        hasPaper = true;
+                    } else if (LIVE.test(firstText) || LIVE.test(li.textContent)) {
+                        tag.className = 'task-tag live';
+                        tag.textContent = 'Live screen ';
+                        hasLive = true;
+                    } else {
+                        tag.className = 'task-tag desk';
+                        tag.textContent = 'Analysis ';
+                        hasDesk = true;
+                    }
+                    li.insertBefore(tag, li.firstChild);
+                    li.insertBefore(document.createTextNode(' '), tag.nextSibling);
+                });
+                // per-exercise legend above the task list
+                if (hasLive || hasPaper || hasDesk) {
+                    var legend = document.createElement('div');
+                    legend.className = 'task-legend';
+                    var bits = [];
+                    if (hasLive) bits.push('<span class="legend-item"><span class="task-tag live">Live screen</span> do this on a dashboard</span>');
+                    if (hasPaper) bits.push('<span class="legend-item"><span class="task-tag paper">On paper</span> classify the listed examples</span>');
+                    if (hasDesk) bits.push('<span class="legend-item"><span class="task-tag desk">Analysis</span> written reasoning</span>');
+                    legend.innerHTML = bits.join('');
+                    list.parentNode.insertBefore(legend, list);
+                }
+            });
+        })();
+
         /* ---- Keep scenario incident IDs current (item 6) ---- */
         (function refreshIncidentYears() {
             const y = new Date().getFullYear();
@@ -2945,6 +3092,37 @@
             else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
         }
     });
+})();
+</script>
+<script>
+(function () {
+    'use strict';
+    function curTheme() { return document.documentElement.getAttribute('data-theme') || 'dark'; }
+    function apply(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        try { localStorage.setItem('soc-theme', theme); } catch (e) {}
+        var btn = document.querySelector('.theme-toggle');
+        if (btn) {
+            var light = theme === 'light';
+            btn.textContent = light ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            btn.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+            btn.setAttribute('aria-pressed', light ? 'true' : 'false');
+        }
+    }
+    function build() {
+        if (document.querySelector('.theme-toggle')) return;
+        var btn = document.createElement('button');
+        btn.className = 'theme-toggle';
+        btn.type = 'button';
+        btn.textContent = curTheme() === 'light' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        btn.setAttribute('aria-label', curTheme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+        btn.setAttribute('aria-pressed', curTheme() === 'light' ? 'true' : 'false');
+        btn.addEventListener('click', function () { apply(curTheme() === 'light' ? 'dark' : 'light'); });
+        document.body.appendChild(btn);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', build);
+    } else { build(); }
 })();
 </script>
 </body>
