@@ -1381,7 +1381,13 @@
             var bc = null;
             try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
             function deliver(evt) {
-                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                if (!evt || !evt.id || seen[evt.id]) return;
+                if (evt.type === 'control-event') {
+                    seen[evt.id] = true;
+                    window.postMessage({ type: 'soc-sim', cmd: evt.cmd }, '*');
+                    return;
+                }
+                if (evt.type !== 'scenario-event') return;
                 seen[evt.id] = true;
                 handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
             }
@@ -1392,7 +1398,7 @@
             });
             return {
                 publish: function (evt) {
-                    evt.type = 'scenario-event';
+                    evt.type = evt.type || 'scenario-event';
                     evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
                     evt.ts = evt.ts || Date.now();
                     seen[evt.id] = true;
@@ -1856,10 +1862,17 @@
             });
         }
         
+        function seedFirewallLog() {
+            // Pre-populate the firewall log so the panel isn't empty on arrival
+            // and Exercise 3 ("blocked connections observed") has data immediately.
+            for (let i = 0; i < 18; i++) { addFirewallLog(); }
+        }
+
         function init() {
             initTopTalkers();
             renderTopTalkers();
             renderPortGrid();
+            seedFirewallLog();
             
             for (let i = 0; i < 60; i++) {
                 trafficData.inbound[i] = Math.floor(simRandom() * 80) + 20;

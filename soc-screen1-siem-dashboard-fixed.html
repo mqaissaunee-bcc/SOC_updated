@@ -1008,7 +1008,13 @@
             var bc = null;
             try { bc = new BroadcastChannel('soc-sim'); } catch (e) {}
             function deliver(evt) {
-                if (!evt || evt.type !== 'scenario-event' || !evt.id || seen[evt.id]) return;
+                if (!evt || !evt.id || seen[evt.id]) return;
+                if (evt.type === 'control-event') {
+                    seen[evt.id] = true;
+                    window.postMessage({ type: 'soc-sim', cmd: evt.cmd }, '*');
+                    return;
+                }
+                if (evt.type !== 'scenario-event') return;
                 seen[evt.id] = true;
                 handlers.forEach(function (h) { try { h(evt); } catch (e) {} });
             }
@@ -1019,7 +1025,7 @@
             });
             return {
                 publish: function (evt) {
-                    evt.type = 'scenario-event';
+                    evt.type = evt.type || 'scenario-event';
                     evt.id = evt.id || ('evt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36));
                     evt.ts = evt.ts || Date.now();
                     seen[evt.id] = true;
@@ -1574,13 +1580,31 @@
         });
         
         function init() {
-            for (let i = 0; i < 15; i++) {
+            // Seed a believable overnight backlog of 47 alerts (matches Exercise 1).
+            // Guarantee a visible floor of critical + high alerts so triage always
+            // has something to find, regardless of the random/seeded draw.
+            const SEED_TOTAL = 47;
+            const SEED_CRITICAL = 8;   // guaranteed criticals (beginners must find these)
+            const SEED_HIGH = 9;       // guaranteed highs
+            function seedAlert(forceSeverity) {
                 const alert = generateAlert();
+                if (forceSeverity) {
+                    counts[alert.severity]; // (no-op; clarity)
+                    alert.severity = forceSeverity;
+                    // pick a type whose category fits the forced severity for realism
+                    if (forceSeverity === 'critical') {
+                        const crit = alertTypes.filter(a => ['Impact', 'Exfiltration', 'Cloud', 'Execution'].includes(a.category));
+                        if (crit.length) { const pick = crit[Math.floor(simRandom() * crit.length)]; alert.type = pick.type; alert.category = pick.category; alert.tactics = pick.tactics; }
+                    }
+                }
                 alert.timestamp = new Date(Date.now() - simRandom() * 3600000);
                 alerts.push(alert);
                 counts[alert.severity]++;
                 counts.total++;
             }
+            for (let i = 0; i < SEED_CRITICAL; i++) seedAlert('critical');
+            for (let i = 0; i < SEED_HIGH; i++) seedAlert('high');
+            for (let i = 0; i < SEED_TOTAL - SEED_CRITICAL - SEED_HIGH; i++) seedAlert(null);
             
             alerts.sort((a, b) => b.timestamp - a.timestamp);
             
