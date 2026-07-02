@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- SOC Platform · v1.0 · 2026-07-02 · soc-screen1-siem-dashboard-fixed.html -->
 <html lang="en">
 <head>
 <script>
@@ -6,6 +7,8 @@
 </script>
 
     <meta charset="UTF-8">
+<meta name="version" content="1.0">
+<meta name="release-date" content="2026-07-02">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOC Screen 1: SIEM Dashboard</title>
     <style>
@@ -812,6 +815,7 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.18);
         }
         @media print { .theme-toggle { display: none !important; } }
+            .ver-stamp{font-size:.5em;font-weight:400;opacity:.55;margin-left:.5em;letter-spacing:.02em;vertical-align:middle}
     </style>
 </head>
 <body>
@@ -923,7 +927,7 @@
 
 
     <header class="header">
-        <h1>&#128737;&#65039; SIEM Dashboard - Security Operations Center</h1>
+        <h1>&#128737;&#65039; SIEM Dashboard - Security Operations Center <span class="ver-stamp">v1.0 · 2026-07-02</span></h1>
         <div class="header-info">
             <div class="audio-indicator">
                 <div class="sound-wave">
@@ -1145,7 +1149,8 @@
                 user: users[Math.floor(simRandom() * users.length)],
                 timestamp: new Date(),
                 tactics: pick.tactics || ['TA0001'],
-                status: 'new'
+                status: 'new',
+                incidentId: evt.incidentId || ''
             };
             alerts.unshift(alert);
             counts[alert.severity]++;
@@ -1528,7 +1533,7 @@
         
         function renderAlert(alert) {
             return `
-                <div class="alert-item severity-${alert.severity} new-alert" data-severity="${alert.severity}" data-id="${alert.id}">
+                <div class="alert-item severity-${alert.severity} new-alert" data-severity="${alert.severity}" data-id="${alert.id}" data-incident="${alert.incidentId || ''}">
                     <div class="alert-header">
                         <div>
                             <span class="severity-badge ${alert.severity}">${alert.severity}</span>

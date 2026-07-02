@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- SOC Platform · v1.0 · 2026-07-02 · soc-screen4-threat-intel-fixed.html -->
 <html lang="en">
 <head>
 <script>
@@ -6,6 +7,8 @@
 </script>
 
     <meta charset="UTF-8">
+<meta name="version" content="1.0">
+<meta name="release-date" content="2026-07-02">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOC Screen 4: Threat Intel & Endpoint Status</title>
     <style>
@@ -831,6 +834,7 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.18);
         }
         @media print { .theme-toggle { display: none !important; } }
+            .ver-stamp{font-size:.5em;font-weight:400;opacity:.55;margin-left:.5em;letter-spacing:.02em;vertical-align:middle}
     </style>
 </head>
 <body>
@@ -942,7 +946,7 @@
 
 
     <header class="header">
-        <h1>&#128269; Threat Intelligence & Endpoint Status</h1>
+        <h1>&#128269; Threat Intelligence & Endpoint Status <span class="ver-stamp">v1.0 · 2026-07-02</span></h1>
         <div class="header-info">
             <div class="endpoint-summary">
                 <div class="endpoint-stat">
@@ -1125,7 +1129,7 @@
         SocBus.subscribe(function (evt) {
             setTimeout(function () {
                 if (evt.sourceIp) {
-                    iocs.unshift({ type: 'ip', value: evt.sourceIp, confidence: 'high', source: 'Internal IR' });
+                    iocs.unshift({ type: 'ip', value: evt.sourceIp, confidence: 'high', source: 'Internal IR', incidentId: evt.incidentId || '' });
                     if (iocs.length > 50) iocs.pop();
                     renderIOCs();
                 }
@@ -1137,6 +1141,7 @@
                     detail: 'Correlated with ' + (evt.incidentId || 'active scenario') + (evt.host ? ' on ' + evt.host : ''),
                     endpoint: evt.host || 'WKS-001',
                     user: 'SYSTEM',
+                    incidentId: evt.incidentId || '',
                     time: new Date()
                 });
                 if (edrAlerts.length > 20) edrAlerts.pop();
@@ -1499,7 +1504,7 @@
         function renderIOCs() {
             const list = document.getElementById('ioc-list');
             list.innerHTML = iocs.slice(0, 15).map(ioc => `
-                <div class="ioc-item">
+                <div class="ioc-item" data-incident="${ioc.incidentId || ''}">
                     <span class="ioc-type-badge ${ioc.type}">${ioc.type.toUpperCase()}</span>
                     <span class="ioc-value" title="${ioc.value}">${ioc.value}</span>
                     <span class="ioc-confidence confidence-${ioc.confidence}">${ioc.confidence.toUpperCase()}</span>
@@ -1543,7 +1548,7 @@
         function renderEDRAlerts() {
             const list = document.getElementById('edr-list');
             list.innerHTML = edrAlerts.slice(0, 8).map(alert => `
-                <div class="edr-alert ${alert.category}">
+                <div class="edr-alert ${alert.category}" data-incident="${alert.incidentId || ''}">
                     <div class="edr-header">
                         <span class="edr-type">${alert.type}</span>
                         <span class="edr-time">${formatTime(alert.time)}</span>

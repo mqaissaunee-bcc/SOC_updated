@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- SOC Platform · v1.0 · 2026-07-02 · soc-screen2-network-monitor-enhanced.html -->
 <html lang="en">
 <head>
 <script>
@@ -6,6 +7,8 @@
 </script>
 
     <meta charset="UTF-8">
+<meta name="version" content="1.0">
+<meta name="release-date" content="2026-07-02">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOC Screen 2: Network Monitor</title>
     <style>
@@ -837,6 +840,7 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.18);
         }
         @media print { .theme-toggle { display: none !important; } }
+            .ver-stamp{font-size:.5em;font-weight:400;opacity:.55;margin-left:.5em;letter-spacing:.02em;vertical-align:middle}
     </style>
 </head>
 <body>
@@ -947,7 +951,7 @@
     </div>
 
     <header class="header">
-        <h1>&#x1F310;&#144; Network Traffic Monitor</h1>
+        <h1>&#x1F310;&#144; Network Traffic Monitor <span class="ver-stamp">v1.0 · 2026-07-02</span></h1>
         <div class="header-info">
             <div class="network-status">
                 <div class="network-stat">
@@ -1502,6 +1506,7 @@
             var sev = (evt.severity === 'critical' || evt.severity === 'high') ? evt.severity : 'high';
             var point = document.createElement('div');
             point.className = 'attack-point ' + sev;
+            point.setAttribute('data-incident', evt.incidentId || '');
             point.style.left = ((source.x / 1000) * 100) + '%';
             point.style.top = ((source.y / 500) * 100) + '%';
             point.title = sev.toUpperCase() + ' - ' + (evt.title || 'Attack') + ' from ' + source.name + ' [' + (evt.incidentId || 'scenario') + ']';
@@ -1513,6 +1518,7 @@
             if (!list) return;
             var entry = document.createElement('div');
             entry.className = 'log-entry';
+            entry.setAttribute('data-incident', evt.incidentId || '');
             entry.innerHTML = '<span class="log-time">' + new Date().toLocaleTimeString() + '</span>' +
                 '<span class="log-action block">BLOCK</span>' +
                 '<span>' + (evt.sourceIp || 'unknown') + '</span>' +
