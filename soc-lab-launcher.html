@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!-- SOC Platform · v1.0 · 2026-07-02 · soc-lab-launcher.html -->
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="version" content="1.0">
+<meta name="release-date" content="2026-07-02"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOC Lab Launcher</title>
+<meta name="description" content="Stage 2 proof of concept: a catalog-driven, deterministic launcher that opens the four SOC screens on a fixed seed and injects a chosen scenario's titled events over the shared bus so referenced artifacts reliably appear.">
+<style>
+  :root{--bg:#E9EDEF;--surface:#FFFFFF;--surface-2:#F3F6F7;--ink:#14202A;--muted:#55636D;--line:#CDD7DC;--line-strong:#B4C1C7;--accent:#0E7C86;--accent-ink:#0A5B63;--accent-soft:#DBEEF0;--alt:#9A5808;--alt-ink:#7E4706;--alt-soft:#F6E9D6;--ok:#127A3E;--ok-soft:#DDF0E4;--radius:10px;--radius-sm:7px;--shadow:0 1px 2px rgba(20,32,42,.08),0 8px 24px rgba(20,32,42,.06);--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111A;--surface:#121C27;--surface-2:#17232F;--ink:#E7EEF4;--muted:#93A2AF;--line:#263544;--line-strong:#35485A;--accent:#3ED9C6;--accent-ink:#86EBDD;--accent-soft:#0F2B2C;--alt:#E8B341;--alt-ink:#F3CE7C;--alt-soft:#2E2410;--ok:#4ADE80;--ok-soft:#10261A;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);}}
+  :root[data-theme="dark"]{--bg:#0B111A;--surface:#121C27;--surface-2:#17232F;--ink:#E7EEF4;--muted:#93A2AF;--line:#263544;--line-strong:#35485A;--accent:#3ED9C6;--accent-ink:#86EBDD;--accent-soft:#0F2B2C;--alt:#E8B341;--alt-ink:#F3CE7C;--alt-soft:#2E2410;--ok:#4ADE80;--ok-soft:#10261A;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .skip-link{position:absolute;left:-999px;top:0;background:var(--accent);color:#fff;padding:10px 16px;border-radius:0 0 var(--radius-sm) 0;z-index:100;font-weight:600}.skip-link:focus{left:0}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+  header{border-bottom:1px solid var(--line);background:var(--surface)}.wrap{max-width:1000px;margin:0 auto;padding:22px}
+  .head{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap}.head-text{flex:1 1 320px;min-width:0}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.5rem,3.4vw,2rem);margin:0 0 6px;line-height:1.12}
+  .sub{color:var(--muted);margin:0;max-width:74ch;font-size:.95rem}
+  .theme-toggle{font-family:var(--mono);font-size:.8rem;background:var(--surface-2);color:var(--ink);border:1px solid var(--line-strong);border-radius:40px;padding:9px 15px;min-height:44px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}.theme-toggle:hover{border-color:var(--accent)}
+  fieldset{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:20px 0 0;background:var(--surface);box-shadow:var(--shadow)}
+  legend{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);padding:0 8px;display:flex;align-items:center;gap:8px}
+  legend .n{background:var(--accent);color:var(--surface);border-radius:6px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem}
+  label{display:block;font-size:.82rem;font-weight:600;margin:0 0 6px}
+  .hint{font-weight:400;color:var(--muted);font-size:.8rem}
+  select,input[type=text]{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--ink);font-family:var(--sans);font-size:.95rem}
+  .grid{display:grid;gap:14px}@media(min-width:620px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:1fr 1fr 1fr}}
+  .field{margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}.chip{font-size:.76rem;background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent);border-radius:20px;padding:3px 9px}
+  .chip.k{background:var(--surface-2);color:var(--muted);border-color:var(--line-strong)}
+  .steps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}.step{display:grid;grid-template-columns:22px 1fr;gap:9px;font-size:.84rem}.step .n{font-family:var(--mono);font-size:.72rem;color:var(--surface);background:var(--accent);border-radius:5px;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+  .step .t{font-weight:600}.step .m{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .seedrow{display:flex;gap:8px}.seedrow input{flex:1}
+  .radios{display:flex;gap:8px;flex-wrap:wrap}.radio{flex:1 1 auto;border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px 12px;background:var(--surface-2);cursor:pointer;font-size:.86rem;display:flex;gap:8px;align-items:center;min-height:44px}
+  .radio input{margin:0}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  button.act{font-family:var(--sans);font-weight:600;font-size:.9rem;border-radius:var(--radius-sm);padding:11px 16px;min-height:44px;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink)}
+  button.act:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+  button.warn{color:var(--alt-ink);background:var(--alt-soft);border-color:var(--alt)}
+  .links{display:grid;gap:8px;margin-top:12px}.slink{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 12px;font-size:.86rem}
+  .slink a{color:var(--accent-ink);font-family:var(--mono);font-size:.8rem;word-break:break-all}
+  .note{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:10px 12px;font-size:.82rem;color:var(--muted);margin-top:12px}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .metabox{background:var(--ok-soft);border:1px solid var(--ok);border-radius:var(--radius-sm);padding:9px 13px}.metabox b{font-family:var(--mono);font-size:1rem;display:block;color:var(--ok)}.metabox span{font-size:.74rem;color:var(--muted)}
+  #log{font-family:var(--mono);font-size:.8rem;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;max-height:230px;overflow:auto;white-space:pre-wrap;color:var(--ink);margin-top:4px}
+  .logline{padding:2px 0;border-bottom:1px solid var(--line)}.logline .ts{color:var(--muted)}.logline .cr{color:var(--accent-ink)}
+  .copyrow{display:flex;gap:8px;align-items:center;margin-top:10px}textarea.share{width:100%;min-height:96px;font-family:var(--mono);font-size:.78rem;border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px;background:var(--surface-2);color:var(--ink);resize:vertical}
+  footer{border-top:1px solid var(--line);color:var(--muted);font-size:.82rem;margin-top:24px}
+  .live{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:.82rem;color:var(--accent-ink);background:var(--accent-soft);padding:0;max-height:0;overflow:hidden;transition:max-height .2s,padding .2s}
+  .live.show{max-height:60px;padding:10px}
+</style></head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<header><div class="wrap head">
+  <div class="head-text">
+    <p class="eyebrow">Stage 2 · Proof of Concept</p>
+    <h1>SOC Lab Launcher</h1>
+    <p class="sub">Pick a catalog scenario and a seed, open the four screens pinned to that seed, then inject the scenario's titled events over the shared <code>soc-sim</code> bus — so the artifacts an exercise references reliably appear, reproducibly, for every student. Publishes observable events only; no answer content.</p>
+  </div>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false"><span id="themeGlyph" aria-hidden="true">◐</span> <span id="themeLabel">Theme</span></button>
+</div></header>
+<main id="main" class="wrap">
+  <fieldset>
+    <legend><span class="n">1</span> Scenario</legend>
+    <div class="field"><label for="scenario">Catalog scenario <span class="hint">20 scenarios — 13 archetype + 7 historical.</span></label><select id="scenario"></select></div>
+    <div id="scnPreview"></div>
+  </fieldset>
+  <fieldset>
+    <legend><span class="n">2</span> Lab parameters</legend>
+    <div class="grid c2">
+      <div class="field"><label for="seed">Seed <span class="hint">Same seed = identical lab for every student.</span></label><div class="seedrow"><input type="text" id="seed" value="lab-001" autocomplete="off"><button type="button" class="act" id="seedRnd">Randomize</button></div></div>
+      <div class="field"><label for="host">Target host</label><select id="host"></select></div>
+      <div class="field"><label for="country">Source country</label><select id="country"></select></div>
+      <div class="field"><label for="severity">Severity <span class="hint">Applies to instructor-set steps.</span></label><select id="severity"></select></div>
+    </div>
+    <div class="field" style="margin-top:14px"><label>Injection timing</label>
+      <div class="radios" id="timing">
+        <label class="radio"><input type="radio" name="tmode" value="real" checked> Real delays <span class="hint" id="durHint"></span></label>
+        <label class="radio"><input type="radio" name="tmode" value="all"> All at once</label>
+        <label class="radio"><input type="radio" name="tmode" value="step"> Manual step</label>
+      </div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend><span class="n">3</span> Open the screens</legend>
+    <p class="hint">Open these first (each carries the seed), then inject in step 4. Newly-opened screens after an injection can be caught up with “Re-fire”.</p>
+    <div class="btnrow"><button type="button" class="act primary" id="openAll">Open all four screens</button></div>
+    <div class="links" id="screenLinks"></div>
+    <div class="note">On GitHub Pages the four screens share the <code>soc-sim</code> BroadcastChannel automatically. If your browser blocks the multi-tab pop-ups, use the individual links above (one click each).</div>
+  </fieldset>
+  <fieldset>
+    <legend><span class="n">4</span> Inject</legend>
+    <div class="btnrow">
+      <button type="button" class="act primary" id="launch">Launch scenario</button>
+      <button type="button" class="act" id="refire">Re-fire (for late joiners)</button>
+      <button type="button" class="act" id="stepBtn">Step</button>
+      <button type="button" class="act warn" id="abort">Abort pending</button>
+      <button type="button" class="act warn" id="reset">Reset screens</button>
+    </div>
+    <div class="meta" id="meta"></div>
+    <label style="margin-top:16px">Injection log</label>
+    <div id="log" role="log" aria-live="polite"></div>
+  </fieldset>
+  <fieldset>
+    <legend><span class="n">5</span> Share this lab</legend>
+    <p class="hint">Reproducible links. The launcher link re-creates this exact setup; the screen links are what students open.</p>
+    <textarea class="share" id="share" readonly></textarea>
+    <div class="copyrow"><button type="button" class="act" id="copyShare">Copy</button><span class="hint" id="copyMsg"></span></div>
+  </fieldset>
+</main>
+<footer><div class="wrap"><p id="foot"></p></div></footer>
+<div class="live" id="live" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="catalog">{"version":"1.2","generated":"2026-07-02","scenarios":[{"id":"ransomware-outbreak","name":"Ransomware outbreak","category":"archetype","year":null,"incidentTypes":["Ransomware","Malware outbreak with lateral movement"],"steps":[{"order":0,"delayMs":0,"kind":"Malware","title":"Ransomware Attack","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":75000,"kind":"Malware","title":"Ransomware Lateral Spread","severity":"critical","host":"SRV-BACKUP-01"}]},{"id":"aitm-phishing-wave","name":"AiTM phishing wave","category":"archetype","year":null,"incidentTypes":["Identity / session-token theft (AiTM)","Phishing / business email compromise"],"steps":[{"order":0,"delayMs":0,"kind":"Email","title":"AiTM Phishing Session Detected","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":60000,"kind":"Credential","title":"Session Token Replay","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":130000,"kind":"Email","title":"Malicious Inbox Rule Created","severity":"high","host":"instructor-set target host"}]},{"id":"insider-exfiltration","name":"Insider exfiltration","category":"archetype","year":null,"incidentTypes":["Insider threat","Data exfiltration"],"steps":[{"order":0,"delayMs":0,"kind":"Insider","title":"Bulk Data Staging Detected","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":90000,"kind":"Data Breach","title":"Large Outbound Transfer","severity":"critical","host":"instructor-set target host"}]},{"id":"brute-force-campaign","name":"Brute force campaign","category":"archetype","year":null,"incidentTypes":["Credential / brute-force attack"],"steps":[{"order":0,"delayMs":0,"kind":"Credential","title":"Password Spraying","severity":"medium","host":"instructor-set target host"},{"order":1,"delayMs":80000,"kind":"Credential","title":"Successful Login After Spray","severity":"instructor-set (default high)","host":"instructor-set target host"}]},{"id":"cloud-iam-abuse","name":"Cloud IAM abuse","category":"archetype","year":null,"incidentTypes":["Cloud misconfiguration","Supply-chain / CI-CD compromise"],"steps":[{"order":0,"delayMs":0,"kind":"Cloud","title":"CI/CD Pipeline Token Abuse","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":70000,"kind":"Cloud","title":"GuardDuty Crypto Mining Finding","severity":"high","host":"instructor-set target host"}]},{"id":"deepfake-vishing","name":"Deepfake vishing","category":"archetype","year":null,"incidentTypes":["Deepfake / AI-enabled social engineering","Phishing / business email compromise"],"steps":[{"order":0,"delayMs":0,"kind":"Email","title":"Deepfake Vishing Reported","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":60000,"kind":"Email","title":"AI-Generated Phishing Detected","severity":"high","host":"instructor-set target host"}]},{"id":"supply-chain-ci-cd-compromise","name":"Supply-chain / CI-CD compromise","category":"archetype","year":null,"incidentTypes":["Supply-chain / CI-CD compromise"],"steps":[{"order":0,"delayMs":0,"kind":"Cloud","title":"Malicious Image Pushed to Registry","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":65000,"kind":"Execution","title":"Untrusted Image Deployed to Production","severity":"critical","host":"instructor-set target host"}]},{"id":"kubernetes-container-escape","name":"Kubernetes container escape","category":"archetype","year":null,"incidentTypes":["Cloud misconfiguration"],"steps":[{"order":0,"delayMs":0,"kind":"Execution","title":"Terminal Shell in Container","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":55000,"kind":"Credential","title":"Service Account Token Read","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":120000,"kind":"Cloud","title":"Pod Beaconing to Mining Pool","severity":"critical","host":"instructor-set target host"}]},{"id":"cloud-data-exposure-s3","name":"Cloud data exposure (S3)","category":"archetype","year":null,"incidentTypes":["Cloud misconfiguration","Data exfiltration"],"steps":[{"order":0,"delayMs":0,"kind":"Cloud","title":"S3 Bucket Made Public","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":60000,"kind":"Data Breach","title":"Anonymous Bucket Access Spike","severity":"high","host":"instructor-set target host"}]},{"id":"lateral-movement-lotl","name":"Lateral movement (LOTL)","category":"archetype","year":null,"incidentTypes":["APT / nation-state intrusion","Malware outbreak with lateral movement"],"steps":[{"order":0,"delayMs":0,"kind":"Execution","title":"Suspicious PsExec Execution","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":50000,"kind":"Persistence","title":"Remote WMI Process Creation","severity":"high","host":"WKS-FIN-07"},{"order":2,"delayMs":110000,"kind":"Privilege","title":"RDP Lateral Movement to DC","severity":"critical","host":"DC-PRIMARY"}]},{"id":"ddos-volumetric-attack","name":"DDoS / volumetric attack","category":"archetype","year":null,"incidentTypes":["DDoS / availability attack"],"steps":[{"order":0,"delayMs":0,"kind":"Network","title":"Volumetric Traffic Surge","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":20000,"kind":"Network","title":"Edge Bandwidth Saturation","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":40000,"kind":"Network","title":"Service Degradation Detected","severity":"critical","host":"instructor-set target host"}]},{"id":"mfa-fatigue-push-bombing","name":"MFA fatigue / push bombing","category":"archetype","year":null,"incidentTypes":["Credential / brute-force attack","Identity / session-token theft (AiTM)"],"steps":[{"order":0,"delayMs":0,"kind":"Credential","title":"MFA Push Bombing Detected","severity":"instructor-set (default high)","host":"instructor-set target host"},{"order":1,"delayMs":70000,"kind":"Credential","title":"Sign-In After MFA Approval","severity":"high","host":"instructor-set target host"}]},{"id":"benign-noise-burst-anti-fatigue","name":"Benign noise burst (anti-fatigue)","category":"archetype","year":null,"incidentTypes":["Instructor's choice / mixed signals"],"steps":[{"order":0,"delayMs":0,"kind":"Network","title":"Scheduled Vulnerability Scan","severity":"low","host":"instructor-set target host"},{"order":1,"delayMs":8000,"kind":"Authentication","title":"Expired Certificate Warning","severity":"low","host":"SRV-WEB-02"},{"order":2,"delayMs":16000,"kind":"Network","title":"Backup Job Network Spike","severity":"medium","host":"BAK-OPS-01"}]},{"id":"wannacry","name":"WannaCry","category":"historical","year":"2017","incidentTypes":["Ransomware","Malware outbreak with lateral movement"],"steps":[{"order":0,"delayMs":0,"kind":"Network","title":"SMBv1 EternalBlue Exploit (CVE-2017-0144)","severity":"critical","host":"instructor-set target host"},{"order":1,"delayMs":25000,"kind":"Malware","title":"Ransomware Encryption + Worm Propagation (port 445)","severity":"critical","host":"WKS-FIN-07"},{"order":2,"delayMs":55000,"kind":"Network","title":"Outbound to kill-switch domain (iuqerfsodp9...com)","severity":"medium","host":"instructor-set target host"}]},{"id":"notpetya","name":"NotPetya","category":"historical","year":"2017","incidentTypes":["Supply-chain / CI-CD compromise","Malware outbreak with lateral movement"],"steps":[{"order":0,"delayMs":0,"kind":"Cloud","title":"Trojanized Software Update (M.E.Doc supply chain)","severity":"critical","host":"instructor-set target host"},{"order":1,"delayMs":30000,"kind":"Credential","title":"Mimikatz Credential Harvesting","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":65000,"kind":"Network","title":"Spread via SMB + WMI (hits patched hosts too)","severity":"critical","host":"DC-PRIMARY"},{"order":3,"delayMs":100000,"kind":"Malware","title":"Disk Wiped — Unrecoverable (fake ransom note)","severity":"critical","host":"instructor-set target host"}]},{"id":"colonial-pipeline","name":"Colonial Pipeline","category":"historical","year":"2021","incidentTypes":["Ransomware","Credential / brute-force attack","Data exfiltration"],"steps":[{"order":0,"delayMs":0,"kind":"Credential","title":"VPN Login — Inactive Account, No MFA","severity":"high","host":"instructor-set target host"},{"order":1,"delayMs":35000,"kind":"Execution","title":"Lateral Movement + Reconnaissance","severity":"high","host":"SRV-DB-01"},{"order":2,"delayMs":70000,"kind":"Data Breach","title":"~100GB Exfiltrated in ~2 hours","severity":"critical","host":"instructor-set target host"},{"order":3,"delayMs":105000,"kind":"Malware","title":"DarkSide Ransomware Deployed (AES-256 + RSA)","severity":"critical","host":"instructor-set target host"}]},{"id":"target","name":"Target","category":"historical","year":"2013","incidentTypes":["Supply-chain / CI-CD compromise","Data exfiltration","Phishing / business email compromise"],"steps":[{"order":0,"delayMs":0,"kind":"Email","title":"Phishing of HVAC Vendor (Citadel trojan)","severity":"high","host":"instructor-set target host"},{"order":1,"delayMs":30000,"kind":"Credential","title":"Stolen Vendor Portal Credentials Used","severity":"high","host":"SRV-WEB-02"},{"order":2,"delayMs":60000,"kind":"Execution","title":"Lateral Move to POS (weak segmentation)","severity":"high","host":"instructor-set target host"},{"order":3,"delayMs":95000,"kind":"Data Breach","title":"BlackPOS RAM-Scraper + FTP Exfil (40M cards)","severity":"critical","host":"instructor-set target host"}]},{"id":"solarwinds-sunburst","name":"SolarWinds (SUNBURST)","category":"historical","year":"2020","incidentTypes":["Supply-chain / CI-CD compromise","APT / nation-state intrusion"],"steps":[{"order":0,"delayMs":0,"kind":"Cloud","title":"Build System Compromised (SUNSPOT injector)","severity":"critical","host":"instructor-set target host"},{"order":1,"delayMs":35000,"kind":"Malware","title":"Signed Trojanized Orion DLL Shipped","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":75000,"kind":"Network","title":"Dormant 12-14 days, then C2 via avsvmcloud[.]com","severity":"high","host":"instructor-set target host"},{"order":3,"delayMs":110000,"kind":"Persistence","title":"Hands-on-Keyboard: Lateral Move + Data Theft","severity":"critical","host":"DC-PRIMARY"}]},{"id":"equifax","name":"Equifax","category":"historical","year":"2017","incidentTypes":["Zero-day exploitation","Data exfiltration"],"steps":[{"order":0,"delayMs":0,"kind":"Execution","title":"Apache Struts RCE (CVE-2017-5638) on Web Portal","severity":"critical","host":"SRV-WEB-02"},{"order":1,"delayMs":30000,"kind":"Credential","title":"Plaintext Credentials Found on Host","severity":"high","host":"instructor-set target host"},{"order":2,"delayMs":65000,"kind":"Execution","title":"Lateral Movement Across Databases","severity":"high","host":"SRV-DB-01"},{"order":3,"delayMs":100000,"kind":"Data Breach","title":"Exfiltration of 147M Records (78 days, monitoring blind)","severity":"critical","host":"instructor-set target host"}]},{"id":"stuxnet","name":"Stuxnet","category":"historical","year":"2010","incidentTypes":["APT / nation-state intrusion","Zero-day exploitation","Malware outbreak with lateral movement"],"steps":[{"order":0,"delayMs":0,"kind":"Execution","title":"USB Autorun via LNK Zero-Day (CVE-2010-2568)","severity":"high","host":"instructor-set target host"},{"order":1,"delayMs":30000,"kind":"Persistence","title":"Signed with Stolen Certs; Spreads via Shares","severity":"high","host":"WKS-DEV-05"},{"order":2,"delayMs":65000,"kind":"Execution","title":"Siemens Step7 / S7 PLC Code Injection (OB35)","severity":"critical","host":"DC-PRIMARY"},{"order":3,"delayMs":100000,"kind":"Malware","title":"Centrifuges Sabotaged; Operators See Normal Readings","severity":"critical","host":"instructor-set target host"}]}]}</script>
+<script>
+(function(){
+  "use strict";
+  var C=JSON.parse(document.getElementById("catalog").textContent);
+  var SCENARIOS=C.scenarios;
+  /* ===== CONFIG: edit if the screens live elsewhere ===== */
+  var BASE="";  // same folder as this launcher on GitHub Pages
+  var SCREENS=[
+    {n:1,name:"SIEM Dashboard",file:"soc-screen1-siem-dashboard-fixed.html"},
+    {n:2,name:"Network Monitor",file:"soc-screen2-network-monitor-enhanced.html"},
+    {n:3,name:"Incident Response",file:"soc-screen3-incident-response-fixed.html"},
+    {n:4,name:"Threat Intel & Endpoints",file:"soc-screen4-threat-intel-fixed.html"}
+  ];
+  var HOSTS=["FS-HR-03","SRV-DB-01","WKS-FIN-07","DC-PRIMARY","SRV-WEB-02","WKS-EXEC-01","SRV-MAIL-01","WKS-DEV-05"];
+  var COUNTRIES=[["RU","Russia"],["CN","China"],["KP","North Korea"],["IR","Iran"],["BR","Brazil"],["NL","Netherlands (Tor exit)"],["US-E","United States (East)"]];
+  var SEVS=["critical","high","medium"];
+  var IPPFX=["185.220.101","198.51.100","203.0.113","91.219.237","45.146.164","193.169.255","5.188.206","212.71.251"];
+
+  function $(id){return document.getElementById(id);}
+  function el(t,c,tx){var e=document.createElement(t);if(c)e.className=c;if(tx!=null)e.textContent=tx;return e;}
+  function opt(v,t){var o=document.createElement("option");o.value=v;o.textContent=t||v;return o;}
+
+  /* ===== determinism (matches the screens' seed hash + mulberry32) ===== */
+  function hseed(s){var h=0;for(var i=0;i<s.length;i++){h=(Math.imul(h,31)+s.charCodeAt(i))>>>0;}return h>>>0;}
+  function mul(a){return function(){a=(a+0x6D2B79F5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+  function incidentIdFor(seed,id){var h=hseed(seed+"|inc|"+id);return "INC-"+(100000+(h%900000));}
+  function sourceIpFor(seed,id){var r=mul(hseed(seed+"|ip|"+id));var p=IPPFX[Math.floor(r()*IPPFX.length)];return p+"."+(1+Math.floor(r()*253));}
+  function usesParam(v){return typeof v==="string" && v.indexOf("instructor-set")===0;}
+  function buildEvent(scn,step,p,gen){
+    var inc=incidentIdFor(p.seed,scn.id);
+    return {type:"scenario-event",origin:"console",kind:step.kind,title:step.title,
+      severity:usesParam(step.severity)?p.severity:step.severity,
+      host:usesParam(step.host)?p.host:step.host,
+      sourceIp:sourceIpFor(p.seed,scn.id),country:p.country,incidentId:inc,
+      id:inc+".g"+gen+".s"+step.order,ts:Date.now()};
+  }
+
+  /* ===== bus ===== */
+  var bc=null; try{bc=new BroadcastChannel("soc-sim");}catch(e){}
+  function busSend(evt){ if(bc){ try{bc.postMessage(evt);}catch(e){} } }
+
+  /* ===== state ===== */
+  var timers=[], stepIdx=0, gen=1;
+  function scnById(id){for(var i=0;i<SCENARIOS.length;i++)if(SCENARIOS[i].id===id)return SCENARIOS[i];return SCENARIOS[0];}
+  function currentScenario(){return scnById($("scenario").value);}
+  function seedVal(){var v=$("seed").value.trim();return v||"lab-001";}
+  function timing(){var r=document.querySelector('input[name=tmode]:checked');return r?r.value:"real";}
+  function params(){return {seed:seedVal(),host:$("host").value,country:$("country").value,severity:$("severity").value};}
+
+  /* ===== populate ===== */
+  (function(){
+    var sel=$("scenario");
+    var groups={archetype:document.createElement("optgroup"),historical:document.createElement("optgroup")};
+    groups.archetype.label="Archetype scenarios"; groups.historical.label="Historical incidents";
+    SCENARIOS.forEach(function(s){var o=opt(s.id, s.name+(s.year?" ("+s.year+")":"")); (groups[s.category]||groups.archetype).appendChild(o);});
+    sel.appendChild(groups.archetype); sel.appendChild(groups.historical);
+    HOSTS.forEach(function(h){$("host").appendChild(opt(h));});
+    COUNTRIES.forEach(function(c){$("country").appendChild(opt(c[0],c[1]));});
+    SEVS.forEach(function(s){$("severity").appendChild(opt(s, s==="high"?"high (default)":s));});
+    $("severity").value="high";
+  })();
+
+  /* ===== preview + links + share ===== */
+  function renderPreview(){
+    var s=currentScenario(), box=$("scnPreview"); box.innerHTML="";
+    var ch=el("div","chips"); s.incidentTypes.forEach(function(t){ch.appendChild(el("span","chip",t));}); ch.appendChild(el("span","chip k",s.category+(s.year?" · "+s.year:"")));
+    box.appendChild(ch);
+    var ol=el("ul","steps");
+    s.steps.forEach(function(st){var li=el("li","step");li.appendChild(el("span","n",String(st.order+1)));var d=el("div");d.appendChild(el("span","t",st.title));d.appendChild(el("span","m"," · "+st.kind+" · "+(usesParam(st.severity)?"[severity]":st.severity)+" · "+(usesParam(st.host)?"[host]":st.host)+(st.delayMs?" · +"+Math.round(st.delayMs/1000)+"s":" · t0")));li.appendChild(d);ol.appendChild(li);});
+    box.appendChild(ol);
+    var total=Math.max.apply(null,s.steps.map(function(x){return x.delayMs;}));
+    $("durHint").textContent="(~"+Math.round(total/1000)+"s)";
+  }
+  function screenUrl(sc){return BASE+sc.file+"?seed="+encodeURIComponent(seedVal());}
+  function renderLinks(){
+    var box=$("screenLinks"); box.innerHTML="";
+    SCREENS.forEach(function(sc){var row=el("div","slink");row.appendChild(el("span",null,"Screen "+sc.n+" · "+sc.name));var a=el("a",null,screenUrl(sc));a.href=screenUrl(sc);a.target="soc_screen_"+sc.n;a.rel="noopener";row.appendChild(a);box.appendChild(row);});
+    renderShare();
+  }
+  function launcherUrl(){
+    var p=params();var q="?scenario="+encodeURIComponent(currentScenario().id)+"&seed="+encodeURIComponent(p.seed)+"&host="+encodeURIComponent(p.host)+"&country="+encodeURIComponent(p.country)+"&severity="+encodeURIComponent(p.severity);
+    return location.origin+location.pathname+q;
+  }
+  function renderShare(){
+    var lines=["# Instructor launcher (re-creates this setup):",launcherUrl(),"","# Student screen links (open all four):"];
+    SCREENS.forEach(function(sc){lines.push(screenUrl(sc));});
+    $("share").value=lines.join("\n");
+  }
+
+  /* ===== log + meta ===== */
+  function log(evt,note){
+    var line=el("div","logline");
+    var t=new Date().toLocaleTimeString();
+    line.appendChild(el("span","ts",t+"  "));
+    if(evt){line.appendChild(el("span","cr","["+evt.incidentId+"] "));line.appendChild(document.createTextNode(evt.title+"  ("+evt.kind+" / "+evt.severity+" / "+evt.host+" / "+evt.sourceIp+")"));}
+    else{line.appendChild(document.createTextNode(note));}
+    $("log").insertBefore(line,$("log").firstChild);
+  }
+  function showMeta(p,s){
+    var inc=incidentIdFor(p.seed,s.id), ip=sourceIpFor(p.seed,s.id), box=$("meta"); box.innerHTML="";
+    [["Incident ID",inc],["Source IP",ip],["Seed",p.seed]].forEach(function(m){var d=el("div","metabox");d.appendChild(el("b",null,m[1]));d.appendChild(el("span",null,m[0]));box.appendChild(d);});
+  }
+  function flash(msg){var l=$("live");l.textContent=msg;l.classList.add("show");setTimeout(function(){l.classList.remove("show");},2600);}
+
+  /* ===== actions ===== */
+  function newGen(){gen=Date.now();}
+  function fireStep(scn,step,p){var evt=buildEvent(scn,step,p,gen);busSend(evt);log(evt);}
+  function launch(){
+    var scn=currentScenario(), p=params(), mode=timing(); newGen(); stepIdx=0; showMeta(p,scn);
+    if(mode==="step"){ log(null,"Step mode — use the Step button to inject one event at a time."); return; }
+    abortPending(true);
+    if(mode==="all"){ scn.steps.forEach(function(st){fireStep(scn,st,p);}); flash("Injected "+scn.steps.length+" events — "+scn.name); }
+    else { scn.steps.forEach(function(st){ var id=setTimeout(function(){fireStep(scn,st,p);timers=timers.filter(function(x){return x!==id;});},st.delayMs); timers.push(id); }); log(null,"Launched “"+scn.name+"” with real delays — "+scn.steps.length+" steps unfolding."); flash("Launched "+scn.name); }
+  }
+  function refire(){ var scn=currentScenario(), p=params(); showMeta(p,scn); scn.steps.forEach(function(st){fireStep(scn,st,p);}); log(null,"Re-fired all steps (same generation) for late-joining screens."); flash("Re-fired for late joiners"); }
+  function stepOnce(){ var scn=currentScenario(), p=params(); if(stepIdx===0){newGen();showMeta(p,scn);} if(stepIdx>=scn.steps.length){log(null,"Scenario complete — next Step restarts it.");stepIdx=0;newGen();return;} fireStep(scn,scn.steps[stepIdx],p); stepIdx++; }
+  function abortPending(silent){ if(timers.length){timers.forEach(clearTimeout);var n=timers.length;timers=[];if(!silent)log(null,"Aborted "+n+" pending step(s).");} else if(!silent){log(null,"Nothing pending.");} }
+  function resetScreens(){ abortPending(true); stepIdx=0; newGen(); busSend({type:"control-event",cmd:"clear",id:"ctl-c-"+Date.now()}); busSend({type:"control-event",cmd:"resume",id:"ctl-r-"+Date.now()}); log(null,"Reset — cleared injected events on all screens (ambient continues)."); flash("Screens reset to ambient"); }
+  function openAll(){ SCREENS.forEach(function(sc){window.open(screenUrl(sc),"soc_screen_"+sc.n,"noopener");}); flash("Opening four screens (allow pop-ups if blocked)"); }
+
+  /* ===== wire ===== */
+  $("scenario").addEventListener("change",function(){renderPreview();renderShare();});
+  ["seed","host","country","severity"].forEach(function(id){$(id).addEventListener("input",function(){renderLinks();});$(id).addEventListener("change",function(){renderLinks();});});
+  $("seedRnd").addEventListener("click",function(){$("seed").value="lab-"+Math.random().toString(36).slice(2,7);renderLinks();});
+  $("openAll").addEventListener("click",openAll);
+  $("launch").addEventListener("click",launch);
+  $("refire").addEventListener("click",refire);
+  $("stepBtn").addEventListener("click",stepOnce);
+  $("abort").addEventListener("click",function(){abortPending(false);});
+  $("reset").addEventListener("click",resetScreens);
+  $("copyShare").addEventListener("click",function(){var ta=$("share");ta.select();try{navigator.clipboard.writeText(ta.value);}catch(e){document.execCommand&&document.execCommand("copy");}$("copyMsg").textContent="Copied.";setTimeout(function(){$("copyMsg").textContent="";},1800);});
+
+  /* ===== URL param prefill ===== */
+  (function(){
+    try{var q=new URLSearchParams(location.search);
+      var sc=q.get("scenario"); if(sc&&scnById(sc).id===sc)$("scenario").value=sc;
+      var sd=q.get("seed"); if(sd)$("seed").value=sd;
+      var h=q.get("host"); if(h&&HOSTS.indexOf(h)>=0)$("host").value=h;
+      var c=q.get("country"); if(c)$("country").value=c;
+      var sv=q.get("severity"); if(sv&&SEVS.indexOf(sv)>=0)$("severity").value=sv;
+    }catch(e){}
+  })();
+
+  renderPreview(); renderLinks();
+  $("foot").textContent="SOC Lab Launcher · catalog v"+C.version+" · "+SCENARIOS.length+" scenarios · bus: soc-sim (BroadcastChannel) · publishes observable events only · v1.0 · 2026-07-02";
+
+  /* theme */
+  var KEY="soc-lab-theme",tb=$("themeToggle"),g=$("themeGlyph"),tl=$("themeLabel");
+  function effTheme(){var f=document.documentElement.getAttribute("data-theme");if(f)return f;return(window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches)?"dark":"light";}
+  function paint(){var t=effTheme();if(t==="dark"){g.textContent="☀";tl.textContent="Light";tb.setAttribute("aria-pressed","true");}else{g.textContent="☾";tl.textContent="Dark";tb.setAttribute("aria-pressed","false");}}
+  try{var s=localStorage.getItem(KEY);if(s)document.documentElement.setAttribute("data-theme",s);}catch(e){}
+  paint();
+  tb.addEventListener("click",function(){var n=effTheme()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(KEY,n);}catch(e){}paint();});
+
+  /* expose for testing */
+  window.__lab={buildEvent:buildEvent,incidentIdFor:incidentIdFor,sourceIpFor:sourceIpFor,scnById:scnById,params:params,SCENARIOS:SCENARIOS};
+})();
+</script>
+</body></html>
